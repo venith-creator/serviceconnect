@@ -1,0 +1,19 @@
+// routes/chatRoutes.js
+import express from "express";
+import {
+  createOrGetRoom,
+  getRoomsForUser,
+  getMessagesForRoom,
+  sendMessage,
+} from "../controllers/chatController.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
+
+const router = express.Router();
+
+router.post("/room", protect, createOrGetRoom); // create/get room (body: participants[], jobId)
+router.get("/rooms", protect, getRoomsForUser);
+router.get("/room/:roomId/messages", protect, getMessagesForRoom);
+router.post("/room/:roomId/message", protect, sendMessage);
+
+export default router;
