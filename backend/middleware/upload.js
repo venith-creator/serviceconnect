@@ -20,13 +20,30 @@ export const getUploader = (folderName = '') => {
     }
     })
 
-return multer({ storage, fileFilter: (req, file, cb) => {
-    const allowed = folderName === "avatars" ? ['.jpg', '.jpeg', '.png'] : ['.pdf', '.doc', '.docx'];
+    const fileFilter = (req, file, cb) => {
+    let allowed;
+    switch (folderName) {
+      case "avatars":
+        allowed = [".jpg", ".jpeg", ".png"];
+        break;
+      case "portfolio":
+        allowed = [".jpg", ".jpeg", ".png"];
+        break;
+      case "docs":
+        allowed = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png"];
+        break;
+      default:
+        allowed = [];
+    }
+
     const ext = path.extname(file.originalname).toLowerCase();
     if (!allowed.includes(ext)) {
-      return cb(new Error("Only PDF/DOC/DOCX files are allowed"), false);
+      return cb(new Error(`Invalid file type: ${ext}`), false);
     }
     cb(null, true);
-  },
+  };
+
+
+return multer({ storage, fileFilter ,
   limits: { fileSize: 5 * 1024 * 1024 } })
 }

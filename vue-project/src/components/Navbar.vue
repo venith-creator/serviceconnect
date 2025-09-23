@@ -9,9 +9,9 @@
         <!-- Logo -->
         <div class="flex items-center space-x-2">
           <img
-            src="/medical background.png"
+            src="/Service_connect_logo.png"
             alt="Service Connect Logo"
-            class="w-8 h-8"
+            class="w-6 h-6"
           />
           <router-link to="/" class="font-semibold text-xl text-black">
             Service Connect

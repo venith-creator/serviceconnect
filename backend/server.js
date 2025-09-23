@@ -19,6 +19,7 @@ import portfolioRoutes from "./routes/portfolioRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -50,6 +51,10 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/announcement", announcementRoutes);
 app.use("/api/ai", aiRoutes)
+app.use("/api/upload", uploadRoutes);
+
+// Static folder for uploads
+app.use("/uploads", express.static("uploads"));
 
 const PORT = process.env.PORT || 5000;
 detect(DEFAULT_PORT).then(port => {

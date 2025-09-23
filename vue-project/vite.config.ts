@@ -13,10 +13,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  server: {
-    port: 5173,
-    allowedHosts: [ "serviceconnect.uk", "www.serviceconnect.uk"]
-  },
+
   preview: {
     port: 4173,
     host: true,  // Allow external connections

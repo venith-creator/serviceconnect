@@ -7,9 +7,9 @@
           <!-- Logo + Name -->
           <div class="flex items-center space-x-3">
             <img
-              src="/medical background.png"
+              src="/Service_connect_logo.png"
               alt="Service Connect Logo"
-              class="w-10 h-10"
+              class="w-7 h-7"
             />
             <span class="font-semibold text-xl text-gray-900">Service Connect</span>
           </div>
