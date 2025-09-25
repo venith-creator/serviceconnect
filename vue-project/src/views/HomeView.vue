@@ -7,18 +7,18 @@
     >
       <div class="absolute inset-0 bg-black bg-opacity-50"></div>
       <div class="relative z-10 max-w-2xl mx-auto space-y-6 px-4">
-        <h1 class="text-3xl md:text-5xl font-bold text-white">
+        <h1 class="text-3xl md:text-2xl font-bold text-white">
           Find the right service provider for your needs
         </h1>
-        <p class="text-white text-sm md:text-lg">
+        <p class="text-white text-sm md:text-sm">
           Connect with skilled professionals for any task, from home repairs to personal assistance
         </p>
         <!-- Search Box -->
-        <div class="bg-white/90 rounded-lg shadow-md flex items-center p-2 mt-6">
+        <div class="border border-gray-200 rounded-lg shadow-md flex items-center p-7 mt-6 bg-transparent">
           <input
             type="text"
             placeholder="Enter your location"
-            class="flex-1 px-4 py-2 rounded-l-lg border border-gray-200 focus:outline-none text-black"
+            class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:outline-none text-black"
           />
           <button class="bg-primary text-white px-4 py-2 flex items-center gap-2 rounded-lg ml-2">
             <MagnifyingGlassIcon class="w-5 h-5" />
@@ -84,7 +84,7 @@
               <span class="float-right"><ClockIcon class="w-4 h-4 inline" /> {{ job.time }}</span>
             </p>
           </div>
-          <button class="bg-primary text-white px-4 py-2 rounded-lg w-fit">Send Quote</button>
+          <button class="bg-primary text-white px-4 py-2 rounded-lg mx-auto block w-full">Send Quote</button>
         </div>
       </div>
 
@@ -98,58 +98,94 @@
       </div>
 
       <!-- Promo Banners -->
-      <div class="grid md:grid-cols-2 gap-6 mt-12 max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-10 mt-10 max-w-6xl mx-auto">
         <div
-          class="relative h-72 rounded-lg overflow-hidden bg-primary bg-opacity-70 flex items-end p-6 text-left text-white"
+          class="relative h-96 rounded-lg overflow-hidden bg-cover bg-center flex items-end p-8 text-left text-white"
+          style="background-image: url('/content1.png');"
         >
-          <div>
+          <div class="absolute inset-0 bg-primary/60"></div>
+          <div class="relative z-10 w-full">
             <h3 class="font-bold text-xl">Find Trusted Service Providers</h3>
-            <p class="text-sm">
+            <p class="text-sm mt-2">
               Get quality work done by professionals in your area.<br />
               From repairs to personal services we connect you with the right people for the job.
             </p>
-            <button class="mt-4 bg-primary text-white px-4 py-2 rounded-lg">Post Job</button>
+            <button class="mt-6 bg-primary text-white px-6 py-3 rounded-lg w-full">
+              Post Job
+            </button>
           </div>
         </div>
 
         <div
-          class="relative h-72 rounded-lg overflow-hidden bg-yellow-500 bg-opacity-70 flex items-end p-6 text-left text-white"
+          class="relative h-96 rounded-lg overflow-hidden bg-cover bg-center flex items-end p-8 text-left text-white"
+          style="background-image: url('/content2.png');"
         >
-          <div>
+          <div class="absolute inset-0 bg-yellow-500/60"></div>
+          <div class="relative z-10 w-full">
             <p class="text-sm">Are you a professional?</p>
             <h3 class="font-bold text-xl">Get Customers</h3>
-            <p class="text-sm">
-              Join thousands of service providers earning more through our platform. Grow your
-              business with confidence.
+            <p class="text-sm mt-2">
+              Join thousands of service providers earning more through our platform.
             </p>
-            <button class="mt-4 bg-yellow-400 text-black px-4 py-2 rounded-lg">
+            <button class="mt-6 bg-yellow-400 text-black px-6 py-3 rounded-lg w-full">
               Join Service Providers
             </button>
           </div>
         </div>
       </div>
+
     </section>
 
-    <!-- Testimonials -->
+   <!-- Testimonials -->
     <section class="py-16 px-6 bg-white text-center">
       <h2 class="text-2xl font-bold text-black">What Our Users Say</h2>
       <p class="text-gray-600">Real experiences from homeowners and professionals</p>
 
-      <!-- Carousel Placeholder -->
-      <div class="max-w-2xl mx-auto mt-8">
-        <div class="bg-primary/10 rounded-lg p-6 flex items-center gap-4">
-          <img src="/user.jpg" class="w-16 h-16 rounded-full object-cover" />
-          <div class="text-left">
-            <div class="flex text-yellow-400">
-              <StarIcon v-for="n in 5" :key="n" class="w-5 h-5" />
+      <div class="max-w-2xl mx-auto mt-8 relative">
+        <!-- Active Slide with Transition -->
+        <transition name="fade" mode="out-in">
+          <div
+            v-if="testimonials[activeTestimonial]"
+            :key="activeTestimonial"
+            class="bg-primary/10 rounded-lg p-6 flex items-center gap-4"
+          >
+            <img :src="testimonials[activeTestimonial].img" class="w-16 h-16 rounded-full object-cover" />
+            <div class="text-left">
+              <div class="flex text-yellow-400">
+                <StarIcon v-for="n in 5" :key="n" class="w-5 h-5" />
+              </div>
+              <p class="text-gray-600 text-sm mt-2">“ {{ testimonials[activeTestimonial].text }} ”</p>
+              <p class="font-bold text-black mt-2">{{ testimonials[activeTestimonial].name }}</p>
+              <p class="text-xs text-gray-500">{{ testimonials[activeTestimonial].location }}</p>
             </div>
-            <p class="text-gray-600 text-sm mt-2">
-              “I found a reliable service provider quickly. Smooth experience from posting my job to
-              completion.”
-            </p>
-            <p class="font-bold text-black mt-2">John Harkinson</p>
-            <p class="text-xs text-gray-500">London, Communications</p>
           </div>
+        </transition>
+
+        <!-- Navigation Arrows -->
+        <button
+          @click="prevTestimonial"
+          class="absolute top-1/2 -left-8 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-300"
+        >
+          ‹
+        </button>
+        <button
+          @click="nextTestimonial"
+          class="absolute top-1/2 -right-8 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-300"
+        >
+          ›
+        </button>
+
+        <!-- Dots -->
+        <div class="flex justify-center mt-4 space-x-2">
+          <span
+            v-for="(t, index) in testimonials"
+            :key="index"
+            @click="activeTestimonial = index"
+            :class="[
+              'w-3 h-3 rounded-full cursor-pointer',
+              activeTestimonial === index ? 'bg-primary' : 'bg-gray-300'
+            ]"
+          ></span>
         </div>
       </div>
     </section>
@@ -158,42 +194,57 @@
     <section class="py-16 px-6 bg-white text-center">
       <h2 class="text-2xl font-bold text-black">Frequently Asked Questions</h2>
 
-      <div class="max-w-3xl mx-auto mt-8 space-y-4">
+       <div class="max-w-3xl mx-auto mt-8 space-y-4">
         <div
-          v-for="faq in faqs"
+          v-for="(faq, index) in faqs"
           :key="faq.q"
-          class="border rounded-lg p-4 flex justify-between items-center"
+          class="border rounded-lg p-4 text-left"
         >
-          <p class="font-medium">{{ faq.q }}</p>
-          <ChevronDownIcon class="w-5 h-5 text-gray-500" />
+          <div
+            class="flex justify-between items-center cursor-pointer"
+            @click="toggleFAQ(index)"
+          >
+            <p class="font-medium">{{ faq.q }}</p>
+            <ChevronDownIcon
+              class="w-5 h-5 text-gray-500 transition-transform"
+              :class="{ 'rotate-180': activeFAQ === index }"
+            />
+          </div>
+          <p
+            v-show="activeFAQ === index"
+            class="mt-2 text-gray-600 text-sm transition-all"
+          >
+            {{ faq.a }}
+          </p>
         </div>
       </div>
 
       <p class="mt-6 text-gray-700">Still have questions? Our support team is here to help.</p>
-      <button class="mt-4 bg-primary text-white px-6 py-2 rounded-lg">Contact Support</button>
+      <button class="mt-4 bg-primary text-white px-6 py-2 rounded-lg">Contact Support -></button>
     </section>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted  } from "vue";
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
   ClockIcon,
   ChevronRightIcon,
   ChevronDownIcon,
-  StarIcon,
+  StarIcon, WrenchScrewdriverIcon, BoltIcon, PaintBrushIcon, BuildingOfficeIcon, SunIcon, SparklesIcon, TruckIcon, CameraIcon
 } from "@heroicons/vue/24/solid";
 
 const categories = [
-  { name: "Plumber", icon: "WrenchScrewdriverIcon", color: "text-blue-500" },
-  { name: "Electrician", icon: "BoltIcon", color: "text-yellow-500" },
-  { name: "Painter", icon: "PaintBrushIcon", color: "text-green-500" },
-  { name: "Builder", icon: "BuildingOfficeIcon", color: "text-orange-500" },
-  { name: "Gardener", icon: "LeafIcon", color: "text-green-600" },
-  { name: "Cleaner", icon: "SparklesIcon", color: "text-purple-500" },
-  { name: "Driver", icon: "TruckIcon", color: "text-red-500" },
-  { name: "Photographer", icon: "CameraIcon", color: "text-pink-500" },
+  { name: "Plumber", icon: WrenchScrewdriverIcon, color: "text-blue-500" },
+  { name: "Electrician", icon: BoltIcon, color: "text-yellow-500" },
+  { name: "Painter", icon: PaintBrushIcon, color: "text-green-500" },
+  { name: "Builder", icon: BuildingOfficeIcon, color: "text-orange-500" },
+  { name: "Gardener", icon: SunIcon, color: "text-green-600" },
+  { name: "Cleaner", icon: SparklesIcon, color: "text-purple-500" },
+  { name: "Driver", icon: TruckIcon, color: "text-red-500" },
+  { name: "Photographer", icon: CameraIcon, color: "text-pink-500" },
 ];
 
 const steps = [
@@ -244,6 +295,27 @@ const jobs = [
   },
 ];
 
+const testimonials = [
+  {
+    img: "/user.jpg",
+    text: "I found a reliable service provider quickly. Smooth experience from posting my job to completion.",
+    name: "John Harkinson",
+    location: "London, Communications",
+  },
+  {
+    img: "/user1.jpg",
+    text: "Service provider content makes complete sense.",
+    name: "Hasel Mary",
+    location: "Helinsky, Technology",
+  },
+  {
+    img: "/user2.jpg",
+    text: "Amazing platform for finding professionals.",
+    name: "Rodri Veron",
+    location: "Spain, Telemarketing",
+  },
+];
+
 const faqs = [
   {
     q: "What is Service Connect?",
@@ -266,8 +338,28 @@ const faqs = [
     a: "Yes, they go through an onboarding process before verification.",
   },
 ];
+
+const activeFAQ = ref(null);
+
+const toggleFAQ = (index) => {
+  activeFAQ.value = activeFAQ.value === index ? null : index;
+};
+const activeTestimonial = ref(0);
+
+const nextTestimonial = () => {
+  activeTestimonial.value =
+    (activeTestimonial.value + 1) % testimonials.length;
+};
+const prevTestimonial = () => {
+  activeTestimonial.value =
+    (activeTestimonial.value - 1 + testimonials.length) % testimonials.length;
+};
+
+let interval;
+onMounted(() => {
+  interval = setInterval(nextTestimonial, 5000);
+});
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
-
-<style scoped>
-
-</style>

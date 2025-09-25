@@ -36,6 +36,15 @@
   }
 }
 
+/* Custom theme colors */
+.bg-primary {
+  @apply bg-purple-500; /* Your wisteria theme color */
+}
+
+.text-primary {
+  @apply text-purple-500;
+}
+
 @layer base {
   * {
     border-color: hsl(var(--border));
@@ -45,3 +54,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Fade transition for testimonials */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
