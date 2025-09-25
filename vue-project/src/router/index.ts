@@ -6,10 +6,12 @@ import ProviderDashboard from "@/views/ProviderDashboard.vue";
 import AdminDashboard from "@/views/AdminDashboard.vue";
 import AdminSignup from '@/views/AdminSignup.vue';
 import DashboardSwitch from '@/views/DashboardSwitch.vue';
+import HomeView from '@/views/HomeView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [{ path: "/login", component: Login, meta: { public: true } },
+    { path: "/", component: HomeView, meta: { public: true } },
   { path: "/signup", component: Signup, meta: { public: true } },
   { path: "/adminSignup", component: AdminSignup, meta: { public: true} },
   { path: "/dashboard/switch", component: DashboardSwitch },

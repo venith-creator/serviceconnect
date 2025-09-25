@@ -24,6 +24,7 @@ const providerProfileSchema = new mongoose.Schema({
 
   pastJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
   portfolio: [{ url: String, caption: String }], // photos/videos of past work
+  avatar: { type: String },
 
   ratingAvg: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },

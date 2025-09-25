@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import detect from "detect-port";
 import connectDB from "./config/db.js";
+import multer from "multer";
 import { initSocket } from "./utils/socket.js";
 import { setSocketServer } from "./controllers/chatController.js";
 
@@ -55,6 +56,16 @@ app.use("/api/upload", uploadRoutes);
 
 // Static folder for uploads
 app.use("/uploads", express.static("uploads"));
+
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ message: err.message });
+  } else if (err) {
+    return res.status(400).json({ message: err.message });
+  }
+  next();
+});
 
 const PORT = process.env.PORT || 5000;
 detect(DEFAULT_PORT).then(port => {

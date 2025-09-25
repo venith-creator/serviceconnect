@@ -11,9 +11,17 @@ export const createOrUpdateProfile = async (req, res) => {
       return res.status(403).json({ message: "Only providers can create/update profiles" });
     }
 
+    let parsedData = {};
+    if (req.body.data) {
+      try {
+        parsedData = JSON.parse(req.body.data);
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid JSON in data field" });
+      }
+    }
+
     const {
       services,
-      docs,
       serviceRadiusKm,
       description,
       city,
@@ -23,14 +31,22 @@ export const createOrUpdateProfile = async (req, res) => {
       languages,
       availability,
       paymentOptions,
-      portfolio,
       insurance,
       badges
-    } = req.body;
+    } = parsedData;
 
-    const update = {
+    // 🔹 Grab uploaded files
+    const docs = req.files?.docs?.map((f) => f.path) || [];
+    const portfolio = req.files?.portfolio?.map((f) => ({
+      url: f.path,
+      caption: "" // you can extend frontend to send caption later
+    })) || [];
+    const avatar = req.files?.avatar?.[0]?.path || null;
+
+    // Merge everything
+    const profileData = {
+      user: req.user._id,
       services,
-      docs,
       serviceRadiusKm,
       description,
       city,
@@ -40,9 +56,11 @@ export const createOrUpdateProfile = async (req, res) => {
       languages,
       availability,
       paymentOptions,
-      portfolio,
       insurance,
-      badges
+      badges,
+      docs,
+      portfolio,
+      avatar
     };
 
     let profile = await ProviderProfile.findOne({ user: req.user._id });
@@ -50,19 +68,20 @@ export const createOrUpdateProfile = async (req, res) => {
     if (profile) {
       profile = await ProviderProfile.findOneAndUpdate(
         { user: req.user._id },
-        { $set: update },
+        { $set: profileData },
         { new: true }
       );
       return res.json(profile);
     }
 
-    const newProfile = new ProviderProfile({ user: req.user._id, ...update });
+    const newProfile = new ProviderProfile(profileData);
     await newProfile.save();
     res.status(201).json(newProfile);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //  Get logged-in provider profile + reviews
 export const getMyProfile = async (req, res) => {

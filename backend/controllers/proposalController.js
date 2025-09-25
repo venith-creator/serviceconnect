@@ -2,7 +2,7 @@
 import Proposal from "../models/Proposal.js";
 import Job from "../models/Job.js";
 import ProviderProfile from "../models/ProviderProfile.js";
-import ChatRoom from "../models/ChatRoom.js";
+import ChatRoom from "../models/chatRoom.js";
 import e from "express";
 
 // CREATE proposal for a job

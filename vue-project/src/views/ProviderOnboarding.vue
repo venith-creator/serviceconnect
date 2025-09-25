@@ -535,26 +535,19 @@ function prevStep() {
 async function submitOnboarding() {
   submitting.value = true;
   try {
-
     const fd = new FormData();
 
     // Append docs
-    form.value.docs.forEach((d) => {
-      fd.append("docs", d.file);
-    });
-
-    // Append portfolio
+    form.value.docs.forEach((d) => fd.append("docs", d.file));
     form.value.portfolio.forEach((p, i) => {
       fd.append("portfolio", p.file);
       fd.append(`portfolioCaptions[${i}]`, p.caption);
     });
-
-    // Append avatar
     if (profile.value.photo?.file) {
       fd.append("avatar", profile.value.photo.file);
     }
 
-    // Append JSON fields
+    // JSON payload
     const payload = {
       services: selectedCategories.value.map((c) => ({ category: c })),
       description: profile.value.bio,
@@ -568,29 +561,43 @@ async function submitOnboarding() {
       availability: profile.value.availability,
       paymentOptions: profile.value.paymentOptions,
       insurance: profile.value.insurance || false,
-      badges: profile.value.badges || []
+      badges: profile.value.badges || [],
     };
     fd.append("data", JSON.stringify(payload));
+
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_BASE_URL}/provider-profiles`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
       body: fd,
     });
-    if (!res.ok) throw new Error("Onboarding failed");
-    if (!form.value.docs.length || !selectedCategories.value.length || !form.value.portfolio.length || !profile.value.bio || !profile.value.rate) {
-      onboardingStatus.value = "incomplete";
-    } else {
-      onboardingStatus.value ="success"
+
+    // ⬇️ Instead of a generic error, parse backend response
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      let msg = "Onboarding failed";
+      if (errData?.message) msg = errData.message;
+      if (errData?.errors) msg = errData.errors.join(", ");
+      throw new Error(msg);
     }
 
-    router.push("/dashboard/provider")
+    if (
+      !form.value.docs.length ||
+      !selectedCategories.value.length ||
+      !form.value.portfolio.length ||
+      !profile.value.bio ||
+      !profile.value.rate
+    ) {
+      onboardingStatus.value = "incomplete";
+    } else {
+      onboardingStatus.value = "success";
+    }
 
+    router.push("/dashboard/provider");
   } catch (err) {
     onboardingStatus.value = "incomplete";
-    alert(err.message);
+    alert(`Error: ${err.message}`);
+    console.error("Onboarding error:", err); // 🔎 logs for devs
   } finally {
     submitting.value = false;
   }
