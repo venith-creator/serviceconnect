@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section
       class="relative h-[80vh] flex items-center justify-center text-center bg-cover bg-center"
-      style="background-image: url('/service-hero.jpg');"
+      style="background-image: url('/service-her.jpg');"
     >
       <div class="absolute inset-0 bg-black bg-opacity-50"></div>
       <div class="relative z-10 max-w-2xl mx-auto space-y-6 px-4">
@@ -252,19 +252,19 @@ const steps = [
     number: "01",
     title: "Describe your task",
     desc: "Tell us what you need, add photos, set your timeline",
-    img: "/step1.jpg",
+    img: "/sep1.jpg",
   },
   {
     number: "02",
     title: "Get quotes from professionals",
     desc: "Receive competitive offers from background-checked professionals",
-    img: "/step2.jpg",
+    img: "/sep2.jpg",
   },
   {
     number: "03",
     title: "Hire and pay securely",
     desc: "Choose your provider, complete work, and release payment with escrow protection",
-    img: "/step3.jpg",
+    img: "/sep3.jpg",
   },
 ];
 
