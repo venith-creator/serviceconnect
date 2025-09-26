@@ -9,6 +9,8 @@ const jobSchema = new mongoose.Schema(
     budget: Number,
     timeline: String, // e.g. "2 weeks", "flexible"
     attachments: [{ url: String }],
+    clientEmail: { type: String },
+    clientPhone: { type: String },
     location: {
       type: { type: String, default: "Point" },
       coordinates: { type: [Number] }, // [lng, lat]

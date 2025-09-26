@@ -28,7 +28,7 @@
         <!-- Desktop Buttons -->
         <div class="hidden md:flex items-center space-x-4">
           <router-link
-            to="/signup?role=client"
+            to="/post-job"
             class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
           >
             Post Job

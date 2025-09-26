@@ -112,7 +112,7 @@
         <div>
           <h3 class="font-semibold text-gray-900 mb-4">For Homeowners</h3>
           <ul class="space-y-3 text-gray-700">
-            <li><router-link to="/signup?role=client" class="hover:text-primary">Post a Job</router-link></li>
+            <li><router-link to="/post-job" class="hover:text-primary">Post a Job</router-link></li>
             <li><router-link to="/categories" class="hover:text-primary">Browse Categories</router-link></li>
             <li><router-link to="/how-it-works" class="hover:text-primary">How it Works</router-link></li>
             <li><router-link to="/safety" class="hover:text-primary">Safety Tips</router-link></li>

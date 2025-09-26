@@ -19,6 +19,7 @@ const router = createRouter({
   { path: "/dashboard/provider", component: ProviderDashboard },
   { path: "/dashboard/admin", component: AdminDashboard },
   { path: "/onboarding/provider", component: () => import('@/views/ProviderOnboarding.vue') },
+  { path: "/post-job", component: () => import('@/views/PostJob.vue')}
 ],
 scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

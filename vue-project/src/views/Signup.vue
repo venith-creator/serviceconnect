@@ -5,7 +5,7 @@
       <div class="flex flex-col items-center text-center max-w-sm -mt-12">
         <!-- Fixed size image -->
         <img
-          :src="role === 'provider' ? '/worker.jpg' : '/homeowner.jpg'"
+          :src="role === 'provider' ? '/worker1.png' : '/homeowner1.png'"
           alt="Signup illustration"
           class="w-[400px] h-[300px] object-cover rounded-md shadow-lg shadow-gray-400/50"
         />
