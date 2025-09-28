@@ -35,7 +35,7 @@
           </router-link>
           <router-link
           to="/signup?role=provider"
-          class="px-4 py-2 rounded-lg text-black transition-colors bg-secondary hover:opacity-90"
+          class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
         >
           Join as a Provider
         </router-link>
@@ -72,7 +72,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-100">
           <div class="flex items-center space-x-2">
-            <img src="/medical background.png" alt="Service Connect Logo" class="w-8 h-8" />
+            <img src="/Service_connect_logo.png" alt="Service Connect Logo" class="w-8 h-8" />
             <span class="font-semibold text-xl text-black">Service Connect</span>
           </div>
           <button
@@ -96,7 +96,7 @@
         <!-- Drawer Buttons -->
         <div class="p-6 border-t border-gray-100 space-y-4 flex flex-col">
           <router-link
-          to="/signup?role=client"
+          to="/post-job"
           class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
         >
           Post Job
@@ -104,7 +104,7 @@
 
         <router-link
           to="/signup?role=provider"
-          class="px-4 py-2 rounded-lg text-black transition-colors bg-secondary hover:opacity-90"
+          class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
         >
           Join as a Provider
         </router-link>

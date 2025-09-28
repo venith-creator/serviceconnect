@@ -36,8 +36,6 @@ const upload = multer({ storage });
 // Create a new job (client only, with file uploads)
 router.post(
   "/",
-  protect,
-  authorizeRoles("client"),
   upload.array("attachments", 10),
   createJob
 );

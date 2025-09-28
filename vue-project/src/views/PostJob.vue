@@ -86,14 +86,21 @@
 
           <!-- Timeline -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Timeline</label>
-            <input
-              v-model="form.timeline"
-              type="date"
-              class="mt-1 w-full border rounded px-3 py-2"
-            />
+            <label class="block text-sm font-medium text-gray-700 ">Timeline</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input
+                v-model="form.timelineStart"
+                type="date"
+                class="mt-1 w-full border rounded px-3 py-2"
+              />
+              <span class="self-center">to</span>
+              <input
+                v-model="form.timelineEnd"
+                type="date"
+                class="mt-1 w-full border rounded px-3 py-2"
+              />
+            </div>
           </div>
-
           <!-- Email -->
           <div>
             <label class="block text-sm font-medium text-gray-700">Email</label>
@@ -181,7 +188,7 @@
               :src="`https://www.google.com/maps?q=${encodeURIComponent(form.location)}&output=embed`"
               allowfullscreen
             ></iframe>
-          <span class="text-gray-500">Enter location to see map</span>
+          <span v-else class="text-gray-500">Enter location to see map</span>
         </div>
       </div>
       <!-- Guest Note -->
@@ -213,7 +220,8 @@ const form = ref({
   category: "",
   location: "",
   budget: "",
-  timeline: "",
+  timelineStart: "",
+  timelineEnd: "",
   email: "",
   phone: "",
 });
@@ -235,7 +243,6 @@ const submitJob = async () => {
   try {
     const fd = new FormData();
 
-    // Append fields
     Object.entries(form.value).forEach(([k, v]) => {
       if (k === "category" && v === "other") {
         fd.append("category", customCategory.value || "Other");
@@ -246,19 +253,31 @@ const submitJob = async () => {
 
     attachments.value.forEach((f) => fd.append("attachments", f));
 
-    const res = await fetch(`${API_BASE_URL}/api/jobs`, {
+    const res = await fetch(`${API_BASE_URL}/jobs`, {
       method: "POST",
       body: fd,
     });
 
-    if (!res.ok) throw new Error("Failed to post job");
+    // Try to parse JSON only if response is JSON
+    let data;
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      data = { message: await res.text() }; // fallback (HTML error page, etc.)
+    }
 
-    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || data.message || "Failed to post job");
+    }
+
+
     alert("Job posted successfully!");
     console.log("Created job:", data);
   } catch (err) {
-    alert("Error posting job");
-    console.error(err);
+    console.error("❌ Error posting job:", err);
+    alert(err.message || "Error posting job");
   }
 };
+
 </script>

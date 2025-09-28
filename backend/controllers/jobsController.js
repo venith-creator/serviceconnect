@@ -1,32 +1,88 @@
 // controllers/jobsController.js
 import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
+import User from "../models/User.js";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
   try {
-    const { category, title, description, location, budget, timeline, attachments, city, state, country } = req.body;
+    let parsedData = {};
 
-    const job = new Job({
-      client: req.user._id,
+    if (req.body.data) {
+      try {
+        parsedData = JSON.parse(req.body.data);
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid JSON in data field" });
+      }
+    } else {
+      parsedData = req.body;
+    }
+
+    const {
+      category,
+      title,
+      description,
+      location,
+      budget,
+      timelineStart,
+      timelineEnd,
+      city,
+      state,
+      country,
+      email,
+      phone,
+    } = parsedData;
+
+    // ✅ wrap each file path in { url }
+    const attachments =
+      req.files?.map((f) => ({
+        url: f.path.replace(/\\/g, "/"), // normalize Windows paths
+      })) || [];
+
+    let jobData = {
       category,
       title,
       description,
       budget,
-      timeline,
+      timelineStart,
+      timelineEnd,
       attachments,
       location,
       city,
       state,
       country,
-    });
+    };
 
+    if (req.user) {
+      // logged-in client
+      jobData.client = req.user._id;
+    } else {
+      // guest posting
+      jobData.clientEmail = email;
+      jobData.clientPhone = phone;
+
+      if (email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          jobData.client = existingUser._id;
+        }
+      }
+    }
+
+    const job = new Job(jobData);
     await job.save();
+
     res.status(201).json(job);
   } catch (error) {
-    res.status(500).json({ message: "Error creating job", error: error.message });
+    console.error("❌ Job creation error:", error);
+    res.status(500).json({
+      message: "Error creating job",
+      error: error.message,
+      stack: error.stack,
+    });
   }
 };
+
 
 // GET all jobs
 export const getJobs = async (req, res) => {

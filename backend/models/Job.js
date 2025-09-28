@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 
 const jobSchema = new mongoose.Schema(
   {
-    client: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    client: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
     title: { type: String, required: true },
     description: { type: String, required: true },
     category: String,
     budget: Number,
-    timeline: String, // e.g. "2 weeks", "flexible"
+    timelineStart: { type: Date },
+    timelineEnd: { type: Date },
     attachments: [{ url: String }],
     clientEmail: { type: String },
     clientPhone: { type: String },
