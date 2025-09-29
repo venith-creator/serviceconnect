@@ -63,6 +63,11 @@ export const registerUser = async (req, res) => {
             providerOnboarding: role === "provider" ? false : undefined
         });
 
+        await Job.updateMany(
+          { clientEmail: email, client: { $exists: false } },
+          { $set: { client: user._id } }
+        );
+
         res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -132,6 +137,5 @@ export const addRole = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const upload = getUploader("avatars");
