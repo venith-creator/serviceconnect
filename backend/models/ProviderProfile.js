@@ -5,11 +5,16 @@ const providerProfileSchema = new mongoose.Schema({
   services: [
     {
       category: String,
-      subcategory: String,
-      description: String,
-      priceRange: String
+      rate: Number,
+      availability: String, // free text
+      radiusKm: Number,
+      status: { type: String, default: "trial" }, // trial, active, suspended
+      trialEndsAt: Date,
     }
   ],
+
+  status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+  rejectionReason: { type: String, default: "" },
   docs: [String], // certificates, licenses
   serviceRadiusKm: { type: Number, default: 0 },
   description: String,

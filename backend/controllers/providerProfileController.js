@@ -309,3 +309,19 @@ export const getActiveProviders = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const rejectProvider = async (req, res) => {
+  const { reason } = req.body;
+  const profile = await ProviderProfile.findById(req.params.id);
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
+  profile.status = "rejected";
+  profile.rejectionReason = reason || "";
+  await profile.save();
+  res.json({ message: "Provider rejected", profile });
+};
+
+export const getProviderStatus = async (req, res) => {
+  const profile = await ProviderProfile.findOne({ user: req.user._id });
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
+  res.json({ status: profile.status, rejectionReason: profile.rejectionReason });
+};

@@ -4,7 +4,7 @@
     <header class="px-6 py-4 border-b text-center">
       <h1 class="text-2xl font-bold text-purple-600">Service Provider Onboarding</h1>
       <div class="flex items-center gap-3 mt-2 justify-center max-w-lg mx-auto">
-        <p class="text-sm text-gray-600">Step {{ step }} of 4</p>
+        <p class="text-sm text-gray-600">Step {{ step }} of 5</p>
         <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden max-w-sm">
           <div
             class="h-2 bg-purple-600 transition-all duration-300"
@@ -318,8 +318,11 @@
           </div>
 
           <div class="mt-4">
-            <label class="font-medium text-gray-700">Availability</label>
-            <input v-model="profile.availability" placeholder="e.g. Weekdays, Weekends" class="w-full border rounded px-3 py-2 mt-1" />
+            <label class="font-medium text-gray-700">General Availability</label>
+            <select v-model="profile.generalAvailability" class="w-full border rounded px-3 py-2 mt-1">
+              <option disabled value="">Select availability</option>
+              <option v-for="opt in availabilityOptions" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
           </div>
 
           <div class="mt-4">
@@ -336,6 +339,91 @@
           </div>
         </div>
 
+        <!-- Step 5 -->
+        <div v-else-if="step === 5">
+          <div class="text-center">
+            <h2 class="mt-3 text-xl font-semibold">Payment & Summary</h2>
+            <p class="text-gray-600 mt-1">
+              You’re on a <b>free 1-month trial</b>. After that, subscription required
+              ($20 first service, $10 each additional).
+            </p>
+          </div>
+
+          <!-- Services loop -->
+          <div class="mt-6 space-y-6">
+            <div
+              v-for="(service, i) in services"
+              :key="i"
+              class="border rounded-lg p-4 bg-purple-50"
+            >
+              <h3 class="font-semibold text-purple-700">
+                {{ service.category }}
+              </h3>
+
+              <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <label class="font-medium">Rate ($)</label>
+                  <input
+                    v-model.number="service.rate"
+                    type="number"
+                    min="1"
+                    class="w-full border rounded px-2 py-1"
+                  />
+                </div>
+
+                <div>
+                  <label class="font-medium">Availability</label>
+                  <input
+                    v-model="service.availability"
+                    placeholder="e.g. Weekdays, Evenings"
+                    class="w-full border rounded px-2 py-1"
+                  />
+                </div>
+
+                <div>
+                  <label class="font-medium">Service Radius (km)</label>
+                  <input
+                    v-model.number="service.radiusKm"
+                    type="number"
+                    min="1"
+                    class="w-full border rounded px-2 py-1"
+                  />
+                </div>
+
+                <div>
+                  <label class="font-medium">Status</label>
+                  <input
+                    v-model="service.status"
+                    disabled
+                    class="w-full border rounded px-2 py-1 bg-gray-100"
+                  />
+                </div>
+              </div>
+
+              <p class="text-xs text-gray-500 mt-2">
+                Trial ends: {{ formatTrialEnd(service.trialEndsAt) }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Mini Profile Summary -->
+          <div class="mt-6 bg-purple-50 p-4 rounded text-sm space-y-2">
+            <p class="font-semibold">Profile Summary:</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Documents: {{ form.docs.length }} uploaded</li>
+              <li>Services: {{ services.length }}</li>
+              <li>Portfolio: {{ form.portfolio.length }} photos</li>
+              <li>Location: {{ profile.city || "?" }}, {{ profile.state || "?" }}, {{ profile.country || "?" }}</li>
+            </ul>
+          </div>
+
+          <!-- Terms notice -->
+          <p class="mt-4 text-xs text-gray-500 text-center">
+            By completing onboarding, you agree to Service Connect’s terms and subscription model.
+          </p>
+        </div>
+
+
         <!-- Navigation Buttons -->
         <div class="flex justify-between items-center mt-6">
           <button
@@ -347,7 +435,7 @@
           </button>
           <div class="ml-auto flex gap-3">
             <button
-              v-if="step < 4"
+              v-if="step < 5"
               @click="nextStep"
               class="bg-purple-600 text-white px-6 py-2 rounded"
             >
@@ -395,7 +483,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted} from "vue";
 import {
   DocumentIcon,
   CameraIcon,
@@ -449,12 +537,16 @@ const checklist = [
   { key: "categories", label: "Categories", step: 2 },
   { key: "portfolio", label: "Portfolio", step: 3 },
   { key: "profile", label: "Profile", step: 4 },
+  { key: "Payment & Summary", label: "Payment & Summary", step: 5},
 ];
 const completedSteps = ref({});
 
 // Progress
-const progress = computed(() => (step.value / 4) * 100);
+const progress = computed(() => (step.value / 5) * 100);
+// availability options
+const availabilityOptions = ["Full-time", "Part-time", "Weekends", "On-call"]
 
+const services = ref([]);
 // Handlers
 async function handleDocsUpload(e) {
   const files = Array.from(e.target.files);
@@ -476,20 +568,39 @@ function removeDoc(i) {
 function toggleCategory(cat) {
   if (selectedCategories.value.includes(cat)) {
     selectedCategories.value = selectedCategories.value.filter((c) => c !== cat);
+    services.value = services.value.filter((s) => s.category !== cat);
   } else {
     selectedCategories.value.push(cat);
+    services.value.push({
+      category: cat,
+      rate: "",
+      availability: "",
+      radiusKm: "",
+      status: "Active",
+      trialEndsAt: new Date(Date.now() + 30*24*60*60*1000),
+    });
   }
   completedSteps.value.categories = selectedCategories.value.length > 0;
 }
 function addCustomCategory() {
-  if (customCategory.value && !categories.includes(customCategory.value)) {
+  if (customCategory.value && !selectedCategories.value.includes(customCategory.value)) {
     selectedCategories.value.push(customCategory.value);
+    services.value.push({
+      category: customCategory.value,
+      rate: "",
+      availability: "",
+      radiusKm: "",
+      status: "Active",
+      trialEndsAt: new Date(Date.now() + 30*24*60*60*1000),
+    });
     completedSteps.value.categories = true;
     customCategory.value = "";
   }
 }
 function removeCategory(i) {
+  const removed = selectedCategories.value[i];
   selectedCategories.value.splice(i, 1);
+  services.value = services.value.filter((s) => s.category !== removed);
   completedSteps.value.categories = selectedCategories.value.length > 0;
 }
 async function handlePortfolioUpload(e) {
@@ -525,11 +636,62 @@ async function handlePhotoUpload(e) {
 }
 // Navigation
 function nextStep() {
-  if (step.value < 4) step.value++;
+  if (step.value < 5) step.value++;
 }
 function prevStep() {
   if (step.value > 1) step.value--;
 }
+
+// keep Step 5 services in sync with chosen categories
+watch(selectedCategories, (newCats) => {
+  services.value = newCats.map(cat => {
+    const existing = services.value.find(s => s.category === cat);
+    return existing || {
+      category: cat,
+      rate: "",
+      availability: "",
+      radiusKm: "",
+      status: "Active",
+      trialEndsAt: new Date(Date.now() + 30*24*60*60*1000),
+    };
+  });
+}, { immediate: true });
+function formatTrialEnd(date) {
+  if (!(date instanceof Date)) date = new Date(date);
+  return date.toLocaleDateString();
+}
+
+// persist draft locally (without blobs)
+watch([form, profile, selectedCategories, services], () => {
+  const data = {
+    docs: form.value.docs.map(f => ({ name: f.name })),  // only names
+    portfolio: form.value.portfolio.map(p => ({
+      name: p.name, caption: p.caption, preview: p.preview
+    })),
+    profile: profile.value,
+    selectedCategories: selectedCategories.value,
+    services: services.value,
+    step: step.value,
+  };
+  localStorage.setItem("onboardingDraft", JSON.stringify(data));
+}, { deep: true });
+
+// restore draft on mount
+onMounted(() => {
+  const saved = localStorage.getItem("onboardingDraft");
+  if (saved) {
+    const data = JSON.parse(saved);
+    profile.value = data.profile || profile.value;
+    selectedCategories.value = data.selectedCategories || [];
+    services.value = data.services || [];
+    step.value = data.step || 1;
+
+    // docs/portfolio restored as "placeholders"
+    form.value.docs = data.docs || [];
+    form.value.portfolio = data.portfolio || [];
+  }
+});
+
 
 // Submit
 async function submitOnboarding() {
@@ -547,9 +709,19 @@ async function submitOnboarding() {
       fd.append("avatar", profile.value.photo.file);
     }
 
+    fd.append("profile", JSON.stringify(profile.value));
+    fd.append("services", JSON.stringify(services.value));
+
     // JSON payload
     const payload = {
-      services: selectedCategories.value.map((c) => ({ category: c })),
+      services: services.value.map((s) => ({
+        category: s.category,
+        rate: s.rate,
+        availability: s.availability,
+        radiusKm: s.radiusKm,
+        status: s.status,
+        trialEndsAt: s.trialEndsAt,
+      })),
       description: profile.value.bio,
       rate: profile.value.rate,
       serviceRadiusKm: profile.value.serviceRadiusKm,
@@ -593,7 +765,7 @@ async function submitOnboarding() {
       onboardingStatus.value = "success";
     }
 
-    router.push("/dashboard/provider");
+    router.push("/provider-status");
   } catch (err) {
     onboardingStatus.value = "incomplete";
     alert(`Error: ${err.message}`);

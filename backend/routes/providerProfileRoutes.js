@@ -9,7 +9,9 @@ import {
   getProviderStats,
   getProviderStatsAdmin,
   suspendProfile,
+  getProviderStatus,
   approveProfile,
+  rejectProvider,
   getActiveProviders
 } from "../controllers/providerProfileController.js";
 
@@ -52,6 +54,7 @@ router.get("/active", getActiveProviders);
 
 // Public: get profile by id
 router.get("/:id", getProfileById);
+router.get("/:id/status", protect, authorizeRoles("provider", "admin"), getProviderStatus);
 
 // Admin: delete, stats, suspend, approve
 router.delete("/:id", protect, authorizeRoles("admin"), deleteProfile);
@@ -59,5 +62,6 @@ router.get("/stats/me", protect, authorizeRoles("provider"), getProviderStats);
 router.get("/admin/:id", protect, authorizeRoles("admin"), getProviderStatsAdmin);
 router.patch("/:id/suspend", protect, authorizeRoles("admin"), suspendProfile);
 router.patch("/:id/approve", protect, authorizeRoles("admin"), approveProfile);
+router.patch("/:id/reject", protect, authorizeRoles("admin"), rejectProvider);
 
 export default router;

@@ -7,6 +7,7 @@ import AdminDashboard from "@/views/AdminDashboard.vue";
 import AdminSignup from '@/views/AdminSignup.vue';
 import DashboardSwitch from '@/views/DashboardSwitch.vue';
 import HomeView from '@/views/HomeView.vue';
+import ProviderStatus from '@/views/ProviderStatus.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +20,8 @@ const router = createRouter({
   { path: "/dashboard/provider", component: ProviderDashboard },
   { path: "/dashboard/admin", component: AdminDashboard },
   { path: "/onboarding/provider", component: () => import('@/views/ProviderOnboarding.vue') },
-  { path: "/post-job", component: () => import('@/views/PostJob.vue')}
+  { path: "/post-job", component: () => import('@/views/PostJob.vue')},
+  { path: "/provider-status", component: ProviderStatus}
 ],
 scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
