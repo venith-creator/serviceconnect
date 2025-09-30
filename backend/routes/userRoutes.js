@@ -1,6 +1,8 @@
 import express from "express";
-import { registerUser, loginUser, upload, addRole} from "../controllers/userController.js";
+import { registerUser, loginUser, addRole } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { upload } from "../middleware/upload.js";  // ✅ fix
+
 const router = express.Router();
 
 router.post("/register", upload.single("avatar"), registerUser);

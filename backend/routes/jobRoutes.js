@@ -1,6 +1,5 @@
 // backend/routes/jobRoutes.js
 import express from "express";
-import multer from "multer";
 import {
   createJob,
   getJobs,
@@ -15,30 +14,16 @@ import {
 
 import { protect } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
+import { attachmentUpload } from "../middleware/upload.js";  // ✅ use central uploader
 
 const router = express.Router();
-
-// 🔹 Multer storage (for job attachments)
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // central uploads folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-const upload = multer({ storage });
 
 /**
  * CLIENT ROUTES
  */
 
 // Create a new job (client only, with file uploads)
-router.post(
-  "/",
-  upload.array("attachments", 10),
-  createJob
-);
+router.post("/", attachmentUpload.array("attachments", 10), createJob);
 
 // Get all jobs (public)
 router.get("/", getJobs);

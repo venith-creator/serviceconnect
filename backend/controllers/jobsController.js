@@ -35,9 +35,10 @@ export const createJob = async (req, res) => {
 
     // ✅ wrap each file path in { url }
     const attachments =
-      req.files?.map((f) => ({
-        url: f.path.replace(/\\/g, "/"), // normalize Windows paths
-      })) || [];
+        req.files?.map((f) => ({
+          url: f.location,   // ✅ public MinIO/S3 URL
+          key: f.key,        // optional: useful if you want to delete later
+        })) || [];
 
     let jobData = {
       category,

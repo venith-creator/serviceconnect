@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import multer from "multer";
 import { getUploader } from "../middleware/upload.js";
 dotenv.config();
+import Job from "../models/Job.js";
 
 
 const generateToken = (id, roles) => {

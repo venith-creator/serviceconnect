@@ -17,31 +17,39 @@ import {
 
 import { protect } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
+import { upload, portfolioUpload, docUpload } from "../middleware/upload.js";
+
 
 const router = express.Router();
 
-// 🔹 Multer storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // central uploads folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
-
-// Create or update profile (provider only, with file uploads)
 router.post(
   "/",
   protect,
   authorizeRoles("provider"),
-  upload.fields([
-    { name: "docs", maxCount: 10 },
-    { name: "portfolio", maxCount: 10 },
-    { name: "avatar", maxCount: 1 }
-  ]),
+  (req, res, next) => {
+    // combine multiple uploaders (docs, portfolio, avatar)
+    const multiUpload = (req, res, cb) => {
+      docUpload.array("docs", 10)(req, res, (err) => {
+        if (err) return cb(err);
+        portfolioUpload.array("portfolio", 10)(req, res, (err) => {
+          if (err) return cb(err);
+          upload.single("avatar")(req, res, (err) => {
+            if (err) return cb(err);
+
+            // ✅ Normalize so controller always has req.files.docs/portfolio/avatar
+            req.files = {
+              docs: req.files?.docs || [],
+              portfolio: req.files?.portfolio || [],
+              avatar: req.file ? [req.file] : (req.files?.avatar || []),
+            };
+
+            cb();
+          });
+        });
+      });
+    };
+    multiUpload(req, res, next);
+  },
   createOrUpdateProfile
 );
 

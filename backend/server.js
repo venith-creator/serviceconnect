@@ -1,7 +1,8 @@
 // server.js
+import dotenv from "dotenv";
+dotenv.config();
 import http from "http";
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import detect from "detect-port";
 import connectDB from "./config/db.js";
@@ -20,8 +21,6 @@ import chatRoutes from "./routes/chatRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-
-dotenv.config();
 
 // DB Connection Logs
 console.log("🔌 Connecting to MongoDB...");
