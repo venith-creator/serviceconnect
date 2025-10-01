@@ -21,32 +21,7 @@ export const createOrUpdateProfile = async (req, res) => {
     }
 
     const {
-      services,
-      serviceRadiusKm,
-      description,
-      city,
-      state,
-      country,
-      yearsOfExperience,
-      languages,
-      availability,
-      paymentOptions,
-      insurance,
-      badges
-    } = parsedData;
-
-    // 🔹 Grab uploaded files
-    const docs = req.files?.docs?.map((f) => f.path) || [];
-    const portfolio = req.files?.portfolio?.map((f) => ({
-      url: f.path,
-      caption: "" // you can extend frontend to send caption later
-    })) || [];
-    const avatar = req.files?.avatar?.[0]?.path || null;
-
-    // Merge everything
-    const profileData = {
-      user: req.user._id,
-      services,
+      services = [],
       serviceRadiusKm,
       description,
       city,
@@ -58,9 +33,46 @@ export const createOrUpdateProfile = async (req, res) => {
       paymentOptions,
       insurance,
       badges,
+      portfolioCaptions = []
+    } = parsedData;
+
+    // 🔹 Grab uploaded files
+    const docs = req.files?.docs?.map((f) => f.path) || [];
+    const portfolio = req.files?.portfolio?.map((f, i) => ({
+      url: f.path,
+      caption: parsedData.portfolioCaptions?.[i] || "" 
+    })) || [];
+    const avatar = req.files?.avatar?.[0]?.path || null;
+
+    const normalizedServices = services.map(s => ({
+      category: s.category,
+      rate: Number(s.rate) || 0,
+      availability: s.availability || "",
+      radiusKm: Number(s.radiusKm) || 0,
+      status: "trial",
+      trialEndsAt: new Date(Date.now() + 30*24*60*60*1000),
+      approved: false
+    }));
+
+    // Merge everything
+    const profileData = {
+      user: req.user._id,
+      services: normalizedServices,
+      serviceRadiusKm,
+      description,
+      city,
+      state,
+      country,
+      yearsOfExperience,
+      languages,
+      availability: availability || "On-call",
+      paymentOptions,
+      insurance,
+      badges,
       docs,
       portfolio,
-      avatar
+      avatar,
+      status: "pending",
     };
 
     let profile = await ProviderProfile.findOne({ user: req.user._id });
@@ -324,4 +336,37 @@ export const getProviderStatus = async (req, res) => {
   const profile = await ProviderProfile.findOne({ user: req.user._id });
   if (!profile) return res.status(404).json({ message: "Profile not found" });
   res.json({ status: profile.status, rejectionReason: profile.rejectionReason });
+};
+
+// Approve a specific service
+export const approveService = async (req, res) => {
+  const { id, serviceId } = req.params; // profile + service
+  const profile = await ProviderProfile.findById(id);
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+  const service = profile.services.id(serviceId);
+  if (!service) return res.status(404).json({ message: "Service not found" });
+
+  service.approved = true;
+  await profile.save();
+
+  res.json({ message: "Service approved", profile });
+};
+
+// Reject a specific service
+export const rejectService = async (req, res) => {
+  const { id, serviceId } = req.params;
+  const { reason } = req.body;
+  const profile = await ProviderProfile.findById(id);
+  if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+  const service = profile.services.id(serviceId);
+  if (!service) return res.status(404).json({ message: "Service not found" });
+
+  service.approved = false;
+  service.status = "rejected";
+  service.rejectionReason = reason || "";
+  await profile.save();
+
+  res.json({ message: "Service rejected", profile });
 };

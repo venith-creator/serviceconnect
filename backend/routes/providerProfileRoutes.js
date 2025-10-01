@@ -12,14 +12,14 @@ import {
   getProviderStatus,
   approveProfile,
   rejectProvider,
-  getActiveProviders
+  getActiveProviders,
+  approveService,
+  rejectService,
 } from "../controllers/providerProfileController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
-import { upload, portfolioUpload, docUpload } from "../middleware/upload.js";
-
-
+import { multiUpload } from "../middleware/upload.js";
 const router = express.Router();
 
 router.post(
@@ -27,28 +27,13 @@ router.post(
   protect,
   authorizeRoles("provider"),
   (req, res, next) => {
-    // combine multiple uploaders (docs, portfolio, avatar)
-    const multiUpload = (req, res, cb) => {
-      docUpload.array("docs", 10)(req, res, (err) => {
-        if (err) return cb(err);
-        portfolioUpload.array("portfolio", 10)(req, res, (err) => {
-          if (err) return cb(err);
-          upload.single("avatar")(req, res, (err) => {
-            if (err) return cb(err);
-
-            // ✅ Normalize so controller always has req.files.docs/portfolio/avatar
-            req.files = {
-              docs: req.files?.docs || [],
-              portfolio: req.files?.portfolio || [],
-              avatar: req.file ? [req.file] : (req.files?.avatar || []),
-            };
-
-            cb();
-          });
-        });
-      });
-    };
-    multiUpload(req, res, next);
+    multiUpload(req, res, function (err) {
+      if (err) {
+        console.error("Upload error:", err.message);
+        return res.status(400).json({ message: err.message });
+      }
+      next(); // ✅ proceed only if upload succeeded
+    });
   },
   createOrUpdateProfile
 );
@@ -71,5 +56,7 @@ router.get("/admin/:id", protect, authorizeRoles("admin"), getProviderStatsAdmin
 router.patch("/:id/suspend", protect, authorizeRoles("admin"), suspendProfile);
 router.patch("/:id/approve", protect, authorizeRoles("admin"), approveProfile);
 router.patch("/:id/reject", protect, authorizeRoles("admin"), rejectProvider);
+router.patch("/:id/services/:serviceId/approve", protect, authorizeRoles("admin"), approveService);
+router.patch("/:id/services/:serviceId/reject", protect, authorizeRoles("admin"), rejectService);
 
 export default router;

@@ -10,6 +10,9 @@ const providerProfileSchema = new mongoose.Schema({
       radiusKm: Number,
       status: { type: String, default: "trial" }, // trial, active, suspended
       trialEndsAt: Date,
+      approved: { type: Boolean, default: false },
+      rejectionReason: { type: String, default: "" },
+      _id: { type: mongoose.Schema.Types.ObjectId, auto: true }
     }
   ],
 

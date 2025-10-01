@@ -319,7 +319,7 @@
 
           <div class="mt-4">
             <label class="font-medium text-gray-700">General Availability</label>
-            <select v-model="profile.generalAvailability" class="w-full border rounded px-3 py-2 mt-1">
+            <select v-model="profile.availability" class="w-full border rounded px-3 py-2 mt-1">
               <option disabled value="">Select availability</option>
               <option v-for="opt in availabilityOptions" :key="opt" :value="opt">{{ opt }}</option>
             </select>
@@ -700,10 +700,12 @@ async function submitOnboarding() {
     const fd = new FormData();
 
     // Append docs
-    form.value.docs.forEach((d) => fd.append("docs", d.file));
+    form.value.docs.forEach((d) => { if (d.file) fd.append("docs", d.file); });
     form.value.portfolio.forEach((p, i) => {
+      if (p.file) {
       fd.append("portfolio", p.file);
-      fd.append(`portfolioCaptions[${i}]`, p.caption);
+      fd.append(`portfolioCaptions[${i}]`, p.caption || "");
+      }
     });
     if (profile.value.photo?.file) {
       fd.append("avatar", profile.value.photo.file);
@@ -734,6 +736,7 @@ async function submitOnboarding() {
       paymentOptions: profile.value.paymentOptions,
       insurance: profile.value.insurance || false,
       badges: profile.value.badges || [],
+      portfolioCaptions: form.value.portfolio.map(p => p.caption || ""),
     };
     fd.append("data", JSON.stringify(payload));
 
