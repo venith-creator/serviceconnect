@@ -19,6 +19,7 @@
     "@headlessui/vue": "^1.7.19",
     "@heroicons/vue": "^2.2.0",
     "@ricky0123/vad-web": "^0.0.24",
+    "lucide-vue-next": "^0.544.0",
     "pinia": "^3.0.3",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.5.18",
@@ -27,7 +28,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
-    "@types/node": "^22.16.5",
+    "@types/node": "^22.18.8",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",

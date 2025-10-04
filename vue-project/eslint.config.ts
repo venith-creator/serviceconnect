@@ -14,9 +14,32 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  globalIgnores(['**/dist/**',
+  '**/dist-ssr/**',
+  '**/coverage/**',
+  'postcss.config.js',
+  'tailwind.config.js']),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
   skipFormatting,
+
+  {
+    languageOptions: {
+      parserOptions: {
+       project: './tsconfig.eslint.json',
+        tsconfigRootDir: process.cwd(),
+      },
+    },
+  },
+
+  {
+  rules: {
+    'vue/block-lang': 'off',
+    'vue/multi-word-component-names': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-object-type': 'off',
+  },
+}
+
 )

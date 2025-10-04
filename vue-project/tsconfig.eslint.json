@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [
+    "eslint.config.ts",
+    "vite.config.ts",
+    "tailwind.config.js",
+    "postcss.config.js",
+    "vue.config.js",
+    "env.d.ts", 
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.vue"  // 👈 ensure Vue SFCs are included
+  ]
+}
