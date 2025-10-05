@@ -59,7 +59,7 @@ import { Menu, Bell, User } from 'lucide-vue-next'
 import ClientDashboardSidebar from './ClientDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import { useAuthStore } from '@/stores/auth'
-import DashboardSwitchModal from './DashboardSwitchModal.vue'
+import DashboardSwitchModal from './DashboardSwitchmodal.vue'
 const showSwitch = ref(false)
 
 
