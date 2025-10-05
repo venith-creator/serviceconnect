@@ -106,6 +106,7 @@ onUnmounted(() => document.removeEventListener('keydown', handleEscape))
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', href: '/dashboard/admin' },
   { id: 'providers', label: 'Providers', href: '/dashboard/admin/ManageProviders' },
+  { id: 'homeowners', label: 'Homeowners', href: '/dashboard/admin/ManageHomeowners' },
   { id: 'jobs', label: 'Jobs', href: '/dashboard/admin/ManageJobs' },
   { id: 'payments', label: 'Payments', href: '/dashboard/admin/ManagePayments' },
   { id: 'reviews', label: 'Reviews', href: '/dashboard/admin/ManageReviews' },

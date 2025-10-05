@@ -19,6 +19,15 @@
             <h1 class="text-2xl font-bold text-gray-900">{{ getCurrentPageTitle() }}</h1>
           </div>
           <div class="flex items-center space-x-4">
+
+            <div class="flex items-center space-x-4">
+            <button
+              @click="showSwitch = true"
+              class="px-3 py-1 border rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+            >
+              Switch Role
+            </button>
+
             <Badge class="bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded-full">
               Client
             </Badge>
@@ -30,6 +39,8 @@
               <span class="text-sm font-medium text-gray-900 hidden sm:block">{{ name }}</span>
             </div>
           </div>
+
+          </div>
         </div>
       </header>
 
@@ -37,6 +48,7 @@
         <slot />
       </main>
     </div>
+    <DashboardSwitchModal :open="showSwitch" @close="showSwitch = false" />
   </div>
 </template>
 
@@ -47,6 +59,9 @@ import { Menu, Bell, User } from 'lucide-vue-next'
 import ClientDashboardSidebar from './ClientDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import { useAuthStore } from '@/stores/auth'
+import DashboardSwitchModal from './DashboardSwitchModal.vue'
+const showSwitch = ref(false)
+
 
 const auth = useAuthStore()
 const route = useRoute()

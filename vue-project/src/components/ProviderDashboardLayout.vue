@@ -31,6 +31,12 @@
           </div>
 
           <div class="flex items-center space-x-4">
+            <button
+              @click="showSwitch = true"
+              class="px-3 py-1 border rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+            >
+              Switch Role
+            </button>
             <Badge class="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded-full">
               Provider
             </Badge>
@@ -49,6 +55,7 @@
         <slot />
       </main>
     </div>
+    <DashboardSwitchModal :open="showSwitch" @close="showSwitch = false" />
   </div>
 </template>
 
@@ -59,6 +66,8 @@ import { Menu, Bell, User } from 'lucide-vue-next'
 import ProviderDashboardSidebar from './ProviderDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import { useAuthStore } from '@/stores/auth'
+import DashboardSwitchModal from './DashboardSwitchModal.vue'
+const showSwitch = ref(false)
 
 const auth = useAuthStore()
 const route = useRoute()

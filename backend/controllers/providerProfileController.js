@@ -148,6 +148,9 @@ export const listAllProfiles = async (req, res) => {
       filter.approved = true;
       filter.suspended = false;
     }
+    
+    if (req.query.status) filter.status = req.query.status;
+
 
     if (service) filter["services.category"] = new RegExp(service, "i");
     if (city) filter.city = new RegExp(city, "i");
