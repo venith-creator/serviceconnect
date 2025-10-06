@@ -169,5 +169,19 @@ scrollBehavior(to, from, savedPosition) {
   },
 }
 )
+router.beforeEach((to, from, next) => {
+  if (['/onboarding/provider', '/provider-status'].includes(to.path)) {
+    localStorage.setItem('previousRoute', from.fullPath || '/dashboard/switch');
+  }
 
+  const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
+  if (to.path === '/onboarding/provider' && onboardingComplete) {
+    return next('/provider-status');
+  }
+
+  if (to.path === '/provider-status' && !onboardingComplete) {
+    return next('/onboarding/provider');
+  }
+  next();
+});
 export default router

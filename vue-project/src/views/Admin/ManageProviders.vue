@@ -260,12 +260,27 @@ const filteredProviders = computed(() => {
 })
 
 const approveProvider = async (id: string) => {
-  await fetch(`${API_BASE_URL}/provider-profiles/${id}/approve`, {
-    method: 'PATCH',
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-  })
-  await fetchProviders()
-}
+  try {
+    const res = await fetch(`${API_BASE_URL}/provider-profiles/${id}/approve`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      console.error("Approve failed:", err);
+      alert(err?.message || "Approve failed");
+      return;
+    }
+
+    alert("Provider approved successfully");
+    showProviderModal.value = false;
+    await fetchProviders();
+  } catch (err) {
+    console.error("Approve error:", err);
+  }
+};
+
 
 const suspendProvider = async (id: string) => {
   await fetch(`${API_BASE_URL}/provider-profiles/${id}/suspend`, {
@@ -290,19 +305,30 @@ const openRejectModal = (id: string) => {
 }
 
 const confirmReject = async () => {
-  await fetch(`${API_BASE_URL}/provider-profiles/${selectedId.value}/reject`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify({ reason: rejectReason.value }),
-  })
-  showRejectModal.value = false
-  rejectReason.value = ''
-  await fetchProviders()
-}
+  try {
+    const res = await fetch(`${API_BASE_URL}/provider-profiles/${selectedId.value}/reject`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ reason: rejectReason.value }),
+    });
 
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      alert(err?.message || "Reject failed");
+      return;
+    }
+
+    alert("Provider rejected successfully");
+    showRejectModal.value = false;
+    rejectReason.value = "";
+    await fetchProviders();
+  } catch (err) {
+    console.error("Reject error:", err);
+  }
+};
 
 const viewProvider = async (id: string) => {
   try {

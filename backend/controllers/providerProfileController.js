@@ -3,6 +3,7 @@ import ProviderProfile from "../models/ProviderProfile.js";
 import Review from "../models/Review.js";
 import Job from "../models/Job.js";
 import mongoose from "mongoose";
+import User from "../models/User.js";
 
 //  Create or Update Profile
 export const createOrUpdateProfile = async (req, res) => {
@@ -88,6 +89,7 @@ export const createOrUpdateProfile = async (req, res) => {
 
     const newProfile = new ProviderProfile(profileData);
     await newProfile.save();
+    await User.findByIdAndUpdate(req.user._id, { providerOnboarding: true });
     res.status(201).json(newProfile);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -145,7 +147,6 @@ export const listAllProfiles = async (req, res) => {
     const filter = {};
 
     if (!req.user || !req.user.roles.includes("admin")) {
-      filter.approved = true;
       filter.suspended = false;
     }
     
@@ -267,7 +268,8 @@ export const approveProfile = async (req, res) => {
     const profile = await ProviderProfile.findById(req.params.id);
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    profile.approved = true; // add `approved` field in schema**
+    profile.approved = true;
+    profile.status = "approved";
     await profile.save();
 
     res.json({ message: "Provider approved", profile });
@@ -330,6 +332,7 @@ export const rejectProvider = async (req, res) => {
   const profile = await ProviderProfile.findById(req.params.id);
   if (!profile) return res.status(404).json({ message: "Profile not found" });
   profile.status = "rejected";
+  profile.approved = false;
   profile.rejectionReason = reason || "";
   await profile.save();
   res.json({ message: "Provider rejected", profile });

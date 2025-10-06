@@ -76,10 +76,10 @@ function goToDashboard(role) {
   if (role === "client") {
     router.push("/dashboard/client");
   } else if (role === "provider") {
-    if (!userData.providerOnboarding) {
+    if (!userData.providerOnboarding || !onboardingComplete) {
       router.push("/onboarding/provider");
     } else {
-      router.push("/dashboard/provider");
+      router.push("/provider-status");
     }
   }
 }

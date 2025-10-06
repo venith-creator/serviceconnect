@@ -12,6 +12,12 @@
           <p class="mt-3 text-gray-700">
             Your profile is under review. You will be notified once it's approved.
           </p>
+          <button
+            @click="goBack"
+            class="mt-6 px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+          >
+            ← Go Back
+          </button>
         </div>
 
         <!-- Approved -->
@@ -36,6 +42,12 @@
           >
             Retry Onboarding
           </button>
+          <button
+            @click="goBack"
+            class="mt-6 px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+          >
+            ← Go Back
+          </button>
         </div>
       </template>
     </div>
@@ -50,6 +62,15 @@ const status = ref('');
 const rejectionReason = ref('');
 const loading = ref(true);
 const router = useRouter();
+
+function goBack() {
+  const prev = localStorage.getItem('previousRoute') || '/';
+  if (prev) {
+  router.push(prev);
+  } else {
+    router.push('/dashboard/switch');
+  }
+}
 
 const fetchStatus = async () => {
   loading.value = true;
@@ -72,7 +93,11 @@ const fetchStatus = async () => {
 };
 
 const goToDashboard = () => router.push('/provider-dashboard');
-const retryOnboarding = () => router.push('/provider-onboarding');
+const retryOnboarding = () => {
+  localStorage.removeItem('onboardingComplete');
+  router.push('/onboarding/provider');
+};
+
 
 onMounted(fetchStatus);
 </script>

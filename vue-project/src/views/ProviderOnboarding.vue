@@ -768,6 +768,7 @@ async function submitOnboarding() {
       onboardingStatus.value = "success";
     }
 
+    localStorage.setItem("onboardingComplete", "true");
     router.push("/provider-status");
   } catch (err) {
     onboardingStatus.value = "incomplete";

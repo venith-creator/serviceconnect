@@ -113,6 +113,26 @@ localStorage.setItem("user", JSON.stringify({
   providerOnboarding: data.providerOnboarding
 }));
 
+if (data.roles.includes("provider")) {
+  const profileRes = await fetch(`${API_BASE_URL}/provider-profiles/me`, {
+    headers: { Authorization: `Bearer ${data.token}` },
+  });
+
+  if (profileRes.ok) {
+    const profileData = await profileRes.json();
+
+    // ✅ Only mark complete if they have a profile AND status isn't "draft" or "none"
+    if (["pending", "approved", "rejected"].includes(profileData.status)) {
+      localStorage.setItem("onboardingComplete", "true");
+    } else {
+      localStorage.removeItem("onboardingComplete");
+    }
+  } else {
+    // ❌ No profile yet — brand new provider
+    localStorage.removeItem("onboardingComplete");
+  }
+}
+
 // ✅ Redirect logic
 if (data.roles.includes("admin")) {
   router.push("/dashboard/admin");
