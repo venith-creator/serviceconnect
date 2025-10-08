@@ -76,7 +76,7 @@ onMounted(() => {
     : [userData.roles].filter(Boolean)
 })
 
-function goToDashboard(role) {
+/*function goToDashboard(role) {
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   if (role === 'client') {
     router.push('/dashboard/client')
@@ -84,7 +84,46 @@ function goToDashboard(role) {
     if (!user.providerOnboarding) router.push('/onboarding/provider')
     else router.push('/dashboard/provider')
   }
+}*/
+
+async function goToDashboard(role) {
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (role === "client") {
+    router.push("/dashboard/client");
+    return;
+  }
+
+  if (role === "provider") {
+    const token = localStorage.getItem("token");
+    const onboardingComplete = localStorage.getItem("onboardingComplete") === "true";
+
+    // If onboarding hasn't started
+    if (!userData.providerOnboarding || !onboardingComplete) {
+      router.push("/onboarding/provider");
+      return;
+    }
+
+    // If onboarding is complete, check current provider status
+    try {
+      const res = await fetch(`${API_BASE_URL}/provider-status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch status");
+      const data = await res.json();
+
+      if (data.status === "approved") {
+        router.push("/dashboard/provider");
+      } else {
+        router.push("/provider-status");
+      }
+    } catch (err) {
+      console.error("Error fetching provider status:", err);
+      router.push("/provider-status");
+    }
+  }
 }
+
 
 async function addRole(role) {
   try {

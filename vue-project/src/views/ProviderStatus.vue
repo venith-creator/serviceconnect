@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -63,19 +64,30 @@ const rejectionReason = ref('');
 const loading = ref(true);
 const router = useRouter();
 
-function goBack() {
+/*function goBack() {
   const prev = localStorage.getItem('previousRoute') || '/';
   if (prev) {
   router.push(prev);
   } else {
     router.push('/dashboard/switch');
   }
+}*/
+
+function goBack() {
+  const prev = localStorage.getItem("previousRoute");
+
+  if (!prev || prev.includes("/onboarding/provider") || prev === "/provider-status") {
+    router.push("/dashboard/switch");
+  } else {
+    router.push(prev);
+  }
 }
+
 
 const fetchStatus = async () => {
   loading.value = true;
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE}/provider-status`, {
+    const res = await fetch(`${API_BASE_URL}/provider-profiles/provider-status`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -92,7 +104,7 @@ const fetchStatus = async () => {
   }
 };
 
-const goToDashboard = () => router.push('/provider-dashboard');
+const goToDashboard = () => router.push('/dashboard/provider');
 const retryOnboarding = () => {
   localStorage.removeItem('onboardingComplete');
   router.push('/onboarding/provider');

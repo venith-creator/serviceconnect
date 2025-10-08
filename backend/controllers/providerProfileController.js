@@ -269,6 +269,7 @@ export const approveProfile = async (req, res) => {
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
     profile.approved = true;
+    profile.suspended = false;
     profile.status = "approved";
     await profile.save();
 
@@ -338,12 +339,6 @@ export const rejectProvider = async (req, res) => {
   res.json({ message: "Provider rejected", profile });
 };
 
-export const getProviderStatus = async (req, res) => {
-  const profile = await ProviderProfile.findOne({ user: req.user._id });
-  if (!profile) return res.status(404).json({ message: "Profile not found" });
-  res.json({ status: profile.status, rejectionReason: profile.rejectionReason });
-};
-
 // Approve a specific service
 export const approveService = async (req, res) => {
   const { id, serviceId } = req.params; // profile + service
@@ -375,4 +370,21 @@ export const rejectService = async (req, res) => {
   await profile.save();
 
   res.json({ message: "Service rejected", profile });
+};
+
+export const getProviderStatus = async (req, res) => {
+  try {
+    const profile = await ProviderProfile.findOne({ user: req.user._id });
+    if (!profile) {
+      return res.json({ status: "pending" });
+    }
+    console.log("Provider status check:", req.user._id);
+
+    res.json({
+      status: profile.status,
+      rejectionReason: profile.rejectionReason || "",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

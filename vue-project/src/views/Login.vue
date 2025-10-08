@@ -4,7 +4,7 @@
     <div class="w-full max-w-md bg-white rounded-xl shadow p-8 space-y-6">
       <!-- Heading -->
       <div class="text-center space-y-1">
-        <h2 class="text-2xl font-bold">Welcome Back</h2>
+        <h2 class="text-2xl font-bold">Welcome</h2>
         <p class="text-gray-600 text-sm">Login to continue with Service Connect</p>
       </div>
 
@@ -120,19 +120,17 @@ if (data.roles.includes("provider")) {
 
   if (profileRes.ok) {
     const profileData = await profileRes.json();
-
-    // ✅ Only mark complete if they have a profile AND status isn't "draft" or "none"
     if (["pending", "approved", "rejected"].includes(profileData.status)) {
       localStorage.setItem("onboardingComplete", "true");
     } else {
       localStorage.removeItem("onboardingComplete");
     }
   } else {
-    // ❌ No profile yet — brand new provider
     localStorage.removeItem("onboardingComplete");
   }
+} else {
+  localStorage.removeItem("onboardingComplete");
 }
-
 // ✅ Redirect logic
 if (data.roles.includes("admin")) {
   router.push("/dashboard/admin");

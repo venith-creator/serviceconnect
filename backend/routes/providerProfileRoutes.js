@@ -46,8 +46,8 @@ router.get("/", listAllProfiles);
 router.get("/active", getActiveProviders);
 
 // Public: get profile by id
+router.get("/provider-status", protect, getProviderStatus);
 router.get("/:id", getProfileById);
-router.get("/:id/status", protect, authorizeRoles("provider", "admin"), getProviderStatus);
 
 // Admin: delete, stats, suspend, approve
 router.delete("/:id", protect, authorizeRoles("admin"), deleteProfile);
