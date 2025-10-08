@@ -16,6 +16,14 @@
       Post a new job
     </h1>
 
+    <!-- Success Banner -->
+    <div
+      v-if="successMessage"
+      class="md:col-span-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center"
+    >
+      ✅ {{ successMessage }}
+    </div>
+
     <!-- Left: Form -->
     <section class="md:col-span-2 border rounded-xl shadow p-6 space-y-6">
       <!-- Job Details -->
@@ -236,6 +244,7 @@ const categories = ["Plumbing", "Electrical", "Cleaning", "Painting", "Carpentry
 const customCategory = ref("");
 const attachments = ref([]);
 const submitting = ref(false);
+const successMessage = ref("");
 
 // Handle files
 const handleFiles = (e) => {
@@ -249,6 +258,7 @@ const removeFile = (i) => {
 const submitJob = async () => {
   try {
     submitting.value = true;
+    successMessage.value = "";
     const fd = new FormData();
 
     Object.entries(form.value).forEach(([k, v]) => {
@@ -280,8 +290,14 @@ const submitJob = async () => {
     }
 
 
-    alert("Job posted successfully!");
+    successMessage.value = "Job posted successfully!";
     console.log("Created job:", data);
+
+    Object.keys(form.value).forEach((key) => (form.value[key] = ""));
+    attachments.value = [];
+    customCategory.value = "";
+
+    setTimeout(() => (successMessage.value = ""), 5000);
   } catch (err) {
     console.error("❌ Error posting job:", err);
     alert(err.message || "Error posting job");
