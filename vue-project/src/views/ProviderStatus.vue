@@ -96,6 +96,13 @@ const fetchStatus = async () => {
     const data = await res.json();
     status.value = data.status;
     rejectionReason.value = data.rejectionReason || '';
+
+    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = userData._id || userData.id;
+
+    if (data.status === 'approved' && userId) {
+      localStorage.setItem(`providerApproved_${userId}`, 'true');
+    }
   } catch (err) {
     console.error(err);
     status.value = 'pending';

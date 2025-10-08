@@ -747,6 +747,12 @@ async function submitOnboarding() {
       body: fd,
     });
 
+    if (!form.value.docs.some(d => d.file) || !form.value.portfolio.some(p => p.file)) {
+      alert("Please re-select your files before submitting.");
+      return;
+    }
+
+
     // ⬇️ Instead of a generic error, parse backend response
     if (!res.ok) {
       const errData = await res.json().catch(() => null);

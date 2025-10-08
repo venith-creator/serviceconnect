@@ -1,4 +1,7 @@
 // controllers/providerProfileController.js
+import dotenv from "dotenv";
+dotenv.config();
+
 import ProviderProfile from "../models/ProviderProfile.js";
 import Review from "../models/Review.js";
 import Job from "../models/Job.js";
@@ -37,13 +40,37 @@ export const createOrUpdateProfile = async (req, res) => {
       portfolioCaptions = []
     } = parsedData;
 
-    // 🔹 Grab uploaded files
-    const docs = req.files?.docs?.map((f) => f.path) || [];
-    const portfolio = req.files?.portfolio?.map((f, i) => ({
-      url: f.path,
-      caption: parsedData.portfolioCaptions?.[i] || "" 
-    })) || [];
-    const avatar = req.files?.avatar?.[0]?.path || null;
+    const base = process.env.MINIO_ENDPOINT || "http://localhost:9000";
+    const bucket = process.env.MINIO_BUCKET || "serviceconnect-files";
+    //  Handle .any() format: req.files is an array
+    const allFiles = Array.isArray(req.files) ? req.files : [];
+
+    const docs = allFiles
+      .filter(f => f.fieldname === "docs")
+      .map(f => ({
+        key: f.key,
+        bucket: f.bucket,
+        originalname: f.originalname,
+        location: f.location,
+        url: f.location || `${base}/${bucket}/${f.key}`,
+      }));
+
+    const portfolio = allFiles
+      .filter(f => f.fieldname === "portfolio")
+      .map((f, i) => ({
+        key: f.key,
+        bucket: f.bucket,
+        originalname: f.originalname,
+        caption: parsedData.portfolioCaptions?.[i] || "",
+        location: f.location,
+        url: f.location || `${base}/${bucket}/${f.key}`,
+      }));
+
+    const avatarFile = allFiles.find(f => f.fieldname === "avatar");
+    const avatar = avatarFile
+      ? avatarFile.location || `${base}/${bucket}/${avatarFile.key}`
+      : null;
+
 
     const normalizedServices = services.map(s => ({
       category: s.category,
@@ -134,7 +161,27 @@ export const getProfileById = async (req, res) => {
       .populate("reviewer", "name")
       .sort({ createdAt: -1 });
 
-    res.json({ ...profile.toObject(), reviews });
+      const base = process.env.MINIO_ENDPOINT || "http://localhost:9000";
+    const bucket = process.env.MINIO_BUCKET || "serviceconnect-files";
+
+      const enrichedProfile = {
+      ...profile.toObject(),
+      docs: (profile.docs || []).map((d) => ({
+        ...d,
+        url: d.url || d.location || `${base}/${bucket}/${d.key}`,
+      })),
+      portfolio: (profile.portfolio || []).map((p) => ({
+        ...p,
+        url: p.url || p.location || `${base}/${bucket}/${p.key}`,
+      })),
+      avatar:
+        profile.avatar && !profile.avatar.startsWith("http")
+          ? `${base}/${bucket}/${profile.avatar}`
+          : profile.avatar,
+      reviews,
+    };
+
+    res.json({ profile: enrichedProfile });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

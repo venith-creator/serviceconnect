@@ -18,7 +18,15 @@ const providerProfileSchema = new mongoose.Schema({
 
   status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
   rejectionReason: { type: String, default: "" },
-  docs: [String], // certificates, licenses
+  docs: [
+    {
+      key: String,
+      bucket: String,
+      originalname: String,
+      location: String,
+      url: String,
+    }
+  ],
   serviceRadiusKm: { type: Number, default: 0 },
   description: String,
   city: String,
@@ -31,7 +39,16 @@ const providerProfileSchema = new mongoose.Schema({
   paymentOptions: [String],
 
   pastJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
-  portfolio: [{ url: String, caption: String }], // photos/videos of past work
+  portfolio: [
+    {
+      key: String,
+      bucket: String,
+      originalname: String,
+      caption: String,
+      location: String,
+      url: String,
+    }
+  ],
   avatar: { type: String },
 
   ratingAvg: { type: Number, default: 0 },

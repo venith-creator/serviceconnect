@@ -88,6 +88,7 @@ onMounted(() => {
 
 async function goToDashboard(role) {
   const userData = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = userData._id || userData.id;
 
   if (role === "client") {
     router.push("/dashboard/client");
@@ -97,7 +98,12 @@ async function goToDashboard(role) {
   if (role === "provider") {
     const token = localStorage.getItem("token");
     const onboardingComplete = localStorage.getItem("onboardingComplete") === "true";
+    const providerApproved = userId && (localStorage.getItem(`providerApproved_${userId}`) === "true");
 
+    if (providerApproved) {
+      router.push("/dashboard/provider");
+      return;
+    }
     // If onboarding hasn't started
     if (!userData.providerOnboarding || !onboardingComplete) {
       router.push("/onboarding/provider");
@@ -106,14 +112,20 @@ async function goToDashboard(role) {
 
     // If onboarding is complete, check current provider status
     try {
-      const res = await fetch(`${API_BASE_URL}/provider-status`, {
+      const res = await fetch(`${API_BASE_URL}/provider-profiles/provider-status`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch status");
       const data = await res.json();
 
+      if (userId) {
       if (data.status === "approved") {
+        localStorage.setItem(`providerApproved_${userId}`, "true");
         router.push("/dashboard/provider");
+      } else {
+        localStorage.removeItem(`providerApproved_${userId}`);
+        router.push("/provider-status");
+      }
       } else {
         router.push("/provider-status");
       }

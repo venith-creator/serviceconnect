@@ -107,6 +107,7 @@ const handleLogin = async () => {
 localStorage.setItem("token", data.token);
 localStorage.setItem("user", JSON.stringify({
   id: data._id,
+  _id: data._id,
   name: data.name,
   email: data.email,
   roles: data.roles,

@@ -143,49 +143,126 @@
           </div>
         </div>
       </div>
-      <!-- View Provider Modal -->
+     <!-- View Provider Modal -->
       <div
         v-if="showProviderModal"
-        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
       >
-        <div class="bg-white p-6 rounded-lg shadow-lg w-[600px] max-h-[80vh] overflow-y-auto">
-          <h2 class="text-xl font-semibold mb-4">Provider Details</h2>
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto border border-gray-200">
+          <h2 class="text-2xl font-semibold mb-4 text-gray-800">Provider Details</h2>
 
           <div v-if="selectedProvider">
-            <p><strong>Name:</strong> {{ selectedProvider.user?.name }}</p>
-            <p><strong>Email:</strong> {{ selectedProvider.user?.email }}</p>
-            <p><strong>City:</strong> {{ selectedProvider.city }}, {{ selectedProvider.state }}</p>
-            <p><strong>Experience:</strong> {{ selectedProvider.yearsOfExperience || 'N/A' }}</p>
-            <p><strong>Bio:</strong> {{ selectedProvider.description || 'No bio provided.' }}</p>
+            <!-- Profile Header -->
+            <div class="flex items-center gap-4 mb-5 border-b pb-3">
+              <img
+                :src="selectedProvider.avatar?.url || selectedProvider.avatar || '/default-avatar.png'"
+                alt="Avatar"
+                class="w-20 h-20 rounded-full object-cover border shadow-sm"
+              />
+              <div>
+                <h3 class="text-lg font-bold">{{ selectedProvider.user?.name || 'Unknown' }}</h3>
+                <p class="text-gray-500 text-sm">{{ selectedProvider.user?.email }}</p>
+                <p class="text-gray-700 text-sm mt-1">
+                  <strong>Status:</strong> <span class="capitalize">{{ selectedProvider.status }}</span>
+                </p>
+              </div>
+            </div>
 
-            <div class="mt-3">
-              <h3 class="font-semibold mb-1">Documents</h3>
-              <ul class="list-disc pl-5">
-                <li v-for="doc in selectedProvider.docs" :key="doc">
-                  <a :href="doc" target="_blank" class="text-green-600 underline">View Document</a>
+            <!-- Basic Info -->
+            <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+              <p><strong>City:</strong> {{ selectedProvider.city || '-' }}</p>
+              <p><strong>State:</strong> {{ selectedProvider.state || '-' }}</p>
+              <p><strong>Experience:</strong> {{ selectedProvider.yearsOfExperience || 'N/A' }} yrs</p>
+              <p><strong>Rate:</strong> {{ selectedProvider.rate ? `$${selectedProvider.rate}/hr` : 'N/A' }}</p>
+              <p><strong>Languages:</strong> {{ selectedProvider.languages || '-' }}</p>
+              <p><strong>Availability:</strong> {{ selectedProvider.availability || '-' }}</p>
+            </div>
+
+            <p class="mt-3 text-gray-700">
+              <strong>Bio:</strong><br />
+              <span class="text-gray-600">{{ selectedProvider.description || 'No bio provided.' }}</span>
+            </p>
+
+            <!-- Documents -->
+            <div class="mt-6">
+              <h3 class="font-semibold mb-2 text-gray-800">Documents</h3>
+              <div v-if="selectedProvider.docs?.length" class="space-y-1">
+                <a
+                  v-for="(doc, i) in selectedProvider.docs"
+                  :key="i"
+                  :href="doc.url"
+                  target="_blank"
+                  class="text-green-600 underline hover:text-green-700 flex items-center gap-2"
+                >
+                  📄 {{ doc.originalname || `Document ${i + 1}` }}
+                </a>
+              </div>
+              <p v-else class="text-gray-400 text-sm">No documents uploaded.</p>
+            </div>
+
+            <!-- Portfolio -->
+            <div class="mt-6">
+              <h3 class="font-semibold mb-2 text-gray-800">Portfolio</h3>
+              <div
+                v-if="selectedProvider.portfolio?.length"
+                class="grid grid-cols-2 md:grid-cols-3 gap-3"
+              >
+                <div
+                  v-for="(item, i) in selectedProvider.portfolio"
+                  :key="i"
+                  class="border rounded-lg overflow-hidden bg-gray-50 hover:shadow-md transition"
+                >
+                  <img
+                    :src="item.url"
+                    alt="Portfolio item"
+                    class="w-full h-32 object-cover"
+                  />
+                  <p class="text-sm text-gray-600 p-2">{{ item.caption || 'No caption' }}</p>
+                </div>
+              </div>
+              <p v-else class="text-gray-400 text-sm">No portfolio uploaded.</p>
+            </div>
+
+            <!-- Services -->
+            <div v-if="selectedProvider.services?.length" class="mt-6">
+              <h3 class="font-semibold mb-2 text-gray-800">Services Offered</h3>
+              <ul class="divide-y divide-gray-200">
+                <li
+                  v-for="(srv, i) in selectedProvider.services"
+                  :key="i"
+                  class="py-2 flex justify-between items-center"
+                >
+                  <span>{{ srv.category }}</span>
+                  <span class="text-gray-500 text-sm">
+                    {{ srv.rate ? `$${srv.rate}` : 'N/A' }} • {{ srv.availability || 'N/A' }}
+                  </span>
                 </li>
               </ul>
             </div>
-
-            <div class="mt-3">
-              <h3 class="font-semibold mb-1">Portfolio</h3>
-              <div class="grid grid-cols-2 gap-2">
-                <div v-for="item in selectedProvider.portfolio" :key="item.url">
-                  <img
-                    :src="item.url"
-                    class="w-full h-32 object-cover rounded"
-                    alt="Portfolio item"
-                  />
-                  <p class="text-sm text-gray-500 mt-1">{{ item.caption }}</p>
-                </div>
-              </div>
-            </div>
           </div>
 
+          <!-- Buttons -->
           <div class="mt-6 flex justify-end gap-2">
-            <button @click="showProviderModal = false" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Close</button>
-            <button @click="approveProvider(selectedProvider._id)" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
-            <button @click="openRejectModal(selectedProvider._id)" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>
+            <button
+              @click="showProviderModal = false"
+              class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+            >
+              Close
+            </button>
+            <button
+              v-if="selectedProvider.status === 'pending'"
+              @click="approveProvider(selectedProvider._id)"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Approve
+            </button>
+            <button
+              v-if="selectedProvider.status === 'pending'"
+              @click="openRejectModal(selectedProvider._id)"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Reject
+            </button>
           </div>
         </div>
       </div>
@@ -338,7 +415,7 @@ const viewProvider = async (id: string) => {
       },
     });
     const data = await res.json();
-    selectedProvider.value = data;
+    selectedProvider.value = data.profile || data;
     showProviderModal.value = true;
   } catch (err) {
     console.error("Error fetching provider:", err);
