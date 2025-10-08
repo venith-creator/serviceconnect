@@ -1,4 +1,14 @@
 <template>
+  <div class="min-h-screen bg-white p-6 space-y-6">
+
+  <!-- Guest Note -->
+      <div class="border rounded-xl bg-yellow-50 p-4 ">
+        <h3 class="font-semibold text-yellow-700">Important for Guests</h3>
+        <p class="text-sm text-yellow-800 mt-1">
+          If you’re posting as a guest, please enter your correct email and phone number.
+          This ensures that when you sign up later as a homeowner, you can track your posted jobs as long as you enter the email and phone number you inputed here.
+        </p>
+      </div>
   <div class="min-h-screen bg-white p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
 
     <!-- Page Title -->
@@ -154,10 +164,13 @@
         <button
           @click="submitJob"
           class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700"
+          :disabled="submitting"
         >
-          Post Job
+            <span v-if="submitting">Submitting...</span>
+            <span v-else>Post Job</span>
         </button>
       </div>
+
     </section>
 
     <!-- Right: Tips -->
@@ -191,16 +204,9 @@
           <span v-else class="text-gray-500">Enter location to see map</span>
         </div>
       </div>
-      <!-- Guest Note -->
-      <div class="border rounded-xl bg-yellow-50 p-4 mt-4">
-        <h3 class="font-semibold text-yellow-700">Important for Guests</h3>
-        <p class="text-sm text-yellow-800 mt-1">
-          If you’re posting as a guest, please enter your correct email and phone number.
-          This ensures that when you sign up later as a homeowner, you can track your posted jobs as long as you enter the email and phone number you inputed here.
-        </p>
-      </div>
 
     </aside>
+  </div>
   </div>
 </template>
 
@@ -229,6 +235,7 @@ const form = ref({
 const categories = ["Plumbing", "Electrical", "Cleaning", "Painting", "Carpentry"];
 const customCategory = ref("");
 const attachments = ref([]);
+const submitting = ref(false);
 
 // Handle files
 const handleFiles = (e) => {
@@ -241,6 +248,7 @@ const removeFile = (i) => {
 // Submit job with fetch
 const submitJob = async () => {
   try {
+    submitting.value = true;
     const fd = new FormData();
 
     Object.entries(form.value).forEach(([k, v]) => {
@@ -277,6 +285,8 @@ const submitJob = async () => {
   } catch (err) {
     console.error("❌ Error posting job:", err);
     alert(err.message || "Error posting job");
+  } finally {
+    submitting.value = false; // stop loading
   }
 };
 
