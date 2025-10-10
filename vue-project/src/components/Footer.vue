@@ -89,7 +89,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Solihull, United Kingdom</span>
+              <span>Sedab House1 - 3 Market place,
+                willenhall
+                WV13 2AA
+              </span>
             </div>
             <div class="flex items-center space-x-3">
               <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

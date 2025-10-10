@@ -162,7 +162,7 @@ export const acceptProposal = async (req, res) => {
       { $set: { status: "rejected" } }
     );
 
-    const participants = [job.client, proposal.provider.user];
+    const participants = [job.client, proposal.provider];
     const existingChat = await ChatRoom.findOne({job: job._id});
 
     if (!existingChat) {

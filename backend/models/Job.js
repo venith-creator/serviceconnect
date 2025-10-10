@@ -13,9 +13,14 @@ const jobSchema = new mongoose.Schema(
     clientEmail: { type: String },
     clientPhone: { type: String },
     location: {
-      type: { type: String, default: "Point" },
-      coordinates: { type: [Number] }, // [lng, lat]
+      type: { type: String, enum: ["Point"], default: "Point" },
+      coordinates: { type: [Number], required: true }, // [longitude, latitude]
+      address: {
+        type: String, // "Ikorodu, Lagos"
+        required: true,
+      },
     },
+
     city: String,
     state: String,
     country: String,

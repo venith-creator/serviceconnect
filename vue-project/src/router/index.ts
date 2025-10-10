@@ -24,6 +24,7 @@ import ManagesChat from '@/views/client/ManagesChat.vue';
 import ManagesJobs from '@/views/client/ManagesJobs.vue';
 import ViewProviders from '@/views/client/ViewProviders.vue';
 import ManagesReviews from '@/views/client/ManagesReviews.vue';
+import JobProposals from '@/views/client/JobProposals.vue';
 
 //providerDashboard
 import ProviderDashboard from "@/views/Provider/ProviderDashboard.vue";
@@ -107,6 +108,12 @@ const router = createRouter({
       path: '/dashboard/client/Manageschat',
       name: 'ClientDashboardManageschat',
       component: ManagesChat,
+      meta: { layout: 'dashboard' }
+    },
+    {
+      path: '/dashboard/client/job/:jobId/proposals',
+      name: 'ClientDashboardJobProposals',
+      component: JobProposals,
       meta: { layout: 'dashboard' }
     },
     {

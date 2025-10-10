@@ -2,6 +2,7 @@
 import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
+import fetch from "node-fetch";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
@@ -40,6 +41,7 @@ export const createJob = async (req, res) => {
           key: f.key,        // optional: useful if you want to delete later
         })) || [];
 
+    const geoLocation = await geocodeLocation(location);
     let jobData = {
       category,
       title,
@@ -48,7 +50,11 @@ export const createJob = async (req, res) => {
       timelineStart,
       timelineEnd,
       attachments,
-      location,
+      location: {
+        type: "Point",
+        coordinates: geoLocation.coordinates,
+        address: location,
+      },
       city,
       state,
       country,
@@ -84,16 +90,74 @@ export const createJob = async (req, res) => {
   }
 };
 
+const geocodeLocation = async (address) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+    );
+    const data = await response.json();
+    if (data.length > 0) {
+      return {
+        type: "Point",
+        coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)],
+        address,
+      };
+    }
+  } catch (err) {
+    console.error("Geocoding failed:", err);
+  }
+  // fallback (if no match)
+  return {
+    type: "Point",
+    coordinates: [0, 0],
+    address,
+  };
+};
 
-// GET all jobs
+// ✅ GET all jobs (with optional filters)
 export const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate("client", "name email roles");
+    const { keyword, category, location, lat, lon, maxDistance, city, state, country } = req.query;
+    const filter = {};
+
+    //  Keyword filter (by title)
+    if (keyword) {
+      filter.title = { $regex: keyword, $options: "i" };
+    }
+
+    //  Category filter
+    if (category) {
+      filter.category = category;
+    }
+
+    //  Text-based city/state/country filter
+    if (city) filter.city = { $regex: city, $options: "i" };
+    if (state) filter.state = { $regex: state, $options: "i" };
+    if (country) filter.country = { $regex: country, $options: "i" };
+
+    // 📍 Optional text address filter (for manual input)
+    if (location) {
+      filter["location.address"] = { $regex: location, $options: "i" };
+    }
+
+    //  Geo-filter: find jobs near given coordinates
+    if (lat && lon) {
+      filter.location = {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(lon), parseFloat(lat)] },
+          $maxDistance: maxDistance ? parseInt(maxDistance) : 10000, // 10 km default
+        },
+      };
+    }
+
+    const jobs = await Job.find(filter).populate("client", "name email roles");
     res.json(jobs);
   } catch (error) {
+    console.error("❌ Error fetching jobs:", error);
     res.status(500).json({ message: "Error fetching jobs", error: error.message });
   }
 };
+
 
 // GET single job by ID + proposals
 export const getJobById = async (req, res) => {

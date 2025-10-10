@@ -26,6 +26,7 @@
           <!-- Info Grid -->
           <div class="text-sm text-gray-700 space-y-1 mb-4">
             <p><strong>Category:</strong> {{ job.category }}</p>
+            <p><strong>Location:</strong> {{ job.location?.address || "N/A" }}</p>
             <p><strong>Budget:</strong> ${{ job.budget }}</p>
             <p><strong>Status:</strong>
               <span
@@ -94,12 +95,19 @@
 import { ref, onMounted } from "vue";
 import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 interface Job {
   _id: string;
   title: string;
   description: string;
   category: string;
+  location?: {
+    type: string;
+    coordinates: number[];
+    address: string;
+  };
   budget: number;
   status: "open" | "taken" | "active" | "completed" | "cancelled" | "pending" | "draft";
   timelineStart?: string;
@@ -130,7 +138,7 @@ const fetchJobs = async () => {
 const viewProposals = (jobId: string) => {
   // Redirect to a proposals page for that job
   // (You can build /client/job/:id/proposals next)
-  window.location.href = `/client/job/${jobId}/proposals`;
+  router.push(`/dashboard/client/job/${jobId}/proposals`);
 };
 
 const deleteJob = async (id: string) => {
