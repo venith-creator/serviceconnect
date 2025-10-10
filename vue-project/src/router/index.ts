@@ -32,6 +32,7 @@ import ManagesProposals from '@/views/Provider/ManagesProposals.vue';
 import viewJobs from '@/views/Provider/viewJobs.vue';
 import ManagesChats from '@/views/Provider/ManagesChats.vue';
 import ManagesReview from '@/views/Provider/ManagesReview.vue';
+import SubscriptionManagement from "@/views/SubscriptionManagement.vue";
 
 
 const router = createRouter({
@@ -43,8 +44,7 @@ const router = createRouter({
   { path: "/dashboard/switch", component: DashboardSwitch },
   { path: "/onboarding/provider", component: () => import('@/views/ProviderOnboarding.vue') },
   { path: "/post-job", component: () => import('@/views/PostJob.vue')},
-  { path: "/provider-status", component: ProviderStatus},
-
+  { path: "/provider-status", component: ProviderStatus },
   // AdminDashboard routes
     { path: "/dashboard/admin", component: AdminDashboard, name: 'AdminDashboard', meta: { layout: 'dashboard'} },
     {
@@ -161,6 +161,12 @@ const router = createRouter({
       component: ManagesProposals,
       meta: { layout: 'dashboard' }
     },
+    {
+      path: '/dashboard/provider/subscription',
+      name: 'SubscriptionManagement',
+      component: SubscriptionManagement,
+      meta: { layout: 'dashboard' }
+    },
 ],
 scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
@@ -177,10 +183,12 @@ scrollBehavior(to, from, savedPosition) {
 }
 )
 router.beforeEach((to, from, next) => {
+  // Store the previous route for onboarding/providers
   if (['/onboarding/provider', '/provider-status'].includes(to.path)) {
     localStorage.setItem('previousRoute', from.fullPath || '/dashboard/switch');
   }
 
+  // Check if onboarding is complete
   const onboardingComplete = localStorage.getItem('onboardingComplete') === 'true';
   if (to.path === '/onboarding/provider' && onboardingComplete) {
     return next('/provider-status');
@@ -189,6 +197,19 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/provider-status' && !onboardingComplete) {
     return next('/onboarding/provider');
   }
+
+  // Check if the route requires authentication
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login if not authenticated
+      return next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      });
+    }
+  }
+
   next();
 });
 export default router

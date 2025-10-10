@@ -8,10 +8,12 @@ const providerProfileSchema = new mongoose.Schema({
       rate: Number,
       availability: String, // free text
       radiusKm: Number,
-      status: { type: String, default: "trial" }, // trial, active, suspended
+      status: { type: String, default: "trial" }, // trial, active, suspended, expired
       trialEndsAt: Date,
+      subscriptionExpiresAt: Date, // for paid subscriptions
       approved: { type: Boolean, default: false },
       rejectionReason: { type: String, default: "" },
+      requiresPayment: { type: Boolean, default: false }, // true when trial expires
       _id: { type: mongoose.Schema.Types.ObjectId, auto: true }
     }
   ],
@@ -63,6 +65,11 @@ const providerProfileSchema = new mongoose.Schema({
 
   approved: { type: Boolean, default: false },
   suspended: { type: Boolean, default: false },
+
+  // Stripe subscription management
+  stripeCustomerId: { type: String },
+  hasActiveSubscription: { type: Boolean, default: false },
+  subscriptionPlan: { type: String, enum: ["basic", "premium"], default: "basic" },
 
   createdAt: { type: Date, default: Date.now }
 });

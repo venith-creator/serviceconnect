@@ -301,7 +301,7 @@ export const suspendProfile = async (req, res) => {
     const profile = await ProviderProfile.findById(req.params.id);
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    profile.suspended = true; // add `suspended` field in schema if not present**
+    profile.suspended = true;
     await profile.save();
 
     res.json({ message: "Provider suspended", profile });
@@ -376,47 +376,57 @@ export const getActiveProviders = async (req, res) => {
 };
 
 export const rejectProvider = async (req, res) => {
-  const { reason } = req.body;
-  const profile = await ProviderProfile.findById(req.params.id);
-  if (!profile) return res.status(404).json({ message: "Profile not found" });
-  profile.status = "rejected";
-  profile.approved = false;
-  profile.rejectionReason = reason || "";
-  await profile.save();
-  res.json({ message: "Provider rejected", profile });
+  try {
+    const { reason } = req.body;
+    const profile = await ProviderProfile.findById(req.params.id);
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    profile.status = "rejected";
+    profile.approved = false;
+    profile.rejectionReason = reason || "";
+    await profile.save();
+    res.json({ message: "Provider rejected", profile });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Approve a specific service
 export const approveService = async (req, res) => {
-  const { id, serviceId } = req.params; // profile + service
-  const profile = await ProviderProfile.findById(id);
-  if (!profile) return res.status(404).json({ message: "Profile not found" });
+  try {
+    const { id, serviceId } = req.params;
+    const profile = await ProviderProfile.findById(id);
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-  const service = profile.services.id(serviceId);
-  if (!service) return res.status(404).json({ message: "Service not found" });
+    const service = profile.services.id(serviceId);
+    if (!service) return res.status(404).json({ message: "Service not found" });
 
-  service.approved = true;
-  await profile.save();
+    service.approved = true;
+    await profile.save();
 
-  res.json({ message: "Service approved", profile });
+    res.json({ message: "Service approved", profile });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Reject a specific service
 export const rejectService = async (req, res) => {
-  const { id, serviceId } = req.params;
-  const { reason } = req.body;
-  const profile = await ProviderProfile.findById(id);
-  if (!profile) return res.status(404).json({ message: "Profile not found" });
+  try {
+    const { id, serviceId } = req.params;
+    const { reason } = req.body;
+    const profile = await ProviderProfile.findById(id);
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-  const service = profile.services.id(serviceId);
-  if (!service) return res.status(404).json({ message: "Service not found" });
+    const service = profile.services.id(serviceId);
+    if (!service) return res.status(404).json({ message: "Service not found" });
 
-  service.approved = false;
-  service.status = "rejected";
-  service.rejectionReason = reason || "";
-  await profile.save();
+    service.approved = false;
+    service.status = "rejected";
+    service.rejectionReason = reason || "";
+    await profile.save();
 
-  res.json({ message: "Service rejected", profile });
+    res.json({ message: "Service rejected", profile });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const getProviderStatus = async (req, res) => {
@@ -427,9 +437,72 @@ export const getProviderStatus = async (req, res) => {
     }
     console.log("Provider status check:", req.user._id);
 
+    const servicesStatus = profile.services.map(service => ({
+      id: service._id,
+      category: service.category,
+      status: service.status,
+      trialEndsAt: service.trialEndsAt,
+      subscriptionExpiresAt: service.subscriptionExpiresAt,
+      requiresPayment: service.requiresPayment,
+      approved: service.approved,
+    }));
+
     res.json({
       status: profile.status,
       rejectionReason: profile.rejectionReason || "",
+      hasActiveSubscription: profile.hasActiveSubscription,
+      services: servicesStatus,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Get all services for the current provider
+ */
+export const getProviderServices = async (req, res) => {
+  try {
+    // Get the provider's profile with services
+    const profile = await ProviderProfile.findOne({ user: req.user._id })
+      .select('services')
+      .lean();
+    
+    if (!profile) {
+      return res.status(404).json({ message: 'Provider profile not found' });
+    }
+
+    // Return the services array from the profile
+    res.json(profile.services || []);
+  } catch (error) {
+    console.error('Error fetching provider services:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/**
+ * Get services requiring payment
+ */
+export const getServicesRequiringPayment = async (req, res) => {
+  try {
+    const profile = await ProviderProfile.findOne({ user: req.user._id });
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    const servicesRequiringPayment = profile.services.filter(
+      service => service.requiresPayment && service.status === "expired"
+    );
+
+    res.json({
+      count: servicesRequiringPayment.length,
+      services: servicesRequiringPayment.map(service => ({
+        id: service._id,
+        category: service.category,
+        status: service.status,
+        trialEndsAt: service.trialEndsAt,
+        rate: service.rate,
+      })),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
