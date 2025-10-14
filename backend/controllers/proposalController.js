@@ -42,38 +42,52 @@ export const createProposal = async (req, res) => {
 export const getMyProposals = async (req, res) => {
   try {
     const providerProfile = await ProviderProfile.findOne({ user: req.user._id });
+
     const proposals = await Proposal.find({ provider: providerProfile._id })
-      .populate("job", "title category budget status")
+      .populate({
+        path: "job",
+        select: "title category budget status client",
+        populate: {
+          path: "client",
+          select: "name email",
+        },
+      })
       .populate({
         path: "provider",
-        select: "headline services", // enrich provider info
+        select: "headline services",
         populate: { path: "user", select: "name email" },
       });
+
     res.json(proposals);
   } catch (error) {
     res.status(500).json({ message: "Error fetching proposals", error: error.message });
   }
 };
 
-// GET proposals for a specific job (client only)
+
 export const getProposalsForJob = async (req, res) => {
   try {
     const proposals = await Proposal.find({
       job: req.params.jobId,
-      status: { $in: ["pending", "accepted"] }, // exclude withdrawn/rejected
+      status: { $in: ["pending", "accepted", "completed"] },
     })
       .populate({
         path: "provider",
         select: "headline services",
         populate: { path: "user", select: "name email" },
       })
-      .populate("job", "title category");
+      .populate({
+        path: "job",
+        select: "title category client",
+        populate: { path: "client", select: "name email" }, // 👈 Added this
+      });
 
     res.json(proposals);
   } catch (error) {
     res.status(500).json({ message: "Error fetching proposals", error: error.message });
   }
 };
+
 
 // UPDATE proposal (provider only)
 export const updateProposal = async (req, res) => {
@@ -131,53 +145,98 @@ export const getAllProposals = async (req, res) => {
 
 // ACCEPT proposal (client chooses a provider)
 export const acceptProposal = async (req, res) => {
+  console.log("🟢 Incoming request to accept proposal");
+  console.log("User ID from token:", req.user?._id);
+  console.log("Proposal ID param:", req.params.id);
+
   try {
+    // 1️⃣ Find proposal and its linked job
     const proposal = await Proposal.findById(req.params.id).populate("job provider");
-    if (!proposal) return res.status(404).json({ message: "Proposal not found" });
+    if (!proposal) {
+      console.warn("❌ Proposal not found with ID:", req.params.id);
+      return res.status(404).json({ message: "Proposal not found" });
+    }
 
     const job = await Job.findById(proposal.job._id);
+    if (!job) {
+      console.warn("❌ Linked job not found for proposal:", proposal._id);
+      return res.status(404).json({ message: "Linked job not found" });
+    }
 
-    // Ensure only job owner (client) can accept
+    // 2️⃣ Log key context
+    console.log("🔹 Job ID:", job._id);
+    console.log("🔹 Job client:", job.client);
+    console.log("🔹 Proposal provider:", proposal.provider?._id);
+    console.log("🔹 Job status:", job.status);
+
+    // 3️⃣ Authorization check — only job owner can accept
     if (job.client.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to accept this proposal" });
+      console.warn("🚫 Unauthorized attempt: user", req.user._id, "is not job owner", job.client);
+      return res.status(403).json({
+        message: "You are not authorized to accept this proposal — only the job owner can do that",
+        debug: { loggedInUser: req.user._id, jobClient: job.client }
+      });
     }
 
-    // Prevent re-accepting if job already active/completed
+    // 4️⃣ Status check
     if (job.status !== "open") {
-      return res.status(400).json({ message: "Job is not open for new proposals" });
+      console.warn("⚠️ Job is not open:", job.status);
+      return res.status(400).json({
+        message: "Job is not open for new proposals",
+        debug: { currentStatus: job.status }
+      });
     }
 
-    // Update job → assign provider + activate
+    // 5️⃣ Update job status and assign provider
     job.status = "active";
     job.assignedProvider = proposal.provider._id;
     await job.save();
+    console.log("✅ Job status updated to ACTIVE and provider assigned:", proposal.provider._id);
 
-    // Mark this proposal as accepted
+    // 6️⃣ Update proposal to accepted
     proposal.status = "accepted";
     await proposal.save();
+    console.log("✅ Proposal marked as ACCEPTED:", proposal._id);
 
-    // Reject all other proposals for this job
-    await Proposal.updateMany(
+    // 7️⃣ Reject other proposals for same job
+    const rejectResult = await Proposal.updateMany(
       { job: job._id, _id: { $ne: proposal._id } },
       { $set: { status: "rejected" } }
     );
+    console.log("🔻 Other proposals rejected:", rejectResult.modifiedCount);
 
-    const participants = [job.client, proposal.provider];
-    const existingChat = await ChatRoom.findOne({job: job._id});
-
+    // 8️⃣ Create chat room if it doesn't exist
+    const participants = [job.client, proposal.provider.user || proposal.provider];
+    const existingChat = await ChatRoom.findOne({ job: job._id });
     if (!existingChat) {
       await ChatRoom.create({
         job: job._id,
         participants,
         createdBy: req.user._id,
       });
+      console.log("💬 New ChatRoom created for job:", job._id);
+    } else {
+      console.log("💬 ChatRoom already exists for job:", job._id);
     }
 
-    res.json({ message: "Proposal accepted, job activated", job, acceptedProposal: proposal });
+    // 9️⃣ Success
+    console.log("🎉 Proposal accepted successfully for job:", job._id);
+    res.json({
+      message: "Proposal accepted successfully",
+      job,
+      acceptedProposal: proposal
+    });
+
   } catch (error) {
-    res.status(500).json({ message: "Error accepting proposal", error: error.message });
+    console.error("🔥 Error in acceptProposal:", error);
+    res.status(500).json({
+      message: "Error accepting proposal",
+      error: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    });
   }
 };
+
 
 // WITHDRAW proposal (provider only)
 export const withdrawProposal = async (req, res) => {

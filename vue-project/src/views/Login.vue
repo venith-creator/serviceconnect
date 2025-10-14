@@ -113,6 +113,7 @@ localStorage.setItem("user", JSON.stringify({
   roles: data.roles,
   providerOnboarding: data.providerOnboarding
 }));
+localStorage.setItem("userId", data._id);
 
 if (data.roles.includes("provider")) {
   const profileRes = await fetch(`${API_BASE_URL}/provider-profiles/me`, {

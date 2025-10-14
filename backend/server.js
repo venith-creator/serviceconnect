@@ -45,19 +45,7 @@ app.use((req, res, next) => {
 const server = http.createServer(app);
 const io = initSocket(server);
 
-// 🔌 Socket.io Connection Logs
-io.on("connection", (socket) => {
-  console.log(`🟢 Socket connected: ${socket.id} from ${socket.handshake.address}`);
-  console.log("Handshake headers:", socket.handshake.headers["user-agent"]);
 
-  socket.on("disconnect", (reason) => {
-    console.log(`🔴 Socket disconnected: ${socket.id} | Reason: ${reason}`);
-  });
-
-  socket.on("error", (err) => {
-    console.error(`⚠️ Socket error on ${socket.id}:`, err);
-  });
-});
 
 setSocketServer(io);
 const DEFAULT_PORT = process.env.PORT || 5000;

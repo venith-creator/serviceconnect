@@ -4,12 +4,16 @@ let io = null;
 
 export const initSocket = (server) => {
   const socketio = new Server(server, {
-    cors: { origin: "*" }
+    cors: { origin: "*" },
+    path: "/socket.io",
+    transports: ["websocket", "polling"],
+    pingTimeout: 60000,
   });
 
   io = socketio;
 
   io.on("connection", (socket) => {
+    console.log(`🟢 Socket connected: ${socket.id}`);
     // client should join room(s) by calling socket.emit('joinRoom', { roomId })
     socket.on("joinRoom", ({ roomId }) => {
       if (roomId) socket.join(roomId);

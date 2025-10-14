@@ -275,3 +275,30 @@ export const assignProvider = async (req, res ) => {
     res.status(500).json({ message: "Error assigning provider", error: error.message});
   }
 };
+// ✅ CLIENT: mark job as completed
+export const markJobCompleted = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    // Only job owner can mark as completed
+    if (job.client.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to complete this job" });
+    }
+
+    // Update job status
+    job.status = "completed";
+    await job.save();
+
+    // Also update accepted proposal (if any)
+    await Proposal.updateMany(
+      { job: job._id, status: "accepted" },
+      { $set: { status: "completed" } }
+    );
+
+    res.json({ message: "Job marked as completed successfully", job });
+  } catch (error) {
+    console.error("❌ markJobCompleted error:", error);
+    res.status(500).json({ message: "Error marking job completed", error: error.message });
+  }
+};

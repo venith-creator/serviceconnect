@@ -1,10 +1,8 @@
 <template>
   <div>
-    <!-- Header -->
     <header
       class="border-b bg-[#F8F4FF]/95 backdrop-blur supports-[backdrop-filter]:bg-[#F8F4FF]/60 sticky top-0 z-50"
     >
-
       <div class="container mx-auto px-4 h-16 flex items-center justify-between">
         <!-- Logo -->
         <div class="flex items-center space-x-2">
@@ -18,7 +16,7 @@
           </router-link>
         </div>
 
-        <!-- Desktop Navigation -->
+        <!-- Desktop Nav -->
         <nav class="hidden md:flex items-center space-x-8">
           <a href="#how" class="text-black hover:text-gray-700 font-medium transition-colors">How it Works</a>
           <a href="#testimonials" class="text-black hover:text-gray-700 font-medium transition-colors">Testimonials</a>
@@ -26,20 +24,54 @@
         </nav>
 
         <!-- Desktop Buttons -->
-        <div class="hidden md:flex items-center space-x-4">
+        <div class="hidden md:flex items-center space-x-4 relative">
           <router-link
             to="/post-job"
             class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
           >
             Post Job
           </router-link>
+
+         <!-- Signup with dropdown -->
+        <div class="relative">
+          <!-- Signup button -->
           <router-link
-          to="/signup?role=provider"
-          class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
-        >
-          Join as a Provider
-        </router-link>
+            to="/signup"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-primary hover:opacity-90 transition-colors"
+            @click.stop="toggleDropdown"
+          >
+            Signup
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 9l-7 7-7-7" />
+            </svg>
+          </router-link>
+
+          <!-- Dropdown -->
+          <transition name="fade">
+            <div
+              v-if="showDropdown"
+              class="absolute left-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50"
+            >
+              <router-link
+                to="/login"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                @click="closeDropdown"
+              >
+                Login
+              </router-link>
+            </div>
+          </transition>
         </div>
+
+        </div>
+
 
         <!-- Mobile Hamburger -->
         <button
@@ -53,7 +85,7 @@
       </div>
     </header>
 
-    <!-- Mobile Menu Backdrop -->
+    <!-- Mobile Backdrop -->
     <div
       v-if="isMobileMenuOpen"
       class="fixed inset-0 z-40 md:hidden"
@@ -96,19 +128,28 @@
         <!-- Drawer Buttons -->
         <div class="p-6 border-t border-gray-100 space-y-4 flex flex-col">
           <router-link
-          to="/post-job"
-          class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
-        >
-          Post Job
-        </router-link>
+            to="/post-job"
+            class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
+            @click="closeMobileMenu"
+          >
+            Post Job
+          </router-link>
 
-        <router-link
-          to="/signup?role=provider"
-          class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
-        >
-          Join as a Provider
-        </router-link>
+          <router-link
+            to="/signup"
+            class="px-4 py-2 rounded-lg text-white transition-colors bg-primary hover:opacity-90"
+            @click="closeMobileMenu"
+          >
+            Signup
+          </router-link>
 
+          <router-link
+            to="/login"
+            class="px-4 py-2 rounded-lg text-gray-800 border border-gray-300 hover:bg-gray-100 text-center"
+            @click="closeMobileMenu"
+          >
+            Login
+          </router-link>
         </div>
       </div>
     </div>
@@ -120,32 +161,55 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 const isMobileMenuOpen = ref(false);
+const showDropdown = ref(false);
 
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+const toggleMobileMenu = () => (isMobileMenuOpen.value = !isMobileMenuOpen.value);
+const closeMobileMenu = () => (isMobileMenuOpen.value = false);
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
 };
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false;
+const closeDropdown = () => {
+  showDropdown.value = false;
 };
 
-// Close on ESC
+// Close dropdown when clicking outside
+const handleClickOutside = (e: MouseEvent) => {
+  const dropdown = document.querySelector(".relative.flex.items-center");
+  if (dropdown && !dropdown.contains(e.target as Node)) {
+    showDropdown.value = false;
+  }
+};
+
+// ESC to close mobile menu
 const handleEscape = (e: KeyboardEvent) => {
-  if (e.key === "Escape") closeMobileMenu();
+  if (e.key === "Escape") {
+    closeMobileMenu();
+    closeDropdown();
+  }
 };
 
-// Watch for scroll lock
-const handleBodyScroll = () => {
-  document.body.style.overflow = isMobileMenuOpen.value ? "hidden" : "unset";
-};
-
-watch(isMobileMenuOpen, handleBodyScroll);
-
-onMounted(() => {
-  document.addEventListener("keydown", handleEscape);
+watch(isMobileMenuOpen, (open) => {
+  document.body.style.overflow = open ? "hidden" : "unset";
 });
 
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+  document.addEventListener("keydown", handleEscape);
+});
 onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
   document.removeEventListener("keydown", handleEscape);
   document.body.style.overflow = "unset";
 });
 </script>
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+</style>
