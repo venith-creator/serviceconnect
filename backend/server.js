@@ -28,7 +28,12 @@ connectDB()
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}))
 
 // Stripe webhook needs raw body - apply this BEFORE express.json()
 app.use(
