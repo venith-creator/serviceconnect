@@ -9,7 +9,7 @@ import connectDB from "./config/db.js";
 import multer from "multer";
 import { initSocket } from "./utils/socket.js";
 import { setSocketServer } from "./controllers/chatController.js";
-
+import { cleanupOrphanReviews } from "./controllers/reviewController.js";
 import userRoutes from "./routes/userRoutes.js";
 import providerProfileRoutes from "./routes/providerProfileRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
@@ -31,7 +31,7 @@ connectDB()
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+setTimeout(cleanupOrphanReviews, 5000);
 // Request Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);

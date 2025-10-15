@@ -173,7 +173,7 @@ export const getAllReviewsAdmin = async (req, res) => {
       : {};
 
     const reviews = await Review.find(filter)
-      .populate("job", "title description budget status city state country category timelineStart timelineEnd")
+      .populate("job", "title description budget status city state country category timelineStart timelineEnd location")
       .populate("reviewer", "name email role")
       .populate("reviewee", "name email role")
       .sort({ createdAt: -1 })
@@ -235,5 +235,23 @@ export const getProviderRatingSummary = async (req, res) => {
       message: "Error generating rating summary",
       error: error.message,
     });
+  }
+};
+
+// 🧹 Utility: Clean reviews for deleted jobs
+export const cleanupOrphanReviews = async () => {
+  try {
+    const validJobIds = (await Job.find({}, "_id")).map((j) => j._id.toString());
+    const orphanedReviews = await Review.find({ job: { $nin: validJobIds } });
+
+    if (orphanedReviews.length > 0) {
+      const ids = orphanedReviews.map((r) => r._id);
+      await Review.deleteMany({ _id: { $in: ids } });
+      console.log(`🧹 Cleaned up ${ids.length} orphaned reviews`);
+    } else {
+      console.log("✅ No orphaned reviews found");
+    }
+  } catch (error) {
+    console.error("💥 Error cleaning orphan reviews:", error.message);
   }
 };

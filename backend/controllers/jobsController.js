@@ -3,6 +3,7 @@ import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
 import fetch from "node-fetch";
+import Review from "../models/Review.js";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
@@ -300,5 +301,21 @@ export const markJobCompleted = async (req, res) => {
   } catch (error) {
     console.error("❌ markJobCompleted error:", error);
     res.status(500).json({ message: "Error marking job completed", error: error.message });
+  }
+};
+export const getAllJobsAdmin = async (req, res) => {
+  try {
+    const jobs = await Job.find()
+      .populate("client", "name email")
+      .populate({
+        path: "assignedProvider",
+        populate: { path: "user", select: "name email" },
+      })
+      .sort({ createdAt: -1 });
+
+    res.json(jobs);
+  } catch (error) {
+    console.error("❌ Error fetching all jobs for admin:", error);
+    res.status(500).json({ message: "Error fetching jobs", error: error.message });
   }
 };

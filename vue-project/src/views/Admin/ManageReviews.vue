@@ -77,7 +77,7 @@
           <p><strong>Category:</strong> {{ selectedJob.category || 'N/A' }}</p>
           <p><strong>Budget:</strong> ${{ selectedJob.budget?.toLocaleString() || 'N/A' }}</p>
           <p><strong>Location:</strong>
-            {{ selectedJob.city ? `${selectedJob.city}, ${selectedJob.state}` : 'N/A' }}
+            {{ selectedJob.location?.address || 'N/A' }}
           </p>
           <p><strong>Timeline:</strong>
             {{ selectedJob.timelineStart ? new Date(selectedJob.timelineStart).toLocaleDateString() : '—' }}

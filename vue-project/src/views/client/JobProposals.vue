@@ -43,8 +43,19 @@
           </div>
 
           <div class="pt-2 border-t text-sm text-gray-500">
-            <p><strong>Headline:</strong> {{ proposal.provider?.headline }}</p>
-            <p><strong>Services:</strong> {{ proposal.provider?.services?.join(', ') }}</p>
+            <p><strong>Headline:</strong>
+              {{ typeof proposal.provider?.headline === 'object'
+                  ? proposal.provider?.headline?.title || 'N/A'
+                  : proposal.provider?.headline || 'N/A' }}
+            </p>
+            <p><strong>Services:</strong>
+              <span v-if="Array.isArray(proposal.provider?.services)">
+                {{ proposal.provider.services.map((s: any) => s.category || s).join(', ') }}
+              </span>
+              <span v-else>
+                {{ proposal.provider?.services || 'N/A' }}
+              </span>
+            </p>
           </div>
 
          <div class="pt-3">

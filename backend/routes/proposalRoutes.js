@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post("/", protect, authorizeRoles(["provider"]), createProposal);
 router.get("/my", protect, authorizeRoles(["provider"]), getMyProposals);
-router.get("/job/:jobId", protect, authorizeRoles(["client"]), getProposalsForJob);
+router.get("/job/:jobId", protect, authorizeRoles(["client", "admin"]), getProposalsForJob);
 router.get("/admin", protect, authorizeRoles(["admin"]), getAllProposals);
 
 router.route("/:id")

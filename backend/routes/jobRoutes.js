@@ -10,7 +10,8 @@ import {
   forceCompleteJob,
   cancelJobByAdmin,
   assignProvider,
-  markJobCompleted
+  markJobCompleted,
+  getAllJobsAdmin
 } from "../controllers/jobsController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -50,6 +51,12 @@ router.patch(
 /**
  * ADMIN ROUTES
  */
+router.get(
+  "/admin/all",
+  protect,
+  authorizeRoles("admin"),
+  getAllJobsAdmin
+);
 router.patch(
   "/:id/force-complete",
   protect,

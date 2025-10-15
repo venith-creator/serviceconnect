@@ -69,19 +69,23 @@ export const getProposalsForJob = async (req, res) => {
   try {
     const proposals = await Proposal.find({
       job: req.params.jobId,
-      status: { $in: ["pending", "accepted", "completed"] },
+      status: { $in: ["pending", "accepted", "rejected","withdrawn","completed"] },
     })
       .populate({
-        path: "provider",
-        select: "headline services",
-        populate: { path: "user", select: "name email" },
-      })
+          path: "provider",
+          select: "headline services description city state yearsOfExperience portfolio",
+          populate: [
+            { path: "user", select: "name email" },
+          ],
+        })
       .populate({
         path: "job",
         select: "title category client",
         populate: { path: "client", select: "name email" }, // 👈 Added this
       });
-
+      proposals.forEach((proposal) => {
+        console.log("Provider in proposal:", JSON.stringify(proposal.provider, null, 2));
+      });
     res.json(proposals);
   } catch (error) {
     res.status(500).json({ message: "Error fetching proposals", error: error.message });
@@ -134,9 +138,11 @@ export const getAllProposals = async (req, res) => {
       .populate("job", "title category client")
       .populate({
         path: "provider",
-        select: "headline services",
-        populate: { path: "user", select: "name email" },
-      });
+        select: "headline services description city state yearsOfExperience portfolio",
+        populate: [
+          { path: "user", select: "name email" },
+        ],
+      })
     res.json(proposals);
   } catch (error) {
     res.status(500).json({ message: "Error fetching proposals", error: error.message });
