@@ -33,6 +33,7 @@ import viewJobs from '@/views/Provider/viewJobs.vue';
 import ManagesChats from '@/views/Provider/ManagesChats.vue';
 import ManagesReview from '@/views/Provider/ManagesReview.vue';
 import SubscriptionManagement from "@/views/SubscriptionManagement.vue";
+import AdminJobProposals from '@/views/Admin/AdminJobProposals.vue';
 
 
 const router = createRouter({
@@ -51,6 +52,12 @@ const router = createRouter({
       path: '/dashboard/admin/makeAnnouncement',
       name: 'AdminDashboardMakeAnnouncements',
       component: MakeAnnouncements,
+      meta: { layout: 'dashboard' }
+    },
+    {
+      path: '/dashboard/admin/job/:jobId/proposals',
+      name: 'AdminDashboardJobProposals',
+      component: AdminJobProposals,
       meta: { layout: 'dashboard' }
     },
     {

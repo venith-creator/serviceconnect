@@ -3,6 +3,7 @@ import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
 import fetch from "node-fetch";
+import Review from "../models/Review.js";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
@@ -273,5 +274,48 @@ export const assignProvider = async (req, res ) => {
     res.json({ message: "Provider assigned, job active", job});
   } catch (error) {
     res.status(500).json({ message: "Error assigning provider", error: error.message});
+  }
+};
+// ✅ CLIENT: mark job as completed
+export const markJobCompleted = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    // Only job owner can mark as completed
+    if (job.client.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to complete this job" });
+    }
+
+    // Update job status
+    job.status = "completed";
+    await job.save();
+
+    // Also update accepted proposal (if any)
+    await Proposal.updateMany(
+      { job: job._id, status: "accepted" },
+      { $set: { status: "completed" } }
+    );
+
+    res.json({ message: "Job marked as completed successfully", job });
+  } catch (error) {
+    console.error("❌ markJobCompleted error:", error);
+    res.status(500).json({ message: "Error marking job completed", error: error.message });
+  }
+};
+export const getAllJobsAdmin = async (req, res) => {
+  try {
+    const jobs = await Job.find()
+      .populate("client", "name email")
+      .populate({
+        path: "assignedProvider",
+        populate: { path: "user", select: "name email" },
+      })
+      .sort({ createdAt: -1 });
+
+    res.json(jobs);
+  } catch (error) {
+    console.error("❌ Error fetching all jobs for admin:", error);
+    res.status(500).json({ message: "Error fetching jobs", error: error.message });
   }
 };

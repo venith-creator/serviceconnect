@@ -7,7 +7,7 @@ import connectDB from "./config/db.js";
 import multer from "multer";
 import { initSocket } from "./utils/socket.js";
 import { setSocketServer } from "./controllers/chatController.js";
-
+import { cleanupOrphanReviews } from "./controllers/reviewController.js";
 import userRoutes from "./routes/userRoutes.js";
 import providerProfileRoutes from "./routes/providerProfileRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
@@ -37,7 +37,7 @@ app.use(
 );
 
 app.use(express.json());
-
+setTimeout(cleanupOrphanReviews, 5000);
 // Request Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -51,19 +51,7 @@ app.use((req, res, next) => {
 const server = http.createServer(app);
 const io = initSocket(server);
 
-// 🔌 Socket.io Connection Logs
-io.on("connection", (socket) => {
-  console.log(`🟢 Socket connected: ${socket.id} from ${socket.handshake.address}`);
-  console.log("Handshake headers:", socket.handshake.headers["user-agent"]);
 
-  socket.on("disconnect", (reason) => {
-    console.log(`🔴 Socket disconnected: ${socket.id} | Reason: ${reason}`);
-  });
-
-  socket.on("error", (err) => {
-    console.error(`⚠️ Socket error on ${socket.id}:`, err);
-  });
-});
 
 setSocketServer(io);
 const DEFAULT_PORT = process.env.PORT || 5000;

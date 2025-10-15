@@ -47,7 +47,7 @@
               </a>
 
               <!-- YouTube -->
-              <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+              <a target="_blank" href="https://youtube.com/@serviceconnect-w9s?si=6dLHNfRA0KqEQppD" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
                 <svg class="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505
                   3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017
@@ -61,7 +61,7 @@
               </a>
 
               <!-- Instagram -->
-              <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+              <a target="_blank" href="https://www.instagram.com/serviceconnectltd?igsh=MWpnejl4N3N6cHo0Yw%3D%3D&utm_source=qr" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
                 <svg class="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M7.5 2h9A5.5 5.5 0 0122
                   7.5v9A5.5 5.5 0 0116.5 22h-9A5.5
@@ -99,7 +99,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <a href="mailto:serviceconnect@gmail.com">serviceconnect@gmail.com</a>
+              <a href="mailto:serviceconnect@gmail.com">serviceconnectlimited@gmail.com</a>
             </div>
             <div class="flex items-center space-x-3">
               <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,6 +147,16 @@
       <!-- Copyright -->
       <div class="border-t border-gray-200 pt-8 text-center">
         <p class="text-gray-600">© 2025 Service Connect. All rights reserved.</p>
+        <p class="text-gray-500 text-sm mt-2">
+          Built by
+          <a
+            href="https://www.timglobal.uk"
+            target="_blank"
+            class="text-blue-500 hover:underline"
+          >
+            Timglobal
+          </a>
+        </p>
       </div>
     </div>
   </footer>

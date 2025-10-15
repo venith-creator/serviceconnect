@@ -10,6 +10,8 @@ import {
   forceCompleteJob,
   cancelJobByAdmin,
   assignProvider,
+  markJobCompleted,
+  getAllJobsAdmin
 } from "../controllers/jobsController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -40,10 +42,21 @@ router
 
 // Assign a provider (client)
 router.patch("/:id/assign", protect, authorizeRoles("client"), assignProvider);
-
+router.patch(
+  "/:id/complete",
+  protect,
+  authorizeRoles("client"),
+  markJobCompleted
+);
 /**
  * ADMIN ROUTES
  */
+router.get(
+  "/admin/all",
+  protect,
+  authorizeRoles("admin"),
+  getAllJobsAdmin
+);
 router.patch(
   "/:id/force-complete",
   protect,
