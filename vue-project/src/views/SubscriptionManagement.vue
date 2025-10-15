@@ -119,17 +119,19 @@
             </div>
 
             <div v-if="filteredServices.length > 0" class="space-y-4">
-              <div v-for="service in filteredServices" :key="service._id"
+              <div v-for="(service, index) in filteredServices" :key="service._id"
                    class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                 <div class="flex justify-between items-start">
                   <div class="flex-1">
                     <div class="flex items-start justify-between">
                       <h3 class="font-medium text-gray-900">{{ service.category || 'Uncategorized Service' }}</h3>
                       <div class="flex items-center space-x-2">
-                        <span class="text-sm font-medium text-gray-900">${{ service.rate || 0 }}/hr</span>
+                        <span class="text-sm font-medium text-gray-900">
+                          £ {{index === 0 ? 20 : 10}}
+                        </span>
                         <button
                             v-if="service.requiresPayment"
-                            @click="activateService(service)"
+                            @click="activateService(service, index === 0 ? 20 : 10)"
                             :disabled="processingPayment"
                             class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -424,7 +426,7 @@ const fetchPaymentHistory = async () => {
 
 
 // Activate service (one-time payment)
-const activateService = async (service: IService) => {
+const activateService = async (service: IService, amount: number ) => {
   if (!service?._id) {
     toast.error('Invalid service selected.');
     return;
@@ -435,7 +437,7 @@ const activateService = async (service: IService) => {
     error.value = null;
 
     const { url } = await SubscriptionService.createPaymentIntent(
-      service.rate,
+      amount,
       'gbp',
       {
         serviceId: service._id,
