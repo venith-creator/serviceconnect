@@ -1,10 +1,8 @@
-// server.js
 import dotenv from "dotenv";
 dotenv.config();
 import http from "http";
 import express from "express";
 import cors from "cors";
-import detect from "detect-port";
 import connectDB from "./config/db.js";
 import multer from "multer";
 import { initSocket } from "./utils/socket.js";
@@ -21,6 +19,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import announcementRoutes from "./routes/announcementRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 // DB Connection Logs
 console.log("🔌 Connecting to MongoDB...");
@@ -30,6 +29,13 @@ connectDB()
 
 const app = express();
 app.use(cors());
+
+// Stripe webhook needs raw body - apply this BEFORE express.json()
+app.use(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" })
+);
+
 app.use(express.json());
 setTimeout(cleanupOrphanReviews, 5000);
 // Request Logger
@@ -62,6 +68,7 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/announcement", announcementRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Static folder for uploads
 app.use("/uploads", express.static("uploads"));
@@ -90,4 +97,3 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-

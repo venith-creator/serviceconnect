@@ -1,7 +1,6 @@
 // controllers/reviewController.js
 import Review from "../models/Review.js";
 import Job from "../models/Job.js";
-import ProviderProfile from "../models/ProviderProfile.js";
 import { recalcProviderRating } from "./providerProfileController.js";
 
 // CLIENT → PROVIDER

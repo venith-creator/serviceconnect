@@ -1,5 +1,4 @@
 import express from "express";
-import multer from "multer";
 import {
   createOrUpdateProfile,
   getMyProfile,
@@ -15,6 +14,7 @@ import {
   getActiveProviders,
   approveService,
   rejectService,
+  getServicesRequiringPayment, getProviderServices,
 } from "../controllers/providerProfileController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -32,24 +32,24 @@ router.post(
         console.error("Upload error:", err.message);
         return res.status(400).json({ message: err.message });
       }
-      next(); // ✅ proceed only if upload succeeded
+      next();
     });
   },
   createOrUpdateProfile
 );
 
-// Get my profile (provider)
 router.get("/me", protect, authorizeRoles("provider"), getMyProfile);
 
-// Public: list profiles
+// Get all services for the current provider
+router.get("/me/services", protect, authorizeRoles("provider"), getProviderServices);
+
+router.get("/payment-required", protect, authorizeRoles("provider"), getServicesRequiringPayment);
 router.get("/", listAllProfiles);
 router.get("/active", getActiveProviders);
 
-// Public: get profile by id
 router.get("/provider-status", protect, getProviderStatus);
 router.get("/:id", getProfileById);
 
-// Admin: delete, stats, suspend, approve
 router.delete("/:id", protect, authorizeRoles("admin"), deleteProfile);
 router.get("/stats/me", protect, authorizeRoles("provider"), getProviderStats);
 router.get("/admin/:id", protect, authorizeRoles("admin"), getProviderStatsAdmin);

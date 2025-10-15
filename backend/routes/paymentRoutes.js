@@ -1,18 +1,37 @@
 import express from "express";
-import { createSubscriptionPayment, getProviderPayments, getAllPaymentsAdmin, updatePaymentStatus, getPaymentById, getProviderEarnings } from "../controllers/paymentController.js";
+import {
+  createPayment,
+  getProviderPayments,
+  getAllPaymentsAdmin,
+  updatePaymentStatus,
+  getPaymentById,
+  getProviderEarnings,
+  handleStripeWebhook,
+  processRefund,
+  getProviderPaymentStatus,
+  getProviderPaymentHistory, getCheckoutSessionStatus
+} from "../controllers/paymentController.js";
 import { protect } from "../middleware/authMiddleware.js";
-import { authorizeRoles } from "../middleware/roleMiddleware.js";   
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Provider: create subscription payment
-router.post("/subscribe", protect, authorizeRoles("provider"), createSubscriptionPayment);
-router.get("/my", protect, authorizeRoles("provider"), getProviderPayments);
+// Payment creation and management
+router.post("/create", protect, authorizeRoles("provider"), createPayment);
+router.get("/session/:sessionId", protect, authorizeRoles("provider"), getCheckoutSessionStatus);
+router.get("/provider", protect, authorizeRoles("provider"), getProviderPayments);
+router.get("/history", protect, authorizeRoles("provider"), getProviderPaymentHistory);
+router.get("/admin", protect, authorizeRoles("admin"), getAllPaymentsAdmin);
+router.put("/:id/status", protect, authorizeRoles("admin"), updatePaymentStatus);
+router.get("/:id", protect, getPaymentById);
+router.get("/earnings", protect, authorizeRoles("provider"), getProviderEarnings);
+ // Webhook for Stripe events
+router.post("/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 
-// Admin: all payments, update status
-router.get("/", protect, authorizeRoles("admin"), getAllPaymentsAdmin);
-router.patch("/:id/status", protect, authorizeRoles("admin"), updatePaymentStatus);
-router.get("/:id", protect, authorizeRoles("admin"), getPaymentById);
-router.get("/earnings/me", protect, authorizeRoles("provider"), getProviderEarnings);
+// Refund processing
+router.post("/:id/refund", protect, authorizeRoles("admin"), processRefund);
+
+// Provider payment status
+router.get("/status", protect, authorizeRoles("provider"), getProviderPaymentStatus);
 
 export default router;
