@@ -161,10 +161,10 @@
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                         Payment Required
                       </span>
-                      <span v-if="!service.approved"
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        Pending Approval
-                      </span>
+<!--                      <span v-if="!service.approved"-->
+<!--                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">-->
+<!--                        Pending Approval-->
+<!--                      </span>-->
                     </div>
 
                     <div class="mt-2 text-sm text-gray-600 space-y-1">
@@ -198,14 +198,14 @@
                     </p>
                   </div>
 
-                  <div class="flex space-x-2">
-                    <button
-                        @click="confirmServiceAction(service, 'delete')"
-                        class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
+<!--                  <div class="flex space-x-2">-->
+<!--                    <button-->
+<!--                        @click="confirmServiceAction(service, 'delete')"-->
+<!--                        class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 border border-red-200 rounded-md hover:bg-red-50 transition-colors"-->
+<!--                    >-->
+<!--                      Remove-->
+<!--                    </button>-->
+<!--                  </div>-->
                 </div>
               </div>
             </div>
@@ -238,17 +238,6 @@
           <div class="bg-white rounded-xl shadow-sm p-6">
             <div class="flex justify-between items-center mb-6">
               <h2 class="text-xl font-semibold text-gray-800">Billing History</h2>
-              <button
-                  @click="downloadAllInvoices"
-                  :disabled="billingHistory.length === 0"
-                  class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg class="-ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                Export All
-              </button>
             </div>
 
             <div v-if="billingHistory.length > 0" class="overflow-x-auto">
@@ -271,9 +260,10 @@
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="item in billingHistory" :key="item.id" class="hover:bg-gray-50">
+                <tr v-for="item in billingHistory" :key="item._id" class="hover:bg-gray-50">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ formatDate(item.date) }}
+                    {{ formatDate(item.createdAt) }}
+                    {{ formatDate(item.createdAt) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ item.description }}
@@ -285,7 +275,7 @@
                       <span
                           :class="[
                           'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                          item.status === 'paid'
+                          item.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : item.status === 'failed'
                               ? 'bg-red-100 text-red-800'
@@ -294,14 +284,6 @@
                       >
                         {{ item.status }}
                       </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                        @click="downloadInvoice(item.id)"
-                        class="text-blue-600 hover:text-blue-900"
-                    >
-                      Download
-                    </button>
                   </td>
                 </tr>
                 </tbody>
@@ -328,7 +310,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import ProviderDashboardLayout from '@/components/ProviderDashboardLayout.vue';
 import { useAuthStore } from "@/stores/auth.ts";
-import SubscriptionService, {type IService} from "@/services/subscriptionService.ts";
+import SubscriptionService, {type IService, type Payment} from "@/services/subscriptionService.ts";
 import {API_BASE_URL} from "@/config.ts";
 
 interface BillingRecord {
@@ -358,7 +340,7 @@ const error = ref<string | null>(null);
 
 // Service State
 const services = ref<IService[]>([]);
-const billingHistory = ref<BillingRecord[]>([]);
+const billingHistory = ref<Payment[]>([]);
 
 // UI State
 const showAddService = ref(false);
@@ -410,15 +392,7 @@ const fetchData = async () => {
 // Fetch payment history
 const fetchPaymentHistory = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/payments/history`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    if (response.ok) {
-      billingHistory.value = await response.json();
-    }
+    billingHistory.value = await SubscriptionService.getPayments();
   } catch (err) {
     console.error('Error fetching payment history:', err);
   }
@@ -556,6 +530,7 @@ const checkPaymentStatus = async () => {
 // Lifecycle
 onMounted(() => {
   fetchData();
-  checkPaymentStatus()
+  checkPaymentStatus();
+  fetchPaymentHistory();
 });
 </script>

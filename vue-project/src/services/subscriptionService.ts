@@ -57,13 +57,17 @@ export interface IService {
 
 export interface Payment {
   _id: string;
-  provider: string;
+  provider: {
+    _id: string;
+    name: string;
+    email: string;
+  };
   service: string;
   amount: number;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
-  paymentMethod: string;
-  stripePaymentIntentId: string;
   stripeCustomerId: string;
+  currency: string;
+  description: string;
   refundedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -82,6 +86,44 @@ class SubscriptionService {
 
   constructor() {
     this.baseURL = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  }
+
+  async getAllPayments(page = 1, limit = 10, status = '') {
+    let url = `/payments/history/all?page=${page}&limit=${limit}`;
+    if (status) {
+      url += `&status=${status}`;
+    }
+    return this.request<{
+      data: Payment[];
+      pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      },
+    }>(url);
+  }
+
+  async getPaymentById(id: string) {
+    return this.request<Payment>(`/payments/${id}`);
+  }
+
+  async refundPayment(paymentId: string, amount?: number) {
+    return this.request<{ success: boolean; message: string }>(
+      `/payments/${paymentId}/refund`,
+      {
+        method: 'POST',
+        body: JSON.stringify({amount})
+      }
+    );
+  }
+
+  async getPaymentStats() {
+    return this.request<{
+      totalEarnings: number;
+      pending: number;
+      completed: number;
+    }>('/payments/earnings');
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -119,6 +161,10 @@ class SubscriptionService {
 
   async getProviderServices() {
     return this.request<IService[]>('/provider-profiles/me/services');
+  }
+
+  async getPayments() {
+    return this.request<Payment[]>('/payments/history');
   }
 
   // Payment Intents

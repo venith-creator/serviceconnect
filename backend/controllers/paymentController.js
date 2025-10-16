@@ -9,21 +9,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const createPayment = async (req, res) => {
     try {
         const providerId = req.user._id;
-        const { metadata, amount, currency = "gbp" } = req.body;
+        const {metadata, amount, currency = "gbp"} = req.body;
 
-        const profile = await ProviderProfile.findOne({ user: providerId });
+        const profile = await ProviderProfile.findOne({user: providerId});
         if (!profile) {
-            return res.status(404).json({ message: "Provider profile not found" });
+            return res.status(404).json({message: "Provider profile not found"});
         }
 
         const user = await User.findById(providerId);
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({message: "User not found"});
         }
 
         const service = profile.services.id(metadata.serviceId);
         if (!service) {
-            return res.status(404).json({ message: "Service not found" });
+            return res.status(404).json({message: "Service not found"});
         }
 
         // Check if service is already active
@@ -41,7 +41,7 @@ export const createPayment = async (req, res) => {
             const stripeCustomer = await stripe.customers.create({
                 email: user.email,
                 name: user.name,
-                metadata: { userId: providerId.toString() }
+                metadata: {userId: providerId.toString()}
             });
             stripeCustomerId = stripeCustomer.id;
             profile.stripeCustomerId = stripeCustomerId;
@@ -130,13 +130,14 @@ export const handleCheckoutSessionCompleted = async (session) => {
         await payment.save();
 
         // Update service status to active
-        const profile = await ProviderProfile.findOne({ user: payment.provider });
+        const profile = await ProviderProfile.findOne({user: payment.provider});
         if (profile) {
             const service = profile.services.id(payment.service);
             if (service) {
                 service.status = 'active';
                 service.requiresPayment = false;
                 service.activatedAt = new Date();
+                service.approved = true;
                 await profile.save();
                 console.log(`Service ${service._id} activated for provider ${payment.provider}`);
             }
@@ -155,12 +156,12 @@ export const handleCheckoutSessionCompleted = async (session) => {
 export const handleCheckoutSessionExpired = async (session) => {
     try {
         const payment = await Payment.findOneAndUpdate(
-            { stripeCheckoutSessionId: session.id },
+            {stripeCheckoutSessionId: session.id},
             {
                 status: 'expired',
                 expiredAt: new Date()
             },
-            { new: true }
+            {new: true}
         );
 
         if (payment) {
@@ -177,14 +178,14 @@ export const handleCheckoutSessionExpired = async (session) => {
 // Get checkout session status
 export const getCheckoutSessionStatus = async (req, res) => {
     try {
-        const { sessionId } = req.params;
+        const {sessionId} = req.params;
 
         const session = await stripe.checkout.sessions.retrieve(sessionId, {
             expand: ['payment_intent']
         });
 
         // Find associated payment
-        const payment = await Payment.findOne({ stripeCheckoutSessionId: sessionId });
+        const payment = await Payment.findOne({stripeCheckoutSessionId: sessionId});
 
         res.json({
             session: {
@@ -205,7 +206,7 @@ export const getCheckoutSessionStatus = async (req, res) => {
 
     } catch (error) {
         console.error('Error retrieving session status:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
@@ -273,23 +274,23 @@ export const handleStripeWebhook = async (req, res) => {
         }
 
         // Return a 200 response to acknowledge receipt of the event
-        res.json({ received: true });
+        res.json({received: true});
     } catch (error) {
         console.error('Error handling webhook event:', error);
-        res.status(500).json({ error: 'Error processing webhook' });
+        res.status(500).json({error: 'Error processing webhook'});
     }
 };
 
 // Get all payments for a provider
 export const getProviderPayments = async (req, res) => {
     try {
-        const payments = await Payment.find({ provider: req.user._id })
-            .sort({ createdAt: -1 })
+        const payments = await Payment.find({provider: req.user._id})
+            .sort({createdAt: -1})
             .populate('service', 'category name');
         res.json(payments);
     } catch (error) {
         console.error('Error getting provider payments:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
@@ -297,9 +298,9 @@ export const getProviderPayments = async (req, res) => {
 export const getProviderPaymentStatus = async (req, res) => {
     try {
         const providerId = req.user._id;
-        const profile = await ProviderProfile.findOne({ user: providerId });
+        const profile = await ProviderProfile.findOne({user: providerId});
         if (!profile) {
-            return res.status(404).json({ message: "Profile not found" });
+            return res.status(404).json({message: "Profile not found"});
         }
 
         // Check for services that need activation
@@ -321,7 +322,7 @@ export const getProviderPaymentStatus = async (req, res) => {
         });
     } catch (error) {
         console.error("Error getting provider payment status:", error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
@@ -329,30 +330,30 @@ export const getProviderPaymentStatus = async (req, res) => {
 export const getAllPaymentsAdmin = async (req, res) => {
     try {
         const payments = await Payment.find()
-            .sort({ createdAt: -1 })
+            .sort({createdAt: -1})
             .populate('provider', 'name email')
             .populate('service', 'category name');
         res.json(payments);
     } catch (error) {
         console.error('Error getting all payments:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
 // Update payment status
 export const updatePaymentStatus = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { status } = req.body;
+        const {id} = req.params;
+        const {status} = req.body;
         const payment = await Payment.findById(id);
-        if (!payment) return res.status(404).json({ message: "Payment not found" });
+        if (!payment) return res.status(404).json({message: "Payment not found"});
 
         payment.status = status;
         await payment.save();
 
         // If marking as completed, activate the service
         if (status === 'completed') {
-            const profile = await ProviderProfile.findOne({ user: payment.provider });
+            const profile = await ProviderProfile.findOne({user: payment.provider});
             if (profile) {
                 const service = profile.services.id(payment.service);
                 if (service) {
@@ -366,62 +367,63 @@ export const updatePaymentStatus = async (req, res) => {
         res.json(payment);
     } catch (error) {
         console.error('Error updating payment status:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
 // Get payment by ID
 export const getPaymentById = async (req, res) => {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const payment = await Payment.findById(id)
             .populate('provider', 'name email')
             .populate('service', 'category name');
-        if (!payment) return res.status(404).json({ message: "Payment not found" });
+        if (!payment) return res.status(404).json({message: "Payment not found"});
         res.json(payment);
     } catch (error) {
         console.error('Error getting payment by ID:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
 // Get provider earnings
 export const getProviderEarnings = async (req, res) => {
     try {
-        const providerId = req.user._id;
-        const payments = await Payment.find({
-            provider: providerId,
+        const completedPayments = await Payment.find({
             status: "completed"
-        }).sort({ createdAt: -1 });
+        });
 
-        const totalEarnings = payments.reduce((sum, p) => sum + p.amount, 0);
+        const totalEarnings = completedPayments.reduce((sum, p) => sum + p.amount, 0);
+        const pendingPayments = await Payment.find({
+            status: "pending"
+        }).countDocuments()
         res.json({
             totalEarnings,
-            payments,
-            totalPayments: payments.length
+            completed: completedPayments.length,
+            pending: pendingPayments,
         });
     } catch (error) {
         console.error('Error getting provider earnings:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
 // Process refund
 export const processRefund = async (req, res) => {
     try {
-        const { paymentId, reason } = req.body;
+        const {paymentId, reason} = req.body;
 
         const payment = await Payment.findById(paymentId);
         if (!payment) {
-            return res.status(404).json({ message: "Payment not found" });
+            return res.status(404).json({message: "Payment not found"});
         }
 
         if (payment.status !== 'completed') {
-            return res.status(400).json({ message: "Only completed payments can be refunded" });
+            return res.status(400).json({message: "Only completed payments can be refunded"});
         }
 
         if (!payment.stripePaymentIntentId) {
-            return res.status(400).json({ message: "No payment intent associated with this payment" });
+            return res.status(400).json({message: "No payment intent associated with this payment"});
         }
 
         // Process refund through Stripe
@@ -436,7 +438,7 @@ export const processRefund = async (req, res) => {
         await payment.save();
 
         // Update service status
-        const profile = await ProviderProfile.findOne({ user: payment.provider });
+        const profile = await ProviderProfile.findOne({user: payment.provider});
         if (profile) {
             const service = profile.services.id(payment.service);
             if (service) {
@@ -446,18 +448,18 @@ export const processRefund = async (req, res) => {
             }
         }
 
-        res.json({ success: true, refund });
+        res.json({success: true, refund});
     } catch (error) {
         console.error('Error processing refund:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
 
 // Get payment history for a provider
 export const getProviderPaymentHistory = async (req, res) => {
     try {
-        const { startDate, endDate } = req.query;
-        const query = { provider: req.user._id };
+        const {startDate, endDate} = req.query;
+        const query = {provider: req.user._id};
 
         if (startDate && endDate) {
             query.createdAt = {
@@ -467,32 +469,77 @@ export const getProviderPaymentHistory = async (req, res) => {
         }
 
         const payments = await Payment.find(query)
-            .sort({ createdAt: -1 })
+            .sort({createdAt: -1})
             .populate('service', 'category name');
 
         res.json(payments);
     } catch (error) {
         console.error('Error getting payment history:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getAllProviderPaymentHistory = async (req, res) => {
+    try {
+        const {startDate, endDate, page = 1, limit = 20, status} = req.query;
+        const query = {};
+
+        if (startDate && endDate) {
+            query.createdAt = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate),
+            };
+        }
+
+        if (status) {
+            query.status = status.toLowerCase();
+        }
+
+        const p = Math.max(Number(page), 1);
+        const l = Math.max(Number(limit), 1);
+        const skip = (p - 1) * l;
+
+        const [payments, total] = await Promise.all([
+            Payment.find(query)
+                .sort({createdAt: -1})
+                .skip(skip)
+                .limit(l)
+                .populate("service", "category name")
+                .populate("provider", "name email"),
+            Payment.countDocuments(query),
+        ]);
+
+        res.json({
+            data: payments,
+            pagination: {
+                total,
+                page: p,
+                limit: l,
+                totalPages: Math.ceil(total / l),
+            },
+        });
+    } catch (error) {
+        console.error("Error getting payment history:", error);
+        res.status(500).json({message: error.message});
     }
 };
 
 // Verify payment and service status
 export const verifyPaymentStatus = async (req, res) => {
     try {
-        const { sessionId } = req.params;
+        const {sessionId} = req.params;
 
-        const payment = await Payment.findOne({ stripeCheckoutSessionId: sessionId })
+        const payment = await Payment.findOne({stripeCheckoutSessionId: sessionId})
             .populate('provider', 'name email')
             .populate('service', 'category name status');
 
         if (!payment) {
-            return res.status(404).json({ message: "Payment not found" });
+            return res.status(404).json({message: "Payment not found"});
         }
 
         // If payment is completed, verify service is active
         if (payment.status === 'completed') {
-            const profile = await ProviderProfile.findOne({ user: payment.provider });
+            const profile = await ProviderProfile.findOne({user: payment.provider});
             if (profile) {
                 const service = profile.services.id(payment.service._id);
                 if (service && service.status !== 'active') {
@@ -511,6 +558,6 @@ export const verifyPaymentStatus = async (req, res) => {
 
     } catch (error) {
         console.error('Error verifying payment status:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({message: error.message});
     }
 };
