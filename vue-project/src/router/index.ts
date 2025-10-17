@@ -5,6 +5,9 @@ import AdminSignup from '@/views/AdminSignup.vue';
 import DashboardSwitch from '@/views/DashboardSwitch.vue';
 import HomeView from '@/views/HomeView.vue';
 import ProviderStatus from '@/views/ProviderStatus.vue';
+import ForgotPassword from '@/views/ForgotPassword.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
+import ContactView from '@/views/ContactView.vue';
 
 //adminDashboard
 import AdminDashboard from "@/views/Admin/AdminDashboard.vue";
@@ -46,6 +49,9 @@ const router = createRouter({
   { path: "/onboarding/provider", component: () => import('@/views/ProviderOnboarding.vue') },
   { path: "/post-job", component: () => import('@/views/PostJob.vue')},
   { path: "/provider-status", component: ProviderStatus },
+  { path: "/forgot-password", component: ForgotPassword, meta: { public: true } },
+  { path: "/reset-password/:token", component: ResetPassword, meta: { public: true } },
+  { path: "/contact", component: ContactView, meta: { public: true } },
   // AdminDashboard routes
     { path: "/dashboard/admin", component: AdminDashboard, name: 'AdminDashboard', meta: { layout: 'dashboard'} },
     {

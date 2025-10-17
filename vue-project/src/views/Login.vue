@@ -83,6 +83,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { API_BASE_URL } from "@/config";
+import { connectSocket } from "@/utils/socketClient";
 
 const email = ref("");
 const password = ref("");
@@ -114,6 +115,19 @@ localStorage.setItem("user", JSON.stringify({
   providerOnboarding: data.providerOnboarding
 }));
 localStorage.setItem("userId", data._id);
+
+// ✅ Determine user role and connect socket
+    const primaryRole = data.roles.includes("admin")
+      ? "admin"
+      : data.roles.includes("provider")
+      ? "provider"
+      : "client";
+
+    localStorage.setItem("role", primaryRole);
+
+    // 🔹 Connect socket and tell backend this user’s role
+    const s = connectSocket(data.token);
+    s.emit("registerRole", { role: primaryRole });
 
 if (data.roles.includes("provider")) {
   const profileRes = await fetch(`${API_BASE_URL}/provider-profiles/me`, {

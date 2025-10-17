@@ -14,6 +14,15 @@ export const initSocket = (server) => {
 
   io.on("connection", (socket) => {
     console.log(`🟢 Socket connected: ${socket.id}`);
+     socket.on("registerRole", ({ role }) => {
+        console.log("📢 registerRole received:", role);
+
+        if (role === "client" || role === "provider" || role === "admin") {
+          const roomName = role === "admin" ? "all" : `${role}s`;
+          socket.join(roomName); // e.g. clients, providers, all
+          console.log(`Socket ${socket.id} joined room ${roomName}`);
+        }
+      });
     // client should join room(s) by calling socket.emit('joinRoom', { roomId })
     socket.on("joinRoom", ({ roomId }) => {
       if (roomId) socket.join(roomId);

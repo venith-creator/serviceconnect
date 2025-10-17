@@ -111,7 +111,8 @@ const sidebarItems = [
   { id: 'payments', label: 'Payments', href: '/dashboard/admin/ManagePayments' },
   { id: 'reviews', label: 'Reviews', href: '/dashboard/admin/ManageReviews' },
   { id: 'chats', label: 'Chats', href: '/dashboard/admin/managechats' },
-  { id: 'announcements', label: 'Announcements', href: '/dashboard/admin/makeAnnouncement' }
+  { id: 'announcements', label: 'Announcements', href: '/dashboard/admin/makeAnnouncement' },
+  { id: 'contacts', label: 'Contact Messages', href: '/dashboard/admin/ManageContacts' },
 ]
 
 const getCurrentPageTitle = () => {

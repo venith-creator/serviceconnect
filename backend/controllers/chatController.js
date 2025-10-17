@@ -1,5 +1,6 @@
 import ChatRoom from "../models/chatRoom.js";
 import Message from "../models/Message.js";
+import { getIO } from "../utils/socket.js";
 
 let io = null;
 export const setSocketServer = (socketIo) => {
@@ -147,32 +148,50 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-
 export const publishAnnouncementToChat = async (announcement) => {
-  try {
-    const audience = announcement.audience || "all";
-    const sysName = `system_${audience}`;
+  const io = getIO();
+  const { title, message, audience, createdBy, _id } = announcement;
 
-    let systemRoom = await ChatRoom.findOne({ systemName: sysName });
-    if (!systemRoom) {
-      systemRoom = await ChatRoom.create({ systemName: sysName, participants: [], job: null });
-    }
+  // 🔹 Determine the system room name
+  const systemName = `system_${audience === "all" ? "all" : audience}`;
 
-    const systemMessage = await Message.create({
-      chatRoom: systemRoom._id,
-      sender: announcement.createdBy,
-      text: `[ANNOUNCEMENT] ${announcement.title}\n\n${announcement.message}`,
-      attachments: [],
+  // 🔹 Create or get the system chat room
+  let room = await ChatRoom.findOne({ systemName });
+  if (!room) {
+    room = await ChatRoom.create({
+      systemName,
+      participants: [],
+      job: null,
     });
+  }
 
-    const populated = await systemMessage.populate("sender", "name email avatar roles");
+  // 🔹 Create message representing the announcement
+  const chatMessage = await Message.create({
+    chatRoom: room._id,
+    sender: createdBy,
+    text: `📢 ${title}\n${message}`,
+    type: "announcement",
+  });
 
-    if (io) {
-      io.to(systemRoom._id.toString()).emit("announcement:new", populated);
+  // 🔹 Update lastMessage field in the room
+  room.lastMessage = chatMessage._id;
+  await room.save();
+
+  const targetRoom =
+      audience === "all"
+        ? null // broadcast to all
+        : audience === "clients"
+        ? "clients"
+        : audience === "providers"
+        ? "providers"
+        : null;
+
+    if (targetRoom) {
+      io.to(targetRoom).emit("message:new", { roomId: room._id, message: chatMessage });
+    } else {
+      io.emit("message:new", { roomId: room._id, message: chatMessage });
     }
 
-    return populated;
-  } catch (err) {
-    console.error("publishAnnouncementToChat:", err);
-  }
+  return chatMessage;
 };
+

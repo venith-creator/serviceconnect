@@ -21,40 +21,49 @@
       </div>
 
       <div
-            v-for="m in messages"
-            :key="m._id"
-            class="flex w-full"
-            :class="isMe(m) ? 'justify-end' : 'justify-start'"
-          >
-
-        <!-- bubble -->
-        <div
-          :class="bubbleClasses(m)"
-          class="relative flex flex-col px-4 py-2 text-sm shadow-sm break-words"
-          role="article"
-          aria-label="chat-message"
-        >
-          <div class="whitespace-pre-wrap">{{ m.text }}</div>
-
-          <div
-            :class="timestampClasses(m)"
-            class="text-[11px] mt-1"
-          >
-            {{ formatDate(m.createdAt) }}
-          </div>
-
-          <!-- tail -->
-          <div
-            v-if="isMe(m)"
-            class="absolute right-0 bottom-0 translate-x-1 translate-y-[2px] w-0 h-0 border-t-[8px] border-t-transparent border-l-[8px] border-l-purple-600 border-b-[8px] border-b-transparent"
-          ></div>
-
-          <div
-            v-else
-            class="absolute left-0 bottom-0 -translate-x-1 translate-y-[2px] w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-[8px] border-b-transparent"
-          ></div>
-        </div>
+      v-for="m in messages"
+      :key="m._id"
+      class="flex w-full"
+      :class="m.type === 'announcement' ? 'justify-center' : (isMe(m) ? 'justify-end' : 'justify-start')"
+    >
+      <!-- 📢 Announcement -->
+      <div
+        v-if="m.type === 'announcement'"
+        class="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-xl px-4 py-3 text-sm shadow-sm flex items-center gap-2 max-w-[80%]"
+      >
+        <i class="pi pi-megaphone text-yellow-600"></i>
+        <span class="whitespace-pre-wrap">{{ m.text }}</span>
       </div>
+
+      <!-- 💬 Normal Message -->
+      <div
+        v-else
+        :class="bubbleClasses(m)"
+        class="relative flex flex-col px-4 py-2 text-sm shadow-sm break-words"
+        role="article"
+        aria-label="chat-message"
+      >
+        <div class="whitespace-pre-wrap">{{ m.text }}</div>
+
+        <div
+          :class="timestampClasses(m)"
+          class="text-[11px] mt-1"
+        >
+          {{ formatDate(m.createdAt) }}
+        </div>
+
+        <div
+          v-if="isMe(m)"
+          class="absolute right-0 bottom-0 translate-x-1 translate-y-[2px] w-0 h-0 border-t-[8px] border-t-transparent border-l-[8px] border-l-purple-600 border-b-[8px] border-b-transparent"
+        ></div>
+
+        <div
+          v-else
+          class="absolute left-0 bottom-0 -translate-x-1 translate-y-[2px] w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-[8px] border-b-transparent"
+        ></div>
+      </div>
+    </div>
+
     </div>
 
     <!-- Input -->
@@ -227,7 +236,13 @@ watch(() => props.room, async (room) => {
     // announcements too
     s.off('announcement:new');
     s.on('announcement:new', (m: any) => {
-      // same dedupe logic
+      const myRole = localStorage.getItem("role") || "client";
+      const target = m.audience || m.target || "all";
+
+      // 🎯 Show only relevant announcements
+      if (target !== "all" && target !== myRole) return;
+
+      // ✅ Avoid duplicates
       if (!messages.value.find((x: any) => String(x._id) === String(m._id))) {
         messages.value.push(m);
         nextTick(scrollToBottom);

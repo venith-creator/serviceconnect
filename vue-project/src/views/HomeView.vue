@@ -110,9 +110,13 @@
               Get quality work done by professionals in your area.<br />
               From repairs to personal services we connect you with the right people for the job.
             </p>
-            <button class="mt-6 bg-primary text-white px-6 py-3 rounded-lg w-full">
+            <router-link
+              to="/post-job"
+              class="mt-6 block bg-primary text-white px-6 py-3 rounded-lg w-full text-center hover:bg-purple-600 transition-colors"
+            >
               Post Job
-            </button>
+            </router-link>
+
           </div>
         </div>
 
@@ -127,9 +131,12 @@
             <p class="text-sm mt-2">
               Join thousands of service providers earning more through our platform.
             </p>
-            <button class="mt-6 bg-yellow-400 text-black px-6 py-3 rounded-lg w-full">
-              Join Service Providers
-            </button>
+            <router-link
+                to="/signup"
+                class="mt-6 block bg-yellow-400 text-black px-6 py-3 rounded-lg w-full text-center hover:bg-yellow-300 transition-colors"
+              >
+                Join Service Providers
+              </router-link>
           </div>
         </div>
       </div>
@@ -220,7 +227,12 @@
       </div>
 
       <p class="mt-6 text-gray-700">Still have questions? Our support team is here to help.</p>
-      <button class="mt-4 bg-primary text-white px-6 py-2 rounded-lg">Contact Support -></button>
+      <router-link
+        to="/contact"
+        class="mt-4 inline-block bg-primary text-white px-6 py-2 rounded-lg hover:bg-purple-600 transition-colors"
+      >
+        Contact Support →
+      </router-link>
     </section>
   </div>
 </template>

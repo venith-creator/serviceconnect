@@ -8,6 +8,7 @@ import multer from "multer";
 import { initSocket } from "./utils/socket.js";
 import { setSocketServer } from "./controllers/chatController.js";
 import { cleanupOrphanReviews } from "./controllers/reviewController.js";
+import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import providerProfileRoutes from "./routes/providerProfileRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
@@ -20,6 +21,7 @@ import announcementRoutes from "./routes/announcementRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 // DB Connection Logs
 console.log("🔌 Connecting to MongoDB...");
@@ -34,7 +36,8 @@ app.use(cors({
   preflightContinue: false,
   optionsSuccessStatus: 204
 }))
-
+console.log('🌍 ENV EMAIL_USER:', process.env.EMAIL_USER);
+console.log('🌍 ENV EMAIL_PASS:', process.env.EMAIL_PASS);
 // Stripe webhook needs raw body - apply this BEFORE express.json()
 app.use(
   "/api/payments/webhook",
@@ -62,6 +65,7 @@ setSocketServer(io);
 const DEFAULT_PORT = process.env.PORT || 5000;
 
 // Routes
+app.use('/api/auth', authRoutes)
 app.use("/api/users", userRoutes);
 app.use("/api/provider-profiles", providerProfileRoutes);
 app.use("/api/jobs", jobRoutes);
@@ -74,6 +78,7 @@ app.use("/api/announcement", announcementRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Static folder for uploads
 app.use("/uploads", express.static("uploads"));

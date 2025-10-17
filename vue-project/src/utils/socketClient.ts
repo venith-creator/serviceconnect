@@ -7,26 +7,33 @@ export function getSocket(): Socket {
   console.log("log.socket", socket);
   if (!socket) {
     socket = io(SOCKET_BASE_URL, {
-      path: "/socket.io",
-      transports: ["websocket"],
-      withCredentials: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
-  }
+       path: "/socket.io",
+       transports: ["websocket"],
+       withCredentials: true,
+       reconnection: true,
+       reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+       });
+    }
   return socket;
 }
 
 export function connectSocket(token?: string): Socket {
-  const s = getSocket();
-  if (token) {
+  if (socket && socket.connected) return socket;
 
-    (s.io as any).opts.auth = { token };
-  }
-  if (!s.connected) s.connect();
-  return s;
+  socket = io(SOCKET_BASE_URL, {
+    path: "/socket.io",
+    transports: ["websocket"],
+    withCredentials: true,
+    auth: { token },
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+  });
+
+  return socket;
 }
+
 
 export function disconnectSocket(): void {
   const s = getSocket();

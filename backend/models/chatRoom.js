@@ -7,7 +7,6 @@ const chatRoomSchema = new mongoose.Schema({
   lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
 }, { timestamps: true });
 
-// Check if model already exists
 const ChatRoom = mongoose.models.ChatRoom || mongoose.model("ChatRoom", chatRoomSchema);
 
 export default ChatRoom;

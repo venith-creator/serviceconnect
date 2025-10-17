@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { API_BASE_URL } from '@/config';
-import { connectSocket, getSocket } from '@/utils/socketClient';
+import { connectSocket} from '@/utils/socketClient';
 
 const props = defineProps<{ selectedRoomId?: string; initialRoomId?: string }>();
 const emit = defineEmits<{
@@ -86,13 +86,34 @@ onMounted(async () => {
     if (match) openRoom(match);
   }
 
-  if (token) {
+  /*if (token) {
     connectSocket(token);
     const s = getSocket();
+    s.emit("registerRole", { role: "client" });
     s.on('message:new', () => fetchRooms());
     s.on('announcement:new', () => fetchRooms());
-  }
-});
+  }*/
+    if (token) {
+      const s = connectSocket(token);
+
+      s.on("connect", () => {
+        s.emit("registerRole", { role: "client" }); // or "provider"
+        console.log("✅ Registered role:", "client");
+      });
+
+      s.on("message:new", () => fetchRooms());
+      s.on("announcement:new", (announcement) => {
+        console.log("📢 New announcement received:", announcement);
+        fetchRooms();
+      });
+
+      // Optional — re-register after reconnect
+      s.on("reconnect", () => {
+        s.emit("registerRole", { role: "client" });
+      });
+    }
+
+    });
 
 watch(() => props.selectedRoomId, (v) => selectedRoomId.value = v || '');
 </script>
