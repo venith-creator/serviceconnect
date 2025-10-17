@@ -1,5 +1,5 @@
 import Contact from '../models/Contact.js'
-import { sendMail } from '../utils/email.js'
+import { sendMail } from '../utils/Email.js'
 
 export const submitContact = async (req, res) => {
   try {
