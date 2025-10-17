@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import 'primeicons/primeicons.css'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from "@/components/Navbar.vue";
