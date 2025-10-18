@@ -28,3 +28,25 @@ export const createAnnouncement = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+export const getAnnouncements = async (req, res) => {
+  try {
+    const isAdmin = req.user.roles.includes("admin");
+    const now = new Date();
+
+    const filter = isAdmin
+      ? {} // admin sees all
+      : {
+          $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }], // only active ones
+        };
+
+    const announcements = await Announcement.find(filter)
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "name email");
+
+    res.json(announcements);
+  } catch (err) {
+    console.error("getAnnouncements error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};

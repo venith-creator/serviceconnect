@@ -60,12 +60,11 @@ export const createOrGetRoom = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 export const getRoomsForUser = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const rooms = await ChatRoom.find({
+    let rooms = await ChatRoom.find({
       $or: [{ participants: userId }, { systemName: { $exists: true } }],
     })
       .populate({
@@ -73,8 +72,27 @@ export const getRoomsForUser = async (req, res) => {
         select: "name email avatar roles",
       })
       .populate("job", "title status")
-      .populate("lastMessage") // ✅ include last message for chat previews
+      .populate("lastMessage")
       .sort({ updatedAt: -1 });
+
+    // ✅ Filter system rooms by user role
+    const userRoles = req.user.roles || [];
+
+    rooms = rooms.filter((room) => {
+      if (!room.systemName) return true; // normal user chats
+
+      // system_all → everyone sees
+      if (room.systemName === "system_all") return true;
+
+      // system_clients → only clients
+      if (room.systemName === "system_clients" && userRoles.includes("client")) return true;
+
+      // system_providers → only providers
+      if (room.systemName === "system_providers" && userRoles.includes("provider")) return true;
+
+      // hide other system rooms
+      return false;
+    });
 
     res.json(rooms);
   } catch (err) {
@@ -82,6 +100,7 @@ export const getRoomsForUser = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 // Get messages for a room (pagination)
 export const getMessagesForRoom = async (req, res) => {
   try {
@@ -150,12 +169,22 @@ export const sendMessage = async (req, res) => {
 
 export const publishAnnouncementToChat = async (announcement) => {
   const io = getIO();
-  const { title, message, audience, createdBy, _id } = announcement;
+  const { title, message, audience, createdBy } = announcement;
 
-  // 🔹 Determine the system room name
-  const systemName = `system_${audience === "all" ? "all" : audience}`;
+  if (expiresAt && new Date(expiresAt) < new Date()) {
+    console.log("⚠️ Skipping expired announcement:", title);
+    return null;
+  }
 
-  // 🔹 Create or get the system chat room
+  // ✅ Determine the correct system chatroom name
+  const systemName =
+    audience === "all"
+      ? "system_all"
+      : audience === "clients"
+      ? "system_clients"
+      : "system_providers";
+
+  // ✅ Create or get that room
   let room = await ChatRoom.findOne({ systemName });
   if (!room) {
     room = await ChatRoom.create({
@@ -165,7 +194,7 @@ export const publishAnnouncementToChat = async (announcement) => {
     });
   }
 
-  // 🔹 Create message representing the announcement
+  // ✅ Create the announcement message
   const chatMessage = await Message.create({
     chatRoom: room._id,
     sender: createdBy,
@@ -173,25 +202,23 @@ export const publishAnnouncementToChat = async (announcement) => {
     type: "announcement",
   });
 
-  // 🔹 Update lastMessage field in the room
+  // ✅ Update lastMessage
   room.lastMessage = chatMessage._id;
   await room.save();
 
-  const targetRoom =
-      audience === "all"
-        ? null // broadcast to all
-        : audience === "clients"
-        ? "clients"
-        : audience === "providers"
-        ? "providers"
-        : null;
+  // ✅ Emit only to audience group
+  const emitTarget =
+    audience === "all"
+      ? null
+      : audience === "clients"
+      ? "clients"
+      : "providers";
 
-    if (targetRoom) {
-      io.to(targetRoom).emit("message:new", { roomId: room._id, message: chatMessage });
-    } else {
-      io.emit("message:new", { roomId: room._id, message: chatMessage });
-    }
+  if (emitTarget) {
+    io.to(emitTarget).emit("announcement:new", { roomId: room._id, message: chatMessage });
+  } else {
+    io.emit("announcement:new", { roomId: room._id, message: chatMessage });
+  }
 
   return chatMessage;
 };
-

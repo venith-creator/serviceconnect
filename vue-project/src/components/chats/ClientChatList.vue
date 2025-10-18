@@ -51,7 +51,13 @@ const fetchRooms = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error('Failed to load chat rooms');
-    rooms.value = await res.json();
+    const allRooms = await res.json();
+
+    // ✅ Filter: clients shouldn’t see provider-only system rooms
+    rooms.value = allRooms.filter((room: any) => {
+      if (!room.systemName) return true; // normal chats
+      return room.systemName === "system_all" || room.systemName === "system_clients";
+    });
   } catch (err) {
     console.error('fetchRooms:', err);
   } finally {
