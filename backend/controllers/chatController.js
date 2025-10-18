@@ -169,12 +169,12 @@ export const sendMessage = async (req, res) => {
 
 export const publishAnnouncementToChat = async (announcement) => {
   const io = getIO();
-  const { title, message, audience, createdBy, expiresAt } = announcement;
+  const { title, message, audience, createdBy } = announcement;
 
-  if (expiresAt && new Date(expiresAt) < new Date()) {
+  /*if (expiresAt && new Date(expiresAt) < new Date()) {
     console.log("⚠️ Skipping expired announcement:", title);
     return null;
-  }
+  }*/
 
   // ✅ Determine the correct system chatroom name
   const systemName =
