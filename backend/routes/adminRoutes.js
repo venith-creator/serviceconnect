@@ -8,6 +8,7 @@ import {
   createAnnouncement,
   listAnnouncements,
   deleteAnnouncement,
+  getAllHomeowners
 } from "../controllers/adminController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -16,6 +17,7 @@ import { authorizeRoles } from "../middleware/roleMiddleware.js";
 const router = express.Router();
 
 // user management
+router.get("/homeowners", protect, authorizeRoles("admin"), getAllHomeowners);
 router.get("/users", protect, authorizeRoles("admin"), listUsers);
 router.patch("/users/:id/role", protect, authorizeRoles("admin"), updateUserRole);
 router.patch("/users/:id/ban", protect, authorizeRoles("admin"), toggleBanUser);

@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
-import { getUploader } from "../middleware/upload.js";
+import { getUploader, getFileUrl } from "../middleware/upload.js";
 dotenv.config();
 import Job from "../models/Job.js";
 
@@ -49,7 +49,11 @@ export const registerUser = async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const avatar = req.file ? req.file.path : null;
+        //const avatar = req.file ? req.file.path : null;
+        let avatar = null;
+        if (req.file && req.file.key) {
+          avatar = getFileUrl(process.env.MINIO_BUCKET || "serviceconnect-files", req.file.key);
+        }
 
         const roles = [role || "client"];
 
@@ -73,6 +77,7 @@ export const registerUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar,
         roles: user.roles,
         providerOnboarding: user.providerOnboarding,
         token: generateToken(user._id, user.roles),

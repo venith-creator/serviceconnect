@@ -3,6 +3,8 @@ import User from "../models/User.js";
 import Job from "../models/Job.js";
 import Payment from "../models/Payment.js";
 import Announcement from "../models/Announcement.js";
+import Review from "../models/Review.js";
+import { getFileUrl } from "../middleware/upload.js";
 import { publishAnnouncementToChat } from "./chatController.js";
 
 // 📌 User management
@@ -133,5 +135,62 @@ export const deleteAnnouncement = async (req, res) => {
     res.json({ message: "Announcement deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const getAllHomeowners = async (req, res) => {
+  try {
+    const bucket = process.env.MINIO_BUCKET || "serviceconnect-files";
+    const baseEndpoint = process.env.MINIO_ENDPOINT || "";
+    // 1️⃣ Get all users with the "client" role
+    const clients = await User.find({ roles: { $in: ["client"] } })
+      .select("name email phone avatar createdAt");
+
+    // 2️⃣ Enrich each client with jobs + reviews
+    const enrichedClients = await Promise.all(
+      clients.map(async (client) => {
+        const jobs = await Job.find({ client: client._id }).select("title status createdAt");
+
+        const reviews = await Review.find({ reviewee: client._id })
+          .populate("job", "title")
+          .populate("reviewer", "name email")
+          .sort({ createdAt: -1 });
+
+        const avgRating =
+          reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
+
+        let avatarUrl = null;
+        if (client.avatar) {
+          // If already a full URL, use it
+          if (/^https?:\/\//i.test(client.avatar)) {
+            avatarUrl = client.avatar;
+          } else {
+            // If stored as key/path (e.g. "avatars/123.jpg" or "avatars/123.jpg" or "avatars\\123.jpg")
+            // sanitize and build full URL
+            const cleanKey = client.avatar.replace(/^\/+/, "").replace(/\\/g, "/");
+            avatarUrl = getFileUrl(bucket, cleanKey); // returns `${MINIO_ENDPOINT}/${bucket}/${key}`
+          }
+        }
+
+        return {
+          _id: client._id,
+          name: client.name,
+          email: client.email,
+          phone: client.phone,
+          avatar: client.avatar,
+          joinedAt: client.createdAt,
+          jobsCount: jobs.length,
+          avgRating: avgRating.toFixed(1),
+          reviews,
+        };
+      })
+    );
+
+    res.json(enrichedClients);
+  } catch (error) {
+    console.error("❌ Error fetching homeowners:", error);
+    res.status(500).json({ message: "Error fetching homeowners", error: error.message });
   }
 };
