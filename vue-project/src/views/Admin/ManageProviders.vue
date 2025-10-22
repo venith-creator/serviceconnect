@@ -52,7 +52,7 @@
                       ? 'bg-green-100 text-green-700'
                       : provider.status === 'rejected'
                       ? 'bg-red-100 text-red-700'
-                      : provider.suspended
+                      : provider.status === 'suspended'
                       ? 'bg-gray-200 text-gray-700'
                       : ''
                   ]"
@@ -199,6 +199,42 @@
               </div>
               <p v-else class="text-gray-400 text-sm">No documents uploaded.</p>
             </div>
+
+            <!-- Reviews Section -->
+              <div class="mt-6">
+                <h3 class="font-semibold mb-3 text-gray-800 flex items-center gap-2">
+                  <span>Client Reviews ({{ providerReviews.length }})</span>
+                </h3>
+
+                <div v-if="providerReviews.length">
+                  <div
+                    v-for="(review, i) in providerReviews"
+                    :key="i"
+                    class="border-b py-3"
+                  >
+                    <div class="flex justify-between items-center">
+                      <p class="text-sm font-medium text-gray-800">
+                        ⭐ {{ review.rating.toFixed(1) }} / 5
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        {{ new Date(review.createdAt).toLocaleDateString() }}
+                      </p>
+                    </div>
+
+                    <p class="text-gray-700 text-sm mt-1">{{ review.comment }}</p>
+
+                    <p class="text-xs text-gray-500 mt-1">
+                      <strong>Client:</strong> {{ review.reviewer?.name || "Anonymous" }}<br />
+                      <strong>Job:</strong> {{ review.job?.title || "N/A" }}
+                    </p>
+                  </div>
+                </div>
+
+                <div v-else class="text-gray-500 text-sm">
+                  No reviews yet.
+                </div>
+              </div>
+
 
             <!-- Portfolio -->
             <div class="mt-6">
@@ -407,7 +443,33 @@ const confirmReject = async () => {
   }
 };
 
+
 const viewProvider = async (id: string) => {
+  try {
+    const [profileRes, reviewsRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/provider-profiles/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }),
+      fetch(`${API_BASE_URL}/reviews/provider/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }),
+    ])
+
+    const profileData = await profileRes.json()
+    const reviewsData = await reviewsRes.json()
+
+    selectedProvider.value = {
+      ...profileData.profile,
+      reviews: reviewsData, // attach provider-only reviews
+    }
+
+    showProviderModal.value = true
+  } catch (err) {
+    console.error("Error fetching provider:", err)
+  }
+}
+
+/*const viewProvider = async (id: string) => {
   try {
     const res = await fetch(`${API_BASE_URL}/provider-profiles/${id}`, {
       headers: {
@@ -421,7 +483,14 @@ const viewProvider = async (id: string) => {
     console.error("Error fetching provider:", err);
   }
   await fetchProviders ()
-};
+};*/
+const providerReviews = computed(() => {
+  if (!selectedProvider.value?.reviews) return []
+  // Only show reviews where the revieweeRole is "provider"
+  return selectedProvider.value.reviews.filter(
+    (r:any) => r.revieweeRole === "provider"
+  )
+})
 
 onMounted(fetchProviders)
 </script>

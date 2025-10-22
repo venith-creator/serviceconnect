@@ -3,6 +3,7 @@ import {
   createReview,
   providerCreateReview,
   getReviewsForProvider,
+  getReviewsForClient,
   getMyReviews,
   deleteReview,
    getAllReviewsAdmin,
@@ -20,6 +21,7 @@ router.post("/provider", protect, authorizeRoles("provider"), providerCreateRevi
 
 router.get("/my", protect, getMyReviews);
 router.get("/provider/:providerId", getReviewsForProvider);
+router.get("/client/:clientId", getReviewsForClient);
 router.get("/admin/all", protect, authorizeRoles("admin"), getAllReviewsAdmin);
 router.get("/admin/summary", protect, authorizeRoles("admin"), getProviderRatingSummary);
 router.delete("/:id", protect, authorizeRoles("admin"), deleteReview);

@@ -225,8 +225,6 @@ const markJobCompleted = async (jobId: string) => {
 const leaveReview = (proposal: any) => {
   const jobId = proposal.job?._id;
   const providerId =
-    proposal.provider?.user?._id ||
-    proposal.provider?.user ||
     proposal.provider?._id;
 
   if (!jobId || !providerId) {

@@ -10,11 +10,25 @@ export const createProposal = async (req, res) => {
   try {
     const { jobId, message, price, timelineEstimate } = req.body;
 
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate("client", "name email _id");
     if (!job) return res.status(404).json({ message: "Job not found" });
 
     const providerProfile = await ProviderProfile.findOne({ user: req.user._id });
     if (!providerProfile) return res.status(400).json({ message: "Provider profile not found" });
+
+    // 3️⃣ Prevent self-proposal (user posting as client cannot submit)
+    const isOwnJob =
+      job.client && job.client._id.toString() === req.user._id.toString();
+
+    const isOwnGuestJob =
+      job.clientEmail &&
+      job.clientEmail.toLowerCase() === req.user.email.toLowerCase();
+
+    if (isOwnJob || isOwnGuestJob) {
+      return res.status(403).json({
+        message: "You cannot submit a proposal for your own job posting.",
+      });
+    }
 
     // Prevent duplicate proposals for the same job
     const existing = await Proposal.findOne({ job: jobId, provider: providerProfile._id });

@@ -310,8 +310,9 @@ const submitProposal = async () => {
         ...proposalForm.value,
       }),
     });
+    const data = await res.json();
 
-    if (!res.ok) throw new Error("Failed to submit proposal");
+    if (!res.ok) throw new Error(data.message || "Failed to submit proposal");
     alert("Proposal sent successfully!");
     closeModal();
   } catch (err: any) {

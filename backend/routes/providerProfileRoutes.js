@@ -44,7 +44,7 @@ router.get("/me", protect, authorizeRoles("provider"), getMyProfile);
 router.get("/me/services", protect, authorizeRoles("provider"), getProviderServices);
 
 router.get("/payment-required", protect, authorizeRoles("provider"), getServicesRequiringPayment);
-router.get("/", listAllProfiles);
+router.get("/", protect, listAllProfiles);
 router.get("/active", getActiveProviders);
 
 router.get("/provider-status", protect, getProviderStatus);

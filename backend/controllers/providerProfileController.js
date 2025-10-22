@@ -133,11 +133,34 @@ export const getMyProfile = async (req, res) => {
 
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    const reviews = await Review.find({ provider: profile._id })
-      .populate("reviewer", "name email")
-      .sort({ createdAt: -1 });
+    const reviews = await Review.find({
+        $or: [
+          { revieweeProvider: profile._id },
+          { reviewee: profile.user._id }, // backward-compatibility
+        ],
+      })
+        .populate("reviewer", "name email avatar")
+        .populate("job", "title createdAt status")
+        .populate({
+            path: "revieweeProvider",
+            populate: {
+              path: "user",
+              select: "name email avatar",
+            },
+          })
+        .sort({ createdAt: -1 })
+        .lean();
 
-    res.json({ ...profile.toObject(), reviews });
+        const enrichedReviews = reviews.map((r) => ({
+          ...r,
+          reviewee:
+            r.revieweeProvider?.user ||
+            r.revieweeUser ||
+            r.reviewee ||
+            null,
+        }));
+
+    res.json({ ...profile.toObject(), reviews: enrichedReviews });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -157,9 +180,18 @@ export const getProfileById = async (req, res) => {
 
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
-    const reviews = await Review.find({ provider: profile._id })
-      .populate("reviewer", "name")
+    const reviews = await Review.find({ $or: [
+        { revieweeProvider: profile._id },
+        { reviewee: profile.user._id },
+      ], })
+      .populate("reviewer", "name email")
+      .populate("job", "title createdAt status")
       .sort({ createdAt: -1 });
+
+      const ratingAvg =
+      reviews.length > 0
+        ? reviews.reduce((a, r) => a + (r.rating || 0), 0) / reviews.length
+        : 0;
 
       const base = process.env.MINIO_ENDPOINT || "http://localhost:9000";
     const bucket = process.env.MINIO_BUCKET || "serviceconnect-files";
@@ -179,6 +211,7 @@ export const getProfileById = async (req, res) => {
           ? `${base}/${bucket}/${profile.avatar}`
           : profile.avatar,
       reviews,
+      ratingAvg,
     };
 
     res.json({ profile: enrichedProfile });
@@ -193,9 +226,13 @@ export const listAllProfiles = async (req, res) => {
     const { service, city, state, country, minExp, minRating, page = 1, limit = 20 } = req.query;
     const filter = {};
 
-    if (!req.user || !req.user.roles.includes("admin")) {
-      filter.suspended = false;
-    }
+    if (!req.user) {
+        filter.suspended = false; // hide only for unauthenticated users
+      } else if (!req.user.roles.includes("admin")) {
+        filter.suspended = false; // hide for non-admins
+      }
+// Admins will now see everything (including suspended)
+
     
     if (req.query.status) filter.status = req.query.status;
 
@@ -217,7 +254,19 @@ export const listAllProfiles = async (req, res) => {
       .populate("user", "name roles")
       .skip(skip)
       .limit(l)
-      .sort({ ratingAvg: -1, createdAt: -1 });
+      .sort({ ratingAvg: -1, createdAt: -1 })
+      .lean();
+
+    for (let provider of profiles) {
+      const reviews = await Review.find({ $or: [
+        { revieweeProvider: provider._id },
+        { reviewee: provider.user._id },
+      ], });
+      provider.ratingAvg =
+        reviews.length > 0
+          ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+          : 0;
+    }
 
     res.json({ total, page: p, limit: l, profiles });
   } catch (error) {
@@ -279,22 +328,50 @@ export const getProviderStats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-export const recalcProviderRating = async (providerId) => {
-  try {
-    const reviews = await Review.find({ provider: providerId });
-    const ratingCount = reviews.length;
-    const ratingAvg = ratingCount > 0
-      ? reviews.reduce((acc, r) => acc + r.rating, 0) / ratingCount
-      : 0;
 
-    await ProviderProfile.findByIdAndUpdate(providerId, {
-      ratingCount,
-      ratingAvg
+export const recalcProviderRating = async (providerProfileOrUserId) => {
+  try {
+    // Try to treat input as ProviderProfile._id first
+    let providerProfile = await ProviderProfile.findById(providerProfileOrUserId);
+
+    // If not found, treat input as a User._id and find profile
+    if (!providerProfile) {
+      providerProfile = await ProviderProfile.findOne({ user: providerProfileOrUserId });
+    }
+
+    if (!providerProfile) {
+      console.warn("recalcProviderRating: provider profile not found for id:", providerProfileOrUserId);
+      return;
+    }
+
+    const providerProfileId = providerProfile._id;
+
+    // Only count reviews targeted to the provider profile as provider
+    const providerReviews = await Review.find({
+      revieweeProvider: providerProfileId,
+      revieweeRole: "provider",
+    });
+
+    if (!providerReviews.length) {
+      await ProviderProfile.findByIdAndUpdate(providerProfileId, {
+        ratingAvg: 0,
+        ratingCount: 0,
+      });
+      return;
+    }
+
+    const total = providerReviews.reduce((sum, r) => sum + (r.rating || 0), 0);
+    const avg = total / providerReviews.length;
+
+    await ProviderProfile.findByIdAndUpdate(providerProfileId, {
+      ratingAvg: avg,
+      ratingCount: providerReviews.length,
     });
   } catch (err) {
-    console.error("Error recalculating rating:", err.message);
+    console.error("❌ Error recalculating provider rating:", err.message || err);
   }
 };
+
 
 export const suspendProfile = async (req, res) => {
   try {
@@ -302,6 +379,7 @@ export const suspendProfile = async (req, res) => {
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
     profile.suspended = true;
+    profile.status = "suspended";
     await profile.save();
 
     res.json({ message: "Provider suspended", profile });
@@ -349,7 +427,7 @@ export const getProviderStatsAdmin = async (req, res) => {
 export const getActiveProviders = async (req, res) => {
   try {
     const { service, city, state, country, minExp, page = 1, limit = 20 } = req.query;
-    const filter = { approved: true, suspended: false };
+    const filter = { approved: true, suspended: false};
 
     if (service) filter["services.category"] = new RegExp(service, "i");
     if (city) filter.city = new RegExp(city, "i");

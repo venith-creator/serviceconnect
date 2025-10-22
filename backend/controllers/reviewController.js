@@ -19,12 +19,22 @@ export const createReview = async (req, res) => {
       return res.status(400).json({ message: "Cannot create review without valid job reference" });
     }
 
-    const review = await Review.create({
+    const existingReview = await Review.findOne({
       job: jobId,
       reviewer: req.user._id,
-      reviewee: providerId, // provider.user._id
+      revieweeProvider: providerId,
+    });
+    if (existingReview)
+      return res.status(400).json({ message: "You already reviewed this provider" });
+
+    const review = await Review.create({
+      job: jobId,
+      reviewerRole: "client",
+      revieweeRole: "provider",
+      revieweeProvider: providerId,
       rating,
       comment,
+      reviewer: req.user._id,
       role: "client",
     });
 
@@ -77,7 +87,7 @@ export const providerCreateReview = async (req, res) => {
     const existingReview = await Review.findOne({
       job: jobId,
       reviewer: req.user._id,
-      reviewee: clientId,
+      revieweeUser: clientId,
     });
 
     if (existingReview) {
@@ -92,7 +102,9 @@ export const providerCreateReview = async (req, res) => {
     const review = await Review.create({
       job: jobId,
       reviewer: req.user._id,
-      reviewee: clientId,
+      reviewerRole: "provider",
+      revieweeRole: "client",
+      revieweeUser: clientId,
       rating,
       comment,
       role: "provider",
@@ -112,22 +124,75 @@ export const providerCreateReview = async (req, res) => {
 
 export const getReviewsForProvider = async (req, res) => {
   try {
-    const reviews = await Review.find({ reviewee: req.params.providerId })
-      .populate("reviewer", "name email")
-      .populate("job", "title");
-    res.json(reviews);
+    const providerId = req.params.providerId;
+    const reviews = await Review.find({revieweeRole: "provider", $or: [
+        { revieweeProvider: providerId },
+        { reviewee: providerId }, // for backward-compatibility (old reviews)
+      ], })
+      .populate("reviewer", "name email avatar")
+      .populate("job", "title")
+      .populate({
+        path: "revieweeProvider",
+        populate: {
+          path: "user",
+          select: "name email avatar",
+        },
+      })
+      .lean();
+
+       const enriched = reviews.map((r) => ({
+      ...r,
+      reviewee:
+        r.revieweeProvider?.user || // provider’s user
+        r.revieweeUser || // direct user (client)
+        r.reviewee || // legacy
+        null,
+    }));
+
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: "Error fetching reviews", error: error.message });
   }
 };
 
+export const getReviewsForClient = async (req, res) => {
+  try {
+    const clientId = req.params.clientId;
+    const reviews = await Review.find({
+      revieweeRole: "client",
+      $or: [{ revieweeUser: clientId }, { reviewee: clientId }],
+    })
+      .populate("reviewer", "name email avatar")
+      .populate("job", "title");
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching client reviews", error: error.message });
+  }
+};
 
 export const getMyReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ reviewer: req.user._id })
-      .populate("reviewee", "name email")
-      .populate("job", "title");
-    res.json(reviews);
+      .populate("revieweeUser", "name email avatar")
+      .populate({
+          path: "revieweeProvider",
+          populate: {
+            path: "user",
+            select: "name email avatar",
+          },
+        })
+      .populate("job", "title")
+      .lean();
+
+      const enriched = reviews.map((r) => ({
+      ...r,
+      reviewee:
+        r.revieweeProvider?.user ||
+        r.revieweeUser ||
+        r.reviewee ||
+        null,
+    }));
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: "Error fetching my reviews", error: error.message });
   }
@@ -149,45 +214,54 @@ export const deleteReview = async (req, res) => {
   }
 };
 
-// Admin - Paginated & Searchable Reviews
 export const getAllReviewsAdmin = async (req, res) => {
   try {
-    const { role, jobId, page = 1, limit = 10, search = "" } = req.query;
-    const filter = {};
-    if (role) filter.role = role;
-    if (jobId) filter.job = jobId;
+    const { role, search, page = 1, limit = 10 } = req.query;
+    const query = {};
 
-    const skip = (page - 1) * limit;
+    if (role) query.reviewerRole = role;
 
-    // Optional search: by reviewer/reviewee name/email
-    const matchStage = search
-      ? {
-          $or: [
-            { "reviewer.name": { $regex: search, $options: "i" } },
-            { "reviewer.email": { $regex: search, $options: "i" } },
-            { "reviewee.name": { $regex: search, $options: "i" } },
-            { "reviewee.email": { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
-
-    const reviews = await Review.find(filter)
-      .populate("job", "title description budget status city state country category timelineStart timelineEnd location")
-      .populate("reviewer", "name email role")
-      .populate("reviewee", "name email role")
+    // 1️⃣ Fetch & populate all data first
+    let reviews = await Review.find(query)
+      .populate("reviewer", "name email")
+      .populate("reviewee", "name email")
+      .populate({
+        path: "revieweeProvider",
+        populate: { path: "user", select: "name email" },
+      })
+      .populate("revieweeUser", "name email")
+      .populate("job", "title")
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit));
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .lean();
 
-    const total = await Review.countDocuments(filter);
+    // 2️⃣ Apply search filtering in-memory (after populate)
+    if (search) {
+      const regex = new RegExp(search, "i");
+      reviews = reviews.filter((r) =>
+        regex.test(r.reviewer?.name || "") ||
+        regex.test(r.reviewer?.email || "") ||
+        regex.test(r.revieweeUser?.name || "") ||
+        regex.test(r.revieweeUser?.email || "") ||
+        regex.test(r.revieweeProvider?.user?.name || "") ||
+        regex.test(r.revieweeProvider?.user?.email || "") ||
+        regex.test(r.reviewee?.name || "") ||
+        regex.test(r.reviewee?.email || "")
+      );
+    }
+
+    // 3️⃣ Count only filtered reviews (for total)
+    const total = reviews.length;
 
     res.json({
-      total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
       reviews,
+      total,
+      pages: Math.ceil(total / limit),
+      page: Number(page),
     });
   } catch (error) {
+    console.error("Error fetching admin reviews:", error);
     res.status(500).json({
       message: "Error fetching admin reviews",
       error: error.message,
@@ -196,46 +270,68 @@ export const getAllReviewsAdmin = async (req, res) => {
 };
 
 // 📊 Admin Summary - Avg Ratings per Provider
+// controllers/reviewController.js
 export const getProviderRatingSummary = async (req, res) => {
   try {
     const summary = await Review.aggregate([
-      { $match: { role: "client" } },
+      // only client → provider reviews
+      { $match: { reviewerRole: "client", revieweeRole: "provider", revieweeProvider: { $exists: true } } },
+
+      // group by provider profile id (revieweeProvider)
       {
         $group: {
-          _id: "$reviewee",
+          _id: "$revieweeProvider",
           avgRating: { $avg: "$rating" },
-          reviewCount: { $sum: 1 },
-        },
+          reviewCount: { $sum: 1 }
+        }
       },
+
+      // join with providerprofiles
+      {
+        $lookup: {
+          from: "providerprofiles",
+          localField: "_id",
+          foreignField: "_id",
+          as: "profile"
+        }
+      },
+      { $unwind: "$profile" },
+
+      // lookup the user for the provider profile
       {
         $lookup: {
           from: "users",
-          localField: "_id",
+          localField: "profile.user",
           foreignField: "_id",
-          as: "provider",
-        },
+          as: "user"
+        }
       },
-      { $unwind: "$provider" },
+      { $unwind: "$user" },
+
+      // tidy project
       {
         $project: {
           _id: 1,
           avgRating: { $round: ["$avgRating", 1] },
           reviewCount: 1,
-          "provider.name": 1,
-          "provider.email": 1,
-        },
+          "user._id": 1,
+          "user.name": 1,
+          "user.email": 1,
+          "profile._id": "$profile._id",
+          "profile.ratingAvg": "$profile.ratingAvg",
+        }
       },
-      { $sort: { avgRating: -1 } },
+
+      { $sort: { avgRating: -1 } }
     ]);
 
     res.json(summary);
   } catch (error) {
-    res.status(500).json({
-      message: "Error generating rating summary",
-      error: error.message,
-    });
+    console.error("Error generating rating summary:", error);
+    res.status(500).json({ message: "Error generating rating summary", error: error.message });
   }
 };
+
 
 // 🧹 Utility: Clean reviews for deleted jobs
 export const cleanupOrphanReviews = async () => {

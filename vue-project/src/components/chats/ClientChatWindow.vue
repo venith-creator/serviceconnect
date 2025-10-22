@@ -5,8 +5,9 @@
       <div>
         <div class="font-semibold text-gray-800">{{ roomTitle }}</div>
         <div class="text-xs text-gray-500">
-          {{ props.room?.job?.title || props.room?.systemName || '' }}
+          {{ props.room?.job?.title || getSubLabel(props.room) }}
         </div>
+
       </div>
     </div>
 
@@ -27,13 +28,13 @@
       :class="m.type === 'announcement' ? 'justify-center' : (isMe(m) ? 'justify-end' : 'justify-start')"
     >
       <!-- 📢 Announcement -->
-      <div
-        v-if="m.type === 'announcement'"
-        class="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-xl px-4 py-3 text-sm shadow-sm flex items-center gap-2 max-w-[80%]"
-      >
-        <i class="pi pi-megaphone text-yellow-600"></i>
-        <span class="whitespace-pre-wrap">{{ m.text }}</span>
-      </div>
+        <div
+          v-if="m.type === 'announcement'"
+          class="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-xl px-4 py-3 text-sm shadow-sm flex items-center gap-2 max-w-[80%]"
+        >
+          <Megaphone class="w-4 h-4 text-yellow-600" />
+          <span class="whitespace-pre-wrap">{{ m.text }}</span>
+        </div>
 
       <!-- 💬 Normal Message -->
       <div
@@ -67,7 +68,11 @@
     </div>
 
     <!-- Input -->
-    <form @submit.prevent="sendMessage" class="p-3 bg-white border-t flex gap-2 items-center">
+      <form
+          v-if="!isAnnouncementRoom"
+          @submit.prevent="sendMessage"
+          class="p-3 bg-white border-t flex gap-2 items-center"
+        >
       <textarea
         v-model="text"
         placeholder="Write a message..."
@@ -82,6 +87,13 @@
         Send
       </button>
     </form>
+    <!-- Disabled State -->
+    <div
+      v-else
+      class="p-4 bg-white border-t text-gray-500 text-center italic"
+    >
+      🔒 Announcements are read-only
+    </div>
   </div>
 </template>
 
@@ -89,6 +101,8 @@
 import { ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { API_BASE_URL } from '@/config';
 import { connectSocket, getSocket } from '@/utils/socketClient';
+import { Megaphone } from "lucide-vue-next";
+
 
 const props = defineProps<{ room: any }>();
 const emit = defineEmits<{ (e: 'sent'): void }>();
@@ -97,10 +111,48 @@ const roomTitle = computed(() => {
   if (!props.room) return '';
   const { job, systemName, participants } = props.room;
   const me = localStorage.getItem('userId') || '';
-  if (systemName) return systemName.replace('system_', '').toUpperCase();
-  const other = participants?.find((p: any) => p._id !== me);
-  return other?.name || job?.title || 'Chat';
+
+  switch (systemName) {
+    case 'system_all':
+      return 'Announcements for Everyone';
+    case 'system_providers':
+      return 'Announcements for Service Providers';
+    case 'system_clients':
+      return 'Announcements for Homeowners';
+    default:
+      const other = participants?.find((p: any) => p._id !== me);
+      return other?.name || job?.title || 'Chat';
+  }
 });
+
+const isAnnouncementRoom = computed(() => {
+  const sysName = props.room?.systemName?.toLowerCase() || '';
+  return (
+    sysName.startsWith('system_') &&
+    (sysName.includes('announcement') ||
+      sysName.includes('all') ||
+      sysName.includes('providers') ||
+      sysName.includes('clients'))
+  );
+});
+
+const getSubLabel = (room: any) => {
+  if (!room) return '';
+  const sys = room.systemName;
+  if (!sys) return 'Direct Chat';
+
+  switch (sys) {
+    case 'system_all':
+      return 'Broadcast Announcement';
+    case 'system_providers':
+      return 'Provider Updates';
+    case 'system_clients':
+      return 'Homeowner Updates';
+    default:
+      return 'Announcement';
+  }
+};
+
 
 const messages = ref<any[]>([]);
 const loadingMessages = ref(false);
@@ -132,6 +184,10 @@ const fetchMessages = async (roomId: string) => {
 /** Send message: IMPORTANT: do NOT push locally; rely on socket event to append canonical saved message */
 const sendMessage = async () => {
   if (!props.room || !props.room._id) return alert('Select a chat');
+  if (isAnnouncementRoom.value) {
+    alert("You cannot reply to announcements.");
+    return;
+  }
   if (!text.value.trim()) return;
   try {
     const body = { text: text.value.trim() };

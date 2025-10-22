@@ -7,9 +7,9 @@
       </div>
 
       <!-- Jobs Grid -->
-      <div v-if="jobs.length" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div v-if="paginatedJobs.length" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
         <div
-          v-for="job in jobs"
+          v-for="job in paginatedJobs"
           :key="job._id"
           class="bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition p-5 flex flex-col justify-between"
         >
@@ -42,8 +42,7 @@
               <p><strong>Budget:</strong> ${{ job.budget || 0 }}</p>
               <p>
                 <strong>Timeline:</strong>
-                {{ formatDate(job.timelineStart) }} →
-                {{ formatDate(job.timelineEnd) }}
+                {{ formatDate(job.timelineStart) }} → {{ formatDate(job.timelineEnd) }}
               </p>
             </div>
           </div>
@@ -78,12 +77,45 @@
       <div v-else class="text-center py-16">
         <p class="text-gray-600 text-lg">No jobs found.</p>
       </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="flex justify-center items-center mt-8 gap-2">
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in visiblePages"
+          :key="page"
+          @click="goToPage(page)"
+          :class="[
+            'px-3 py-1 rounded-lg text-sm font-medium transition',
+            page === currentPage
+              ? 'bg-purple-600 text-white'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+          ]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+          class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
     </div>
   </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRouter } from "vue-router";
@@ -91,11 +123,11 @@ import { useRouter } from "vue-router";
 const jobs = ref<any[]>([]);
 const router = useRouter();
 
-const formatDate = (dateStr?: string) => {
-  if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleDateString();
-};
+// Pagination states
+const currentPage = ref(1);
+const itemsPerPage = 6;
 
+// Fetch all jobs
 const fetchJobs = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -109,6 +141,42 @@ const fetchJobs = async () => {
   }
 };
 
+// Pagination computed values
+const totalPages = computed(() => Math.ceil(jobs.value.length / itemsPerPage));
+
+const paginatedJobs = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return jobs.value.slice(start, start + itemsPerPage);
+});
+
+// Visible pagination buttons (max 5)
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 3) return [1, 2, 3, 4, 5];
+  if (current >= total - 2) return [total - 4, total - 3, total - 2, total - 1, total];
+  return [current - 2, current - 1, current, current + 1, current + 2];
+});
+
+// Page navigation
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) currentPage.value = page;
+};
+
+// Helpers
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return "N/A";
+  return new Date(dateStr).toLocaleDateString();
+};
+
+// Actions
 const viewProposals = (jobId: string) => {
   router.push(`/dashboard/admin/job/${jobId}/proposals`);
 };
@@ -156,4 +224,3 @@ onMounted(fetchJobs);
   -webkit-box-orient: vertical;
 }
 </style>
-

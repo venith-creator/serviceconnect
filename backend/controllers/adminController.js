@@ -151,7 +151,8 @@ export const getAllHomeowners = async (req, res) => {
       clients.map(async (client) => {
         const jobs = await Job.find({ client: client._id }).select("title status createdAt");
 
-        const reviews = await Review.find({ reviewee: client._id })
+        const reviews = await Review.find({ revieweeRole: "client",
+          $or: [{ revieweeUser: client._id }, { reviewee: client._id }],})
           .populate("job", "title")
           .populate("reviewer", "name email")
           .sort({ createdAt: -1 });

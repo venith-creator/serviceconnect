@@ -15,9 +15,14 @@
         :class="['p-3 rounded cursor-pointer','bg-white','hover:bg-gray-50',(selectedRoomId===room._id)?'ring-2 ring-purple-300':'']"
       >
         <div class="flex justify-between items-start">
-          <div>
-            <div class="text-sm font-medium">{{ otherName(room) }}</div>
-            <div class="text-xs text-gray-500">{{ room.job?.title || (room.systemName || 'Chat') }}</div>
+          <div class="flex items-center gap-2">
+            <component :is="getIcon(room)" class="w-4 h-4 text-purple-500" v-if="getIcon(room)" />
+            <div>
+              <div class="text-sm font-medium">{{ getDisplayName(room) }}</div>
+              <div class="text-xs text-gray-500">
+                {{ room.job?.title || getSubLabel(room) }}
+              </div>
+            </div>
           </div>
           <div class="text-xs text-gray-400">{{ lastMessagePreview(room) }}</div>
         </div>
@@ -32,6 +37,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { API_BASE_URL } from '@/config';
 import { connectSocket} from '@/utils/socketClient';
+import { SpeakerWaveIcon, UserGroupIcon } from '@heroicons/vue/24/solid'
 
 const props = defineProps<{ selectedRoomId?: string; initialRoomId?: string }>();
 const emit = defineEmits<{
@@ -43,6 +49,32 @@ const loading = ref(false);
 const selectedRoomId = ref(props.selectedRoomId || '');
 
 const token = localStorage.getItem('token') || '';
+
+// ✅ Map system names to readable titles and icons
+const getDisplayName = (room: any) => {
+  switch (room.systemName) {
+    case 'system_all':
+      return 'Announcements for Everyone'
+    case 'system_clients':
+      return 'Announcements for Homeowners'
+    default:
+      const me = localStorage.getItem('userId')
+      const other = room.participants?.find((p: any) => p && p._id !== me)
+      return other?.name || other?.email || 'Chat Participant'
+  }
+}
+
+const getSubLabel = (room: any) => {
+  if (!room.systemName) return 'Direct Chat'
+  if (room.systemName === 'system_all') return 'Broadcast Announcement'
+  if (room.systemName === 'system_clients') return 'Homeowner Updates'
+  return 'Announcement'
+}
+
+const getIcon = (room: any) => {
+  if (room.systemName) return SpeakerWaveIcon
+  return UserGroupIcon
+}
 
 const fetchRooms = async () => {
   try {
@@ -70,12 +102,12 @@ const openRoom = (room: any) => {
   emit('select', room);
 };
 
-const otherName = (room: any) => {
+/*const otherName = (room: any) => {
   if (room.systemName) return room.systemName.replace('system_', '').toUpperCase();
   const me = localStorage.getItem('userId');
   const other = room.participants?.find((p: any) => p && p._id !== me);
   return other?.name || other?.email || 'Participant';
-};
+};*/
 
 const lastMessagePreview = (room: any) => {
   return room.lastMessage?.text?.slice(0, 40) || '';

@@ -80,12 +80,12 @@ import {
   Briefcase,
   DollarSign,
   MessageSquare,
-  Settings,
+  Speaker,
   Star,
   Users,
   X,
   User,
-  LogOut
+  LogOut,
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
@@ -126,7 +126,7 @@ const menu = [
   { name: 'managePayments', label: 'Payments', path: '/dashboard/admin/ManagePayments', icon: DollarSign },
   { name: 'manageReviews', label: 'Reviews', path: '/dashboard/admin/ManageReviewss', icon: Star },
   { name: 'manageChats', label: 'Chats', path: '/dashboard/admin/managechats', icon: MessageSquare },
-  { name: 'announcements', label: 'Announcements', path: '/dashboard/admin/makeAnnouncement', icon: Settings },
+  { name: 'announcements', label: 'Announcements', path: '/dashboard/admin/makeAnnouncement', icon: Speaker },
   { name: 'contacts', label: 'Contact Messages', path: '/dashboard/admin/ManageContacts', icon: MessageSquare }
 ]
 </script>
