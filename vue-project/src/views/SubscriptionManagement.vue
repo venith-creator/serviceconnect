@@ -1,5 +1,132 @@
 <template>
   <ProviderDashboardLayout>
+    <!-- Add Service Dialog -->
+    <div v-if="showAddService" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Add New Service</h3>
+            <button @click="showAddService = false" class="text-gray-400 hover:text-gray-500">
+              <span class="sr-only">Close</span>
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Select Service Category</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                <button
+                  v-for="cat in availableCategories"
+                  :key="cat.name"
+                  @click="toggleServiceSelection(cat.name)"
+                  :class="[
+                    'p-3 rounded border flex flex-col items-center justify-center text-sm font-medium',
+                    selectedService === cat.name
+                      ? 'bg-blue-50 border-blue-500 text-blue-700'
+                      : 'bg-white hover:bg-gray-50 border-gray-300'
+                  ]"
+                >
+                  <component :is="cat.icon" class="w-6 h-6 mb-1 text-gray-600" />
+                  {{ cat.name }}
+                </button>
+              </div>
+
+              <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Or enter a custom service</label>
+                <div class="flex space-x-2">
+                  <input
+                    v-model="customService"
+                    type="text"
+                    placeholder="e.g., Electrician, Painter, etc."
+                    class="flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                    @keyup.enter="addCustomService"
+                  />
+                  <button
+                    @click="addCustomService"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="selectedService || customService" class="mt-6 space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Service Rate (per hour)</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500 sm:text-sm">£</span>
+                  </div>
+                  <input
+                    v-model="serviceRate"
+                    type="number"
+                    min="0"
+                    step="5"
+                    class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                    placeholder="0.00"
+                  />
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500 sm:text-sm" id="price-currency">GBP</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (km)</label>
+                <input
+                  v-model="serviceRadius"
+                  type="number"
+                  min="1"
+                  max="100"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  placeholder="e.g., 25"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                <select
+                  v-model="serviceAvailability"
+                  class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                >
+                  <option value="Weekdays (9am-5pm)">Weekdays (9am-5pm)</option>
+                  <option value="Weekdays (after 5pm)">Weekdays (after 5pm)</option>
+                  <option value="Weekends">Weekends</option>
+                  <option value="24/7">24/7</option>
+                  <option value="Flexible">Flexible</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <button
+              type="button"
+              @click="showAddService = false"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="addService"
+              :disabled="!canAddService"
+              :class="[
+                'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white',
+                canAddService ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed',
+                'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              ]"
+            >
+              Add Service
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="p-6 space-y-6">
       <!-- Error Alert -->
@@ -130,7 +257,7 @@
                           £ {{index === 0 ? 20 : 10}}
                         </span>
                         <button
-                            v-if="service.requiresPayment"
+                            v-if="service.requiresPayment && service.approved"
                             @click="activateService(service, index === 0 ? 20 : 10)"
                             :disabled="processingPayment"
                             class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -157,14 +284,14 @@
                             :class="getStatusClass(service.status)">
                         {{ service.status }}
                       </span>
-                      <span v-if="service.requiresPayment"
+                      <span v-if="service.requiresPayment && service.approved"
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                         Payment Required
                       </span>
-<!--                      <span v-if="!service.approved"-->
-<!--                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">-->
-<!--                        Pending Approval-->
-<!--                      </span>-->
+                      <span v-if="!service.approved"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Pending Approval
+                      </span>
                     </div>
 
                     <div class="mt-2 text-sm text-gray-600 space-y-1">
@@ -197,15 +324,20 @@
                       </span>
                     </p>
                   </div>
-
-<!--                  <div class="flex space-x-2">-->
-<!--                    <button-->
-<!--                        @click="confirmServiceAction(service, 'delete')"-->
-<!--                        class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 border border-red-200 rounded-md hover:bg-red-50 transition-colors"-->
-<!--                    >-->
-<!--                      Remove-->
-<!--                    </button>-->
-<!--                  </div>-->
+                  <div class="flex space-x-2">
+                    <button
+                        @click="editService(service)"
+                        class="px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 border border-blue-200 rounded-md hover:bg-blue-50 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                        @click="deleteService(service._id, service.category)"
+                        class="px-3 py-1 text-sm font-medium text-red-600 hover:text-red-800 border border-red-200 rounded-md hover:bg-red-50 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -302,6 +434,102 @@
 
       </template>
     </div>
+
+    <!-- Edit Service Dialog -->
+    <div v-if="showEditService" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Edit Service</h3>
+            <button @click="showEditService = false" class="text-gray-400 hover:text-gray-500">
+              <span class="sr-only">Close</span>
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Service Category</label>
+              <input
+                v-model="selectedService"
+                type="text"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                :disabled="true"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Service Rate (per hour)</label>
+              <div class="mt-1 relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">£</span>
+                </div>
+                <input
+                  v-model="serviceRate"
+                  type="number"
+                  min="0"
+                  step="5"
+                  class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                  placeholder="0.00"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">GBP</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (km)</label>
+              <input
+                v-model="serviceRadius"
+                type="number"
+                min="1"
+                max="100"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                placeholder="e.g., 25"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+              <select
+                v-model="serviceAvailability"
+                class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+              >
+                <option value="Weekdays (9am-5pm)">Weekdays (9am-5pm)</option>
+                <option value="Weekdays (after 5pm)">Weekdays (after 5pm)</option>
+                <option value="Weekends">Weekends</option>
+                <option value="24/7">24/7</option>
+                <option value="Flexible">Flexible</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <button
+              type="button"
+              @click="showEditService = false"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="updateService"
+              :disabled="!serviceRate || serviceRate <= 0"
+              :class="[
+                'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white',
+                (!serviceRate || serviceRate <= 0) ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              ]"
+            >
+              Update Service
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </ProviderDashboardLayout>
 </template>
 
@@ -312,49 +540,78 @@ import ProviderDashboardLayout from '@/components/ProviderDashboardLayout.vue';
 import { useAuthStore } from "@/stores/auth.ts";
 import SubscriptionService, {type IService, type Payment} from "@/services/subscriptionService.ts";
 import {API_BASE_URL} from "@/config.ts";
+import {
+  WrenchScrewdriverIcon,
+  PaintBrushIcon,
+  WrenchIcon,
+  ComputerDesktopIcon,
+  TruckIcon,
+  UserGroupIcon,
+  HomeIcon,
+  AcademicCapIcon,
+  BriefcaseIcon,
+  GiftIcon,
+  MusicalNoteIcon,
+  HeartIcon,
+  CameraIcon,
+  PuzzlePieceIcon,
+  SparklesIcon,
+  BoltIcon,
+  CakeIcon,
+  FaceSmileIcon,
+} from '@heroicons/vue/24/outline';
 
-interface BillingRecord {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  status: string;
-}
+// Define service categories with icons
+const availableCategories = [
+  { name: 'Plumbing', icon: WrenchIcon },
+  { name: 'Electrical', icon: BoltIcon },
+  { name: 'Carpentry', icon: WrenchScrewdriverIcon },
+  { name: 'Cleaning', icon: SparklesIcon },
+  { name: 'Painting', icon: PaintBrushIcon },
+  { name: 'Gardening', icon: HomeIcon },
+  { name: 'Moving', icon: TruckIcon },
+  { name: 'IT Support', icon: ComputerDesktopIcon },
+  { name: 'Tutoring', icon: AcademicCapIcon },
+  { name: 'Beauty', icon: FaceSmileIcon },
+  { name: 'Fitness', icon: UserGroupIcon },
+  { name: 'Photography', icon: CameraIcon },
+  { name: 'Catering', icon: CakeIcon },
+  { name: 'Event Planning', icon: GiftIcon },
+  { name: 'Pet Care', icon: HeartIcon },
+  { name: 'Consulting', icon: BriefcaseIcon },
+  { name: 'Handyman', icon: WrenchScrewdriverIcon },
+  { name: 'Personal Training', icon: UserGroupIcon },
+  { name: 'Music Lessons', icon: MusicalNoteIcon },
+  { name: 'Other', icon: PuzzlePieceIcon }
+];
 
 type ServiceStatus = 'all' | 'active' | 'trial' | 'suspended' | 'expired';
-type ConfirmAction = 'delete';
-
-interface ConfirmDialog {
-  title: string;
-  message: string;
-  confirmText: string;
-  action: ConfirmAction | null;
-  data: string | null;
-}
 
 // State
 const activeTab = ref<'services' | 'billing'>('services');
 const processingPayment = ref(false);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const isDeleting = ref<string | null>(null);
+
 
 // Service State
 const services = ref<IService[]>([]);
 const billingHistory = ref<Payment[]>([]);
 
-// UI State
+// Service Form State
 const showAddService = ref(false);
+const showEditService = ref(false);
+const selectedService = ref('');
+const customService = ref('');
+const serviceRate = ref<number | null>(null);
+const serviceRadius = ref<number | null>(null);
+const serviceAvailability = ref('Weekdays (9am-5pm)');
+const editingService = ref<IService | null>(null);
+
+// UI State
 const showServiceFilter = ref(false);
 const serviceFilter = ref<ServiceStatus>('all');
-const showConfirmDialog = ref(false);
-
-const confirmDialog = ref<ConfirmDialog>({
-  title: '',
-  message: '',
-  confirmText: 'Confirm',
-  action: null,
-  data: null
-});
 
 // Auth
 const auth = useAuthStore();
@@ -371,6 +628,116 @@ const filteredServices = computed<IService[]>(() => {
   if (serviceFilter.value === 'all') return services.value;
   return services.value.filter(service => service.status === serviceFilter.value);
 });
+
+// Toggle service selection
+const toggleServiceSelection = (service: string) => {
+  selectedService.value = selectedService.value === service ? '' : service;
+  if (selectedService.value) {
+    customService.value = '';
+  }
+};
+
+// Add a custom service
+const addCustomService = () => {
+  if (customService.value.trim()) {
+    selectedService.value = ''; // Clear any selected service
+  }
+};
+
+// Check if we can add the service
+const canAddService = computed(() => {
+  const hasService = selectedService.value || customService.value.trim();
+  const hasRate = serviceRate.value !== null && serviceRate.value > 0;
+  const hasRadius = serviceRadius.value !== null && serviceRadius.value > 0;
+  return hasService && hasRate && hasRadius;
+});
+
+// Add a new service
+const addService = async () => {
+  if (!canAddService.value) return;
+
+  try {
+    isLoading.value = true;
+    const serviceName = selectedService.value || customService.value.trim();
+
+    // Create the new service object
+    const newService = {
+      category: serviceName,
+      rate: serviceRate.value || 0,
+      availability: serviceAvailability.value,
+      radiusKm: serviceRadius.value || 5,
+    };
+
+    // Add the new service to the backend
+    await SubscriptionService.addService(newService);
+
+    // Reset the form and close dialog
+    resetServiceForm();
+
+    // Fetch the updated services
+    await fetchData();
+
+    // Show success message
+    toast.success('Service added successfully!');
+
+  } catch (err: any) {
+    console.error('Error adding service:', err);
+    error.value = err.message || 'Failed to add service';
+    toast.error(error.value ?? "");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Edit service
+const editService = (service: IService) => {
+  editingService.value = service;
+  selectedService.value = service.category;
+  serviceRate.value = service.rate;
+  serviceRadius.value = service.radiusKm;
+  serviceAvailability.value = service.availability || 'Weekdays (9am-5pm)';
+  showEditService.value = true;
+};
+
+// Update service
+const updateService = async () => {
+  if (!editingService.value) return;
+
+  try {
+    isLoading.value = true;
+
+    const serviceData = {
+      category: selectedService.value || customService.value.trim(),
+      rate: serviceRate.value || 0,
+      radiusKm: serviceRadius.value || 5,
+      availability: serviceAvailability.value,
+    };
+
+    await SubscriptionService.updateService(editingService.value._id, serviceData);
+
+    toast.success('Service updated successfully!');
+    await fetchData();
+    resetServiceForm();
+  } catch (err: any) {
+    console.error('Error updating service:', err);
+    error.value = err.message || 'Failed to update service';
+    toast.error(error.value ?? "");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Reset service form
+const resetServiceForm = () => {
+  selectedService.value = '';
+  customService.value = '';
+  serviceRate.value = null;
+  serviceRadius.value = null;
+  serviceAvailability.value = 'Weekdays (9am-5pm)';
+  editingService.value = null;
+  showAddService.value = false;
+  showEditService.value = false;
+};
 
 // Fetch data
 const fetchData = async () => {
@@ -395,6 +762,29 @@ const fetchPaymentHistory = async () => {
     billingHistory.value = await SubscriptionService.getPayments();
   } catch (err) {
     console.error('Error fetching payment history:', err);
+  }
+};
+
+// Delete a service
+const deleteService = async (serviceId: string, serviceName: string) => {
+  if (!confirm(`Are you sure you want to delete the "${serviceName}" service? This action cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    isDeleting.value = serviceId;
+    await SubscriptionService.deleteService(serviceId);
+
+    // Remove the service from the local state
+    services.value = services.value.filter(s => s._id !== serviceId);
+
+    toast.success('Service deleted successfully');
+    await fetchData();
+  } catch (err: any) {
+    console.error('Error deleting service:', err);
+    toast.error(err.message || 'Failed to delete service');
+  } finally {
+    isDeleting.value = null;
   }
 };
 
@@ -446,17 +836,6 @@ const getStatusClass = (status: string): string => {
   }
 };
 
-const confirmServiceAction = (service: IService, action: ConfirmAction): void => {
-  confirmDialog.value = {
-    title: 'Delete Service',
-    message: `Are you sure you want to remove "${service.category}"? This action cannot be undone.`,
-    confirmText: 'Delete',
-    action,
-    data: service._id
-  };
-
-  showConfirmDialog.value = true;
-};
 
 const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return 'N/A';
@@ -483,16 +862,6 @@ const formatCurrency = (amount: number): string => {
     console.error('Error formatting currency:', err);
     return `${amount.toFixed(2)}`;
   }
-};
-
-const downloadInvoice = async (invoiceId: string): Promise<void> => {
-  // Implementation for downloading invoice
-  console.log('Downloading invoice:', invoiceId);
-};
-
-const downloadAllInvoices = async (): Promise<void> => {
-  // Implementation for downloading all invoices
-  console.log('Downloading all invoices');
 };
 
 const checkPaymentStatus = async () => {

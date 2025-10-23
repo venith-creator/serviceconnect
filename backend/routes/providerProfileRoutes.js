@@ -14,7 +14,7 @@ import {
   getActiveProviders,
   approveService,
   rejectService,
-  getServicesRequiringPayment, getProviderServices,
+  getServicesRequiringPayment, getProviderServices, addService, deleteService, updateService,
 } from "../controllers/providerProfileController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -42,6 +42,9 @@ router.get("/me", protect, authorizeRoles("provider"), getMyProfile);
 
 // Get all services for the current provider
 router.get("/me/services", protect, authorizeRoles("provider"), getProviderServices);
+router.post("/me/services", protect, authorizeRoles("provider"), addService);
+router.delete("/me/services/:id", protect, authorizeRoles("provider"), deleteService);
+router.patch("/me/services/:id", protect, authorizeRoles("provider"), updateService);
 
 router.get("/payment-required", protect, authorizeRoles("provider"), getServicesRequiringPayment);
 router.get("/", protect, listAllProfiles);
