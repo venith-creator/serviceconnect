@@ -264,7 +264,9 @@ import {
   // TruckIcon,
   // CameraIcon
 } from "@heroicons/vue/24/solid";
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 // const categories = [
 //   {name: "Plumber", icon: WrenchScrewdriverIcon, color: "text-blue-500"},
 //   {name: "Electrician", icon: BoltIcon, color: "text-yellow-500"},
