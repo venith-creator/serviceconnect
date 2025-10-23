@@ -1,9 +1,7 @@
-// controllers/jobsController.js
 import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
 import fetch from "node-fetch";
-import Review from "../models/Review.js";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
@@ -118,7 +116,7 @@ const geocodeLocation = async (address) => {
 // ✅ GET all jobs (with optional filters)
 export const getJobs = async (req, res) => {
   try {
-    const { keyword, category, location, lat, lon, maxDistance, city, state, country } = req.query;
+    const { keyword, category, location, lat, lon, maxDistance, city, state, country, status } = req.query;
     const filter = {};
 
     //  Keyword filter (by title)
@@ -129,6 +127,10 @@ export const getJobs = async (req, res) => {
     //  Category filter
     if (category) {
       filter.category = category;
+    }
+
+    if (status) {
+      filter.status = status;
     }
 
     //  Text-based city/state/country filter

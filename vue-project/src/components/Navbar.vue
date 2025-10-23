@@ -18,9 +18,39 @@
 
         <!-- Desktop Nav -->
         <nav class="hidden md:flex items-center space-x-8">
-          <a href="#how" class="text-black hover:text-gray-700 font-medium transition-colors">How it Works</a>
-          <a href="#testimonials" class="text-black hover:text-gray-700 font-medium transition-colors">Testimonials</a>
-          <a href="#faqs" class="text-black hover:text-gray-700 font-medium transition-colors">FAQs</a>
+          <router-link
+            to="/"
+            :class="[
+              'font-medium transition-colors',
+              isActive('/')
+                ? 'text-primary'
+                : 'text-black hover:text-gray-700'
+            ]"
+          >
+            How it Works
+          </router-link>
+          <router-link
+            to="/listing"
+            :class="[
+              'font-medium transition-colors',
+              isActive('/listing')
+                ? 'text-primary'
+                : 'text-black hover:text-gray-700'
+            ]"
+          >
+            Job Listing
+          </router-link>
+          <router-link
+            to="/contact"
+            :class="[
+              'font-medium transition-colors',
+              isActive('/contact')
+                ? 'text-primary'
+                : 'text-black hover:text-gray-700'
+            ]"
+          >
+            Contact Us
+          </router-link>
         </nav>
 
         <!-- Desktop Buttons -->
@@ -41,16 +71,6 @@
             @click.stop="toggleDropdown"
           >
             Signup
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 9l-7 7-7-7" />
-            </svg>
           </router-link>
 
           <!-- Dropdown -->
@@ -68,6 +88,16 @@
               </router-link>
             </div>
           </transition>
+        </div>
+        <div>
+          <!-- Login button -->
+          <router-link
+            to="/login"
+            class="border border-primary flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-white hover:opacity-90 transition-colors"
+            @click.stop="toggleDropdown"
+          >
+            Login
+          </router-link>
         </div>
 
         </div>
@@ -157,11 +187,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, computed } from "vue";
+import { useRoute } from 'vue-router';
 import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 
+const route = useRoute();
 const isMobileMenuOpen = ref(false);
 const showDropdown = ref(false);
+
+// Check if a nav item is active based on current route
+const isActive = (path: string) => {
+  if (path === '/') {
+    return route.path === '/';
+  }
+  return route.path.startsWith(path);
+};
 
 const toggleMobileMenu = () => (isMobileMenuOpen.value = !isMobileMenuOpen.value);
 const closeMobileMenu = () => (isMobileMenuOpen.value = false);
