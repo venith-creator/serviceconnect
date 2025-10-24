@@ -62,44 +62,62 @@
             Post Job
           </router-link>
 
-         <!-- Signup with dropdown -->
-        <div class="relative">
-          <!-- Signup button -->
-          <router-link
-            to="/signup"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-primary hover:opacity-90 transition-colors"
-            @click.stop="toggleDropdown"
-          >
-            Signup
-          </router-link>
+          <div v-if="!isLoggedIn" class="flex items-center space-x-2">
+            <div>
+              <!-- Signup button -->
+              <router-link
+                to="/signup"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-primary hover:opacity-90 transition-colors"
+              >
+                Signup
+              </router-link>
 
-          <!-- Dropdown -->
-          <transition name="fade">
-            <div
-              v-if="showDropdown"
-              class="absolute left-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden z-50"
-            >
+            </div>
+            <div>
+              <!-- Login button -->
               <router-link
                 to="/login"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                @click="closeDropdown"
+                class="border border-primary flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-white hover:opacity-90 transition-colors"
               >
                 Login
               </router-link>
             </div>
-          </transition>
-        </div>
-        <div>
-          <!-- Login button -->
-          <router-link
-            to="/login"
-            class="border border-primary flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-white hover:opacity-90 transition-colors"
-            @click.stop="toggleDropdown"
-          >
-            Login
-          </router-link>
-        </div>
-
+          </div>
+          <div v-else>
+            <div class="relative">
+              <button
+                @click="toggleDropdown"
+                class="flex items-center justify-center w-10 h-10 rounded-full border border-primary bg-white text-primary font-medium hover:opacity-90 transition-colors"
+                aria-haspopup="true"
+                :aria-expanded="isDropdownOpen"
+              >
+                {{ userInitials }}
+              </button>
+              <div
+                v-show="isDropdownOpen"
+                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu"
+              >
+                <router-link
+                  to="/dashboard/switch"
+                  @click="closeDropdown"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  Profile
+                </router-link>
+                <button
+                  @click="handleLogout"
+                  class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  Sign out
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
 
@@ -109,8 +127,8 @@
           class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors z-50 relative"
           aria-label="Toggle mobile menu"
         >
-          <XMarkIcon v-if="isMobileMenuOpen" class="h-6 w-6 text-gray-600" />
-          <Bars3Icon v-else class="h-6 w-6 text-gray-600" />
+          <XMarkIcon v-if="isMobileMenuOpen" class="h-6 w-6 text-gray-600"/>
+          <Bars3Icon v-else class="h-6 w-6 text-gray-600"/>
         </button>
       </div>
     </header>
@@ -134,7 +152,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-100">
           <div class="flex items-center space-x-2">
-            <img src="/Service_connect_logo.png" alt="Service Connect Logo" class="w-8 h-8" />
+            <img src="/Service_connect_logo.png" alt="Service Connect Logo" class="w-8 h-8"/>
             <span class="font-semibold text-xl text-black">Service Connect</span>
           </div>
           <button
@@ -142,16 +160,22 @@
             class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             aria-label="Close mobile menu"
           >
-            <XMarkIcon class="h-6 w-6 text-gray-600" />
+            <XMarkIcon class="h-6 w-6 text-gray-600"/>
           </button>
         </div>
 
         <!-- Drawer Nav -->
         <div class="flex-1 overflow-y-auto">
           <nav class="p-6 space-y-1">
-            <a href="#how" class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100" @click="closeMobileMenu">How it Works</a>
-            <a href="#testimonials" class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100" @click="closeMobileMenu">Testimonials</a>
-            <a href="#faqs" class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100" @click="closeMobileMenu">FAQs</a>
+            <a href="#how"
+               class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
+               @click="closeMobileMenu">How it Works</a>
+            <a href="#testimonials"
+               class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
+               @click="closeMobileMenu">Testimonials</a>
+            <a href="#faqs"
+               class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
+               @click="closeMobileMenu">FAQs</a>
           </nav>
         </div>
 
@@ -187,13 +211,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
-import { useRoute } from 'vue-router';
-import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
+import {ref, onMounted, onUnmounted, watch, computed} from "vue";
+import {useRoute, useRouter} from 'vue-router';
+import {Bars3Icon, XMarkIcon} from "@heroicons/vue/24/outline";
 
 const route = useRoute();
+const router = useRouter();
 const isMobileMenuOpen = ref(false);
 const showDropdown = ref(false);
+const isDropdownOpen = ref(false);
+
+const isLoggedIn = computed(() => {
+  return localStorage.getItem('token') !== null;
+});
+
+const userInitials = computed(() => {
+  const userInfoStr = localStorage.getItem('user');
+  if (!userInfoStr) return "U";
+  const name = JSON.parse(userInfoStr).name;
+  if (!name) return "U";
+
+  const nameParts = name.trim().split(/\s+/);
+  if (nameParts.length === 0) return "U";
+
+  let initials = nameParts[0].charAt(0).toUpperCase();
+
+  if (nameParts.length > 1) {
+    initials += nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+  }
+
+  return initials;
+});
+
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('name');
+  showDropdown.value = false;
+  isDropdownOpen.value = false;
+  router.push('/login');
+};
 
 // Check if a nav item is active based on current route
 const isActive = (path: string) => {
@@ -207,10 +263,10 @@ const toggleMobileMenu = () => (isMobileMenuOpen.value = !isMobileMenuOpen.value
 const closeMobileMenu = () => (isMobileMenuOpen.value = false);
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
+  isDropdownOpen.value = !isDropdownOpen.value;
 };
 const closeDropdown = () => {
-  showDropdown.value = false;
+  isDropdownOpen.value = false;
 };
 
 // Close dropdown when clicking outside
@@ -247,6 +303,7 @@ onUnmounted(() => {
 .fade-enter-active, .fade-leave-active {
   transition: all 0.2s ease;
 }
+
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
   transform: translateY(-5px);
