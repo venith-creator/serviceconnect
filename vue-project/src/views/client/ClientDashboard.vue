@@ -19,7 +19,7 @@
 
         <div class="bg-white rounded-xl shadow-sm p-6">
           <h3 class="text-sm text-gray-500 mb-2">Total Spent</h3>
-          <p class="text-3xl font-bold text-yellow-600">₦120,000</p>
+          <p class="text-3xl font-bold text-yellow-600">£120,000</p>
         </div>
       </section>
     </div>
