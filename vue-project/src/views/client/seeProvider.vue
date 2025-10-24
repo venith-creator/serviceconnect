@@ -125,7 +125,7 @@ const startChat = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ providerId: provider.value._id }),
+      body: JSON.stringify({ providerId: provider.value?.user?._id }),
     });
 
     if (!res.ok) throw new Error("Failed to start chat");
