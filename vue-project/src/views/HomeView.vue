@@ -2,7 +2,7 @@
   <div class="bg-white">
     <!-- Hero Section -->
     <section
-      class="relative h-[80vh] flex items-center justify-center text-center bg-cover bg-center"
+      class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center"
       style="background-image: url('/service-her.jpg');"
     >
       <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -14,34 +14,35 @@
           Connect with skilled professionals for any task, from home repairs to personal assistance
         </p>
         <!-- Search Box -->
-        <div class="border border-gray-200 rounded-lg shadow-md flex items-center p-7 mt-6 bg-transparent">
+        <div
+          class="border border-gray-200 rounded-lg shadow-md flex items-center p-7 mt-6 bg-transparent">
           <input
             type="text"
             placeholder="Enter your location"
             class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:outline-none text-black"
           />
           <button class="bg-primary text-white px-4 py-2 flex items-center gap-2 rounded-lg ml-2">
-            <MagnifyingGlassIcon class="w-5 h-5" />
+            <MagnifyingGlassIcon class="w-5 h-5"/>
             Search Service Provider
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Popular Categories -->
-    <section class="py-16 px-6 text-center">
-      <h2 class="text-2xl font-bold text-black">Popular Categories</h2>
-      <p class="text-gray-600">Find the service you need</p>
+    <!--    &lt;!&ndash; Popular Categories &ndash;&gt;-->
+    <!--    <section class="py-16 px-6 text-center">-->
+    <!--      <h2 class="text-2xl font-bold text-black">Popular Categories</h2>-->
+    <!--      <p class="text-gray-600">Find the service you need</p>-->
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-10 mt-10 max-w-4xl mx-auto">
-        <div v-for="cat in categories" :key="cat.name" class="flex flex-col items-center space-y-2">
-          <div class="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100">
-            <component :is="cat.icon" :class="['w-8 h-8', cat.color]" />
-          </div>
-          <p class="font-medium">{{ cat.name }}</p>
-        </div>
-      </div>
-    </section>
+    <!--      <div class="grid grid-cols-2 sm:grid-cols-4 gap-10 mt-10 max-w-4xl mx-auto">-->
+    <!--        <div v-for="cat in categories" :key="cat.name" class="flex flex-col items-center space-y-2">-->
+    <!--          <div class="w-16 h-16 flex items-center justify-center rounded-full bg-gray-100">-->
+    <!--            <component :is="cat.icon" :class="['w-8 h-8', cat.color]" />-->
+    <!--          </div>-->
+    <!--          <p class="font-medium">{{ cat.name }}</p>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </section>-->
 
     <!-- How It Works -->
     <section class="py-16 px-6 bg-white">
@@ -49,9 +50,10 @@
       <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <!-- Step -->
         <div v-for="step in steps" :key="step.number" class="text-center md:text-left space-y-3">
-          <img :src="step.img" class="w-full h-64 object-cover rounded-md" />
+          <img :src="step.img" class="w-full h-64 object-cover rounded-md"/>
           <div class="flex items-center gap-3 mt-2">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-bold">
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-bold">
               {{ step.number }}
             </div>
             <h3 class="font-semibold text-lg">{{ step.title }}</h3>
@@ -78,21 +80,26 @@
           </div>
           <p class="text-gray-600 text-sm">{{ job.desc }}</p>
           <div class="text-gray-500 text-sm space-y-1">
-            <p><MapPinIcon class="w-4 h-4 inline" /> {{ job.location }}</p>
+            <p>
+              <MapPinIcon class="w-4 h-4 inline"/>
+              {{ job.location }}
+            </p>
             <p>
               £ {{ job.price }}
-              <span class="float-right"><ClockIcon class="w-4 h-4 inline" /> {{ job.time }}</span>
+              <span class="float-right"><ClockIcon class="w-4 h-4 inline"/> {{ job.time }}</span>
             </p>
           </div>
-          <button class="bg-primary text-white px-4 py-2 rounded-lg mx-auto block w-full">Send Quote</button>
+          <button class="bg-primary text-white px-4 py-2 rounded-lg mx-auto block w-full">Send
+            Quote
+          </button>
         </div>
       </div>
 
       <div class="mt-6">
-        <button class="text-black font-semibold flex items-center gap-2 mx-auto">
+        <button @click="viewAllJobs" class="text-black font-semibold flex items-center gap-2 mx-auto">
           View All
           <span class="bg-primary text-white rounded-full p-1">
-            <ChevronRightIcon class="w-4 h-4" />
+            <ChevronRightIcon class="w-4 h-4"/>
           </span>
         </button>
       </div>
@@ -107,7 +114,7 @@
           <div class="relative z-10 w-full">
             <h3 class="font-bold text-xl">Find Trusted Service Providers</h3>
             <p class="text-sm mt-2">
-              Get quality work done by professionals in your area.<br />
+              Get quality work done by professionals in your area.<br/>
               From repairs to personal services we connect you with the right people for the job.
             </p>
             <router-link
@@ -132,18 +139,18 @@
               Join thousands of service providers earning more through our platform.
             </p>
             <router-link
-                to="/signup"
-                class="mt-6 block bg-yellow-400 text-black px-6 py-3 rounded-lg w-full text-center hover:bg-yellow-300 transition-colors"
-              >
-                Join Service Providers
-              </router-link>
+              to="/signup"
+              class="mt-6 block bg-yellow-400 text-black px-6 py-3 rounded-lg w-full text-center hover:bg-yellow-300 transition-colors"
+            >
+              Join Service Providers
+            </router-link>
           </div>
         </div>
       </div>
 
     </section>
 
-   <!-- Testimonials -->
+    <!-- Testimonials -->
     <section class="py-16 px-6 bg-white text-center">
       <h2 class="text-2xl font-bold text-black">What Our Users Say</h2>
       <p class="text-gray-600">Real experiences from homeowners and professionals</p>
@@ -156,12 +163,14 @@
             :key="activeTestimonial"
             class="bg-primary/10 rounded-lg p-6 flex items-center gap-4"
           >
-            <img :src="testimonials[activeTestimonial].img" class="w-16 h-16 rounded-full object-cover" />
+            <img :src="testimonials[activeTestimonial].img"
+                 class="w-16 h-16 rounded-full object-cover"/>
             <div class="text-left">
               <div class="flex text-yellow-400">
-                <StarIcon v-for="n in 5" :key="n" class="w-5 h-5" />
+                <StarIcon v-for="n in 5" :key="n" class="w-5 h-5"/>
               </div>
-              <p class="text-gray-600 text-sm mt-2">“ {{ testimonials[activeTestimonial].text }} ”</p>
+              <p class="text-gray-600 text-sm mt-2">“ {{ testimonials[activeTestimonial].text }}
+                ”</p>
               <p class="font-bold text-black mt-2">{{ testimonials[activeTestimonial].name }}</p>
               <p class="text-xs text-gray-500">{{ testimonials[activeTestimonial].location }}</p>
             </div>
@@ -201,7 +210,7 @@
     <section class="py-16 px-6 bg-white text-center">
       <h2 class="text-2xl font-bold text-black">Frequently Asked Questions</h2>
 
-       <div class="max-w-3xl mx-auto mt-8 space-y-4">
+      <div class="max-w-3xl mx-auto mt-8 space-y-4">
         <div
           v-for="(faq, index) in faqs"
           :key="faq.q"
@@ -238,26 +247,36 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted  } from "vue";
+import {ref, onMounted, onUnmounted} from "vue";
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
   ClockIcon,
   ChevronRightIcon,
   ChevronDownIcon,
-  StarIcon, WrenchScrewdriverIcon, BoltIcon, PaintBrushIcon, BuildingOfficeIcon, SunIcon, SparklesIcon, TruckIcon, CameraIcon
+  StarIcon,
+  // WrenchScrewdriverIcon,
+  // BoltIcon,
+  // PaintBrushIcon,
+  // BuildingOfficeIcon,
+  // SunIcon,
+  // SparklesIcon,
+  // TruckIcon,
+  // CameraIcon
 } from "@heroicons/vue/24/solid";
+import {useRouter} from "vue-router";
 
-const categories = [
-  { name: "Plumber", icon: WrenchScrewdriverIcon, color: "text-blue-500" },
-  { name: "Electrician", icon: BoltIcon, color: "text-yellow-500" },
-  { name: "Painter", icon: PaintBrushIcon, color: "text-green-500" },
-  { name: "Builder", icon: BuildingOfficeIcon, color: "text-orange-500" },
-  { name: "Gardener", icon: SunIcon, color: "text-green-600" },
-  { name: "Cleaner", icon: SparklesIcon, color: "text-purple-500" },
-  { name: "Driver", icon: TruckIcon, color: "text-red-500" },
-  { name: "Photographer", icon: CameraIcon, color: "text-pink-500" },
-];
+const router = useRouter();
+// const categories = [
+//   {name: "Plumber", icon: WrenchScrewdriverIcon, color: "text-blue-500"},
+//   {name: "Electrician", icon: BoltIcon, color: "text-yellow-500"},
+//   {name: "Painter", icon: PaintBrushIcon, color: "text-green-500"},
+//   {name: "Builder", icon: BuildingOfficeIcon, color: "text-orange-500"},
+//   {name: "Gardener", icon: SunIcon, color: "text-green-600"},
+//   {name: "Cleaner", icon: SparklesIcon, color: "text-purple-500"},
+//   {name: "Driver", icon: TruckIcon, color: "text-red-500"},
+//   {name: "Photographer", icon: CameraIcon, color: "text-pink-500"},
+// ];
 
 const steps = [
   {
@@ -281,6 +300,30 @@ const steps = [
 ];
 
 const jobs = [
+  {
+    id: 1,
+    title: "Need a plumber in <br> Solihull",
+    desc: "Urgent plumbing repair needed for kitchen sink and bathroom fixtures",
+    location: "Solihull Street, London",
+    price: "500 - 700",
+    time: "3 days",
+  },
+  {
+    id: 2,
+    title: "Looking for a <br> Gardener in London",
+    desc: "Regular garden maintenance and landscaping services",
+    location: "London Street",
+    price: "200 - 300",
+    time: "5 days",
+  },
+  {
+    id: 3,
+    title: "Electrician Needed - <br> Wiring Installation",
+    desc: "Complete electrical wiring for the new house construction",
+    location: "London",
+    price: "700 - 1000",
+    time: "2 days",
+  },
   {
     id: 1,
     title: "Need a plumber in <br> Solihull",
@@ -350,6 +393,10 @@ const faqs = [
     a: "Yes, they go through an onboarding process before verification.",
   },
 ];
+
+const viewAllJobs = () => {
+  router.push('/listing');
+}
 
 const activeFAQ = ref(null);
 

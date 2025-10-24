@@ -184,6 +184,37 @@ class SubscriptionService {
       }
     );
   }
+
+  async addService(
+    service: {category: string, rate: number, radiusKm: number, availability: string}
+  ) {
+    return this.request<{ success: boolean; message: string }>(
+      '/provider-profiles/me/services',
+      {
+        method: 'POST',
+        body: JSON.stringify(service)
+      }
+    );
+  }
+
+  async deleteService(serviceId: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/provider-profiles/me/services/${serviceId}`,
+      {
+        method: 'DELETE'
+      }
+    );
+  }
+
+  async updateService(serviceId: string, service: {category: string, rate: number, radiusKm: number, availability: string}) {
+    return this.request<{ success: boolean; message: string; service: IService }>(
+      `/provider-profiles/me/services/${serviceId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(service)
+      }
+    );
+  }
 }
 
 export default new SubscriptionService();

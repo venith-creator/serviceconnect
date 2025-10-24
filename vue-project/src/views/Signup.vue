@@ -126,21 +126,21 @@
           </div>
 
 
-          <!-- Social signup -->
-          <div class="space-y-2">
-            <p class="text-center text-xs text-gray-400">or sign up with</p>
-            <div class="flex justify-center gap-4">
-              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-                <img src="/google.jpg" alt="Google" class="w-6 h-6" />
-              </button>
-              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-                <img src="/apple.png" alt="Apple" class="w-6 h-6" />
-              </button>
-              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-                <img src="/facebook.png" alt="Facebook" class="w-6 h-6" />
-              </button>
-            </div>
-          </div>
+<!--          &lt;!&ndash; Social signup &ndash;&gt;-->
+<!--          <div class="space-y-2">-->
+<!--            <p class="text-center text-xs text-gray-400">or sign up with</p>-->
+<!--            <div class="flex justify-center gap-4">-->
+<!--              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--                <img src="/google.jpg" alt="Google" class="w-6 h-6" />-->
+<!--              </button>-->
+<!--              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--                <img src="/apple.png" alt="Apple" class="w-6 h-6" />-->
+<!--              </button>-->
+<!--              <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--                <img src="/facebook.png" alt="Facebook" class="w-6 h-6" />-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
 
           <!-- Submit -->
           <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-semibold">

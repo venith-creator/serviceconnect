@@ -558,6 +558,84 @@ export const getProviderServices = async (req, res) => {
   }
 };
 
+export const addService = async (req, res) => {
+  try {
+    const { category, rate, radiusKm, availability } = req.body;
+    console.log(req.body)
+    const profile = await ProviderProfile.findOne({ user: req.user._id });
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    const newService = {
+      category,
+      rate,
+      availability,
+      radiusKm,
+      status: "trial",
+      trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    };
+
+    profile.services.push(newService);
+    await profile.save();
+
+    res.json({ message: "Service added successfully", service: newService });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await ProviderProfile.findOne({ user: req.user._id });
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Use pull operator to remove the subdocument by its _id
+    const result = await ProviderProfile.updateOne(
+      { user: req.user._id },
+      { $pull: { services: { _id: id } } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "Service not found or already deleted" });
+    }
+
+    res.json({ message: "Service deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting service:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await ProviderProfile.findOne({ user: req.user._id });
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    const service = profile.services.id(id);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    service.set(req.body);
+    await profile.save();
+
+    res.json({ message: "Service updated successfully", service });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 /**
  * Get services requiring payment
  */
