@@ -61,7 +61,10 @@ import { useRoute } from 'vue-router';
 import { API_BASE_URL } from '@/config';
 
 const route = useRoute();
-const selectedRoom = ref<any | null>(null);
+//const selectedRoom = ref<any | null>(null);
+const selectedRoom = ref<any | null>(
+  JSON.parse(localStorage.getItem("selectedRoom") || "null")
+);
 const initialRoomId = route.query.roomId as string | undefined;
 
 onMounted(async () => {
@@ -80,7 +83,12 @@ onMounted(async () => {
   }
 });
 
-const selectRoom = (room: any) => selectedRoom.value = room;
+//const selectRoom = (room: any) => selectedRoom.value = room;
+const selectRoom = (room: any) => {
+  selectedRoom.value = room;
+  localStorage.setItem("selectedRoom", JSON.stringify(room));
+};
+
 const onSent = () => {};
 </script>
 

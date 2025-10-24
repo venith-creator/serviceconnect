@@ -175,7 +175,7 @@ export const getProfileById = async (req, res) => {
     }
 
     const profile = await ProviderProfile.findById(id)
-      .populate("user", "name email roles")
+      .populate("user", "name email roles avatar")
       .populate("pastJobs", "title budget status createdAt completedAt");
 
     if (!profile) return res.status(404).json({ message: "Profile not found" });
@@ -184,7 +184,7 @@ export const getProfileById = async (req, res) => {
         { revieweeProvider: profile._id },
         { reviewee: profile.user._id },
       ], })
-      .populate("reviewer", "name email")
+      .populate("reviewer", "name email avatar")
       .populate("job", "title createdAt status")
       .sort({ createdAt: -1 });
 

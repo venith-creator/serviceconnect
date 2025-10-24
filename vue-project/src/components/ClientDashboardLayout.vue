@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="min-h-screen bg-gray-50 flex overflow-x-hidden">
     <div
       v-if="isMobileSidebarOpen"
       class="fixed inset-0 z-40 lg:hidden bg-black bg-opacity-30"
@@ -9,7 +9,7 @@
       :is-mobile-sidebar-open="isMobileSidebarOpen"
       @close-mobile-sidebar="closeMobileSidebar"
     />
-    <div class="flex-1 flex flex-col lg:ml-64 min-h-screen">
+    <div class="flex-1 flex flex-col lg:ml-64 min-h-screen  overflow-x-hidden">
       <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">

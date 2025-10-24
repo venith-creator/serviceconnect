@@ -1,5 +1,6 @@
 import ChatRoom from "../models/chatRoom.js";
 import Message from "../models/Message.js";
+import mongoose from "mongoose";
 import { getIO } from "../utils/socket.js";
 
 let io = null;
@@ -60,6 +61,133 @@ export const createOrGetRoom = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// near top of file keep: import mongoose from "mongoose";
+export const createClientProviderRoom = async (req, res) => {
+  try {
+    const { providerId } = req.body;
+    const clientId = req.user._id; // from protect middleware
+
+    if (!providerId) {
+      return res.status(400).json({ message: "providerId is required" });
+    }
+
+    // Ensure ObjectId typed participants (prevent mixed string/ObjectId issues)
+    const participants = [
+      new mongoose.Types.ObjectId(String(clientId)),
+      new mongoose.Types.ObjectId(String(providerId)),
+    ];
+
+    // Find existing 1:1 room (no systemName, job null)
+    let room = await ChatRoom.findOne({
+      participants: { $all: participants, $size: participants.length },
+      systemName: { $exists: false },
+      job: null,
+    });
+
+    // Create if none exists
+    if (!room) {
+      room = await ChatRoom.create({
+        participants,
+        job: null,
+      });
+
+      // create a ping message from the client (optional)
+      const welcomeMsg = await Message.create({
+        chatRoom: room._id,
+        sender: clientId,
+        text: "👋 Hello, I'd like to discuss your services!",
+      });
+
+      room.lastMessage = welcomeMsg._id;
+      await room.save();
+    }
+
+    // Populate for the frontend response
+    room = await ChatRoom.findById(room._id)
+      .populate("participants", "name email avatar roles")
+      .populate("lastMessage")
+      .populate("job", "title status");
+
+    // Notify both sides via socket (private user rooms) and also emit chat:new
+    const io = getIO();
+    if (io) {
+      // emit to provider and client private rooms so their lists refresh
+      io.to(String(providerId)).emit("chat:new", room);
+      io.to(String(clientId)).emit("chat:new", room);
+      // also emit to provider role room (optional)
+      io.to("providers").emit("chat:new", room);
+    }
+
+    return res.status(200).json(room);
+  } catch (err) {
+    console.error("createClientProviderRoom:", err);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+
+/*export const createClientProviderRoom = async (req, res) => {
+  try {
+    const { providerId } = req.body;
+    const clientId = req.user._id; // from protect middleware
+
+    if (!providerId) {
+      return res.status(400).json({ message: "providerId is required" });
+    }
+
+    // ✅ Reuse createOrGetRoom logic
+    const participants = [
+      new mongoose.Types.ObjectId(clientId),
+      new mongoose.Types.ObjectId(providerId)
+    ];
+
+    let room = await ChatRoom.findOne({
+      participants: { $all: participants, $size: participants.length },
+      systemName: { $exists: false },
+      job: null,
+    })
+      .populate("participants", "name email avatar roles")
+      .populate("lastMessage");
+
+    // 🆕 Create if none exists
+    if (!room) {
+      room = await ChatRoom.create({
+        participants,
+        job: null,
+      });
+
+      // 📨 Optional first message (acts as ping)
+      const welcomeMsg = await Message.create({
+        chatRoom: room._id,
+        sender: clientId,
+        text: "👋 Hello, I'd like to discuss your services!",
+      });
+
+      room.lastMessage = welcomeMsg._id;
+      await room.save();
+    }
+
+    // ✅ Populate consistently for frontend
+    room = await ChatRoom.findById(room._id)
+      .populate("participants", "name email avatar roles")
+      .populate("lastMessage")
+      .populate("job", "title status");
+
+    // 🔔 Notify provider (if socket connected)
+    const io = getIO();
+    if (io) {
+      io.to(providerId.toString()).emit("chat:new", room);
+      io.to(clientId.toString()).emit("chat:new", room);
+    }
+
+    res.status(200).json(room);
+  } catch (err) {
+    console.error("createClientProviderRoom:", err);
+    res.status(500).json({ message: err.message });
+  }
+};*/
+
 export const getRoomsForUser = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -136,6 +264,8 @@ export const sendMessage = async (req, res) => {
     if (room.systemName && !req.user.roles.includes("admin")) {
       return res.status(403).json({ message: "Only admins can post to system channel" });
     }
+
+    console.log("Participants:", room.participants.map(p => p._id.toString()), "User:", req.user._id.toString());
 
     if (!isParticipant && !room.systemName) {
       return res.status(403).json({ message: "Not a participant in this chat room" });

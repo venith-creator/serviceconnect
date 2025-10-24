@@ -60,12 +60,12 @@ const getDisplayName = (room: any) => {
     default:
       const me = localStorage.getItem('userId')
       const other = room.participants?.find((p: any) => p && p._id !== me)
-      return other?.name || other?.email || 'Chat Participant'
+      return other?.name || other?.email || 'Service Provider'
   }
 }
 
 const getSubLabel = (room: any) => {
-  if (!room.systemName) return 'Direct Chat'
+  if (!room.systemName) return 'Chat with your service provider'
   if (room.systemName === 'system_all') return 'Broadcast Announcement'
   if (room.systemName === 'system_clients') return 'Homeowner Updates'
   return 'Announcement'
@@ -135,10 +135,13 @@ onMounted(async () => {
       const s = connectSocket(token);
 
       s.on("connect", () => {
+        const userId = localStorage.getItem("userId");
         s.emit("registerRole", { role: "client" }); // or "provider"
+        s.emit("register", { userId, role: "client" });
         console.log("✅ Registered role:", "client");
       });
 
+      s.on("chat:new", () => fetchRooms());
       s.on("message:new", () => fetchRooms());
       s.on("announcement:new", (announcement) => {
         console.log("📢 New announcement received:", announcement);

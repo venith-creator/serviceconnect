@@ -127,13 +127,14 @@ const roomTitle = computed(() => {
 
 const isAnnouncementRoom = computed(() => {
   const sysName = props.room?.systemName?.toLowerCase() || '';
-  return (
-    sysName.startsWith('system_') &&
-    (sysName.includes('announcement') ||
-      sysName.includes('all') ||
-      sysName.includes('providers') ||
-      sysName.includes('clients'))
-  );
+  //return (
+   // sysName.startsWith('system_') &&
+   // (sysName.includes('announcement') ||
+     // sysName.includes('all') ||
+     // sysName.includes('providers') ||
+   //   sysName.includes('clients'))
+  //);
+  return sysName === 'system_all' || sysName === 'system_providers' || sysName === 'system_clients';
 });
 
 const getSubLabel = (room: any) => {

@@ -2,6 +2,7 @@
 import express from "express";
 import {
   createOrGetRoom,
+  createClientProviderRoom,
   getRoomsForUser,
   getMessagesForRoom,
   sendMessage,
@@ -15,5 +16,5 @@ router.post("/room", protect, createOrGetRoom); // create/get room (body: partic
 router.get("/rooms", protect, getRoomsForUser);
 router.get("/room/:roomId/messages", protect, getMessagesForRoom);
 router.post("/room/:roomId/message", protect, sendMessage);
-
+router.post("/room/client-provider", protect, createClientProviderRoom);
 export default router;

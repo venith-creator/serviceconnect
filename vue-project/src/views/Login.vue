@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref} from "vue";
 import { useRouter } from "vue-router";
 import { API_BASE_URL } from "@/config";
 import { connectSocket } from "@/utils/socketClient";
@@ -128,7 +128,7 @@ localStorage.setItem("userId", data._id);
     // 🔹 Connect socket and tell backend this user’s role
     const s = connectSocket(data.token);
     s.emit("registerRole", { role: primaryRole });
-
+    s.emit("register", {userId: data._id, role: primaryRole});
 if (data.roles.includes("provider")) {
   const profileRes = await fetch(`${API_BASE_URL}/provider-profiles/me`, {
     headers: { Authorization: `Bearer ${data.token}` },

@@ -38,7 +38,7 @@
           </p>
 
           <div class="text-sm text-gray-700 space-y-1">
-            <p><strong>Price:</strong> ${{ proposal.price }}</p>
+            <p><strong>Price:</strong> £{{ proposal.price }}</p>
             <p><strong>Timeline:</strong> {{ proposal.timelineEstimate }}</p>
           </div>
 

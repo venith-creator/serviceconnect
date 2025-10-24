@@ -23,6 +23,16 @@ export const initSocket = (server) => {
           console.log(`Socket ${socket.id} joined room ${roomName}`);
         }
       });
+
+      socket.on("register", (data) => {
+        console.log("📩 Received register:", data);
+        const { userId, role } = data;
+        if (userId) {
+          socket.join(userId.toString());
+          console.log(`🔗 User ${userId} (${role}) joined their private room`);
+        }
+        socket.role = role;
+      });
     // client should join room(s) by calling socket.emit('joinRoom', { roomId })
     socket.on("joinRoom", ({ roomId }) => {
       if (roomId) socket.join(roomId);

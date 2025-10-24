@@ -27,7 +27,7 @@
           <div class="text-sm text-gray-700 space-y-1 mb-4">
             <p><strong>Category:</strong> {{ job.category }}</p>
             <p><strong>Location:</strong> {{ job.location?.address || "N/A" }}</p>
-            <p><strong>Budget:</strong> ${{ job.budget }}</p>
+            <p><strong>Budget:</strong> £{{ job.budget }}</p>
             <p><strong>Status:</strong>
               <span
                 :class="{

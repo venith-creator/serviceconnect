@@ -39,7 +39,7 @@
               <p><strong>Provider:</strong> {{ job.assignedProvider?.user?.name || 'Unassigned' }}</p>
               <p><strong>Category:</strong> {{ job.category || 'N/A' }}</p>
               <p><strong>Location:</strong> {{ job.location?.address || 'N/A' }}</p>
-              <p><strong>Budget:</strong> ${{ job.budget || 0 }}</p>
+              <p><strong>Budget:</strong> £{{ job.budget || 0 }}</p>
               <p>
                 <strong>Timeline:</strong>
                 {{ formatDate(job.timelineStart) }} → {{ formatDate(job.timelineEnd) }}
