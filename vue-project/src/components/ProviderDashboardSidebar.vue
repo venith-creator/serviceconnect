@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
-import { Briefcase, MessageSquare, Star, X, User, LogOut, FileText, CreditCard } from 'lucide-vue-next'
+import { Briefcase, MessageSquare, Star, X, User, LogOut, FileText, CreditCard, Video } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
 interface Props {
@@ -86,6 +86,7 @@ const menu = [
   { name: 'proposals', label: 'Proposals', path: '/dashboard/provider/ManagesProposals', icon: Briefcase },
   { name: 'chats', label: 'Chats', path: '/dashboard/provider/Manageschats', icon: MessageSquare },
   { name: 'reviews', label: 'Reviews', path: '/dashboard/provider/ManagesReview', icon: Star },
-  { name: 'subscription', label: 'Subscription', path: '/dashboard/provider/subscription', icon: CreditCard }
+  { name: 'subscription', label: 'Subscription', path: '/dashboard/provider/subscription', icon: CreditCard },
+  { name: 'portfolio', label: 'Portfolio', path: '/dashboard/provider/ProviderPortfolio', icon: Video}
 ]
 </script>

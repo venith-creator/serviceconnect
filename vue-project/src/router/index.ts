@@ -28,6 +28,7 @@ import ManagesJobs from '@/views/client/ManagesJobs.vue';
 import ViewProviders from '@/views/client/ViewProviders.vue';
 import ManagesReviews from '@/views/client/ManagesReviews.vue';
 import JobProposals from '@/views/client/JobProposals.vue';
+import seeProvider from '@/views/client/seeProvider.vue';
 
 //providerDashboard
 import ProviderDashboard from "@/views/Provider/ProviderDashboard.vue";
@@ -37,6 +38,7 @@ import ManagesChats from '@/views/Provider/ManagesChats.vue';
 import ManagesReview from '@/views/Provider/ManagesReview.vue';
 import SubscriptionManagement from "@/views/SubscriptionManagement.vue";
 import AdminJobProposals from '@/views/Admin/AdminJobProposals.vue';
+import ProviderPortfolio from '@/views/Provider/ProviderPortfolio.vue';
 
 
 const router = createRouter({
@@ -130,6 +132,13 @@ const router = createRouter({
       meta: { layout: 'dashboard' }
     },
     {
+        path: '/dashboard/client/seeProvider/:providerId',
+        name: 'ClientDashboardSeeProvider',
+        component: seeProvider,
+        meta: { layout: 'dashboard' },
+      },
+
+    {
       path: '/dashboard/client/Managesjobs',
       name: 'ClientDashboardManagesjobs',
       component: ManagesJobs,
@@ -166,6 +175,11 @@ const router = createRouter({
       path: '/dashboard/provider/Manageschats',
       name: 'providerDashboardManageschats',
       component: ManagesChats,
+      meta: { layout: 'dashboard' }
+    },
+    { path: '/dashboard/provider/ProviderPortfolio',
+      name: 'ProviderDashboardProviderPortfolio',
+      component: ProviderPortfolio,
       meta: { layout: 'dashboard' }
     },
     {

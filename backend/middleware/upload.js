@@ -38,6 +38,14 @@ const ALLOWED_MIME = {
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ],
+  provider_posts: [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/jpg",
+    "image/pjpeg",
+    "video/mp4"
+  ],
 };
 
 const ALL_ALLOWED_MIME = [
@@ -136,4 +144,5 @@ export const upload = getUploader(bucket, "avatars");
 export const portfolioUpload = getUploader(bucket, "portfolio");
 export const docUpload = getUploader(bucket, "docs");
 export const attachmentUpload = getUploader(bucket, "attachments");
+export const providerPostUpload = getUploader(bucket, "provider_posts");
 export default multiUpload;

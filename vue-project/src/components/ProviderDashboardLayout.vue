@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex">
+  <div class="min-h-screen bg-gray-50 flex overflow-x-hidden">
     <!-- Mobile Sidebar Backdrop -->
     <div
       v-if="isMobileSidebarOpen"
@@ -15,7 +15,7 @@
     />
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col lg:ml-64 min-h-screen">
+    <div class="flex-1 flex flex-col lg:ml-64 min-h-screen overflow-x-hidden">
       <!-- Header -->
       <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
         <div class="flex items-center justify-between">
@@ -76,6 +76,7 @@ import ProviderDashboardSidebar from './ProviderDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import {useAuthStore} from '@/stores/auth'
 import DashboardSwitchModal from './DashboardSwitchmodal.vue'
+import { connectSocket } from '@/utils/socketClient'
 
 const showSwitch = ref(false)
 const trialDaysRemaining = computed(() => {
@@ -89,7 +90,7 @@ const trialDaysRemaining = computed(() => {
 })
 
 const auth = useAuthStore()
-const route = useRoute()
+//const route = useRoute()
 const name = ref('')
 
 watch(() => auth.user, (newUser) => {
@@ -113,7 +114,10 @@ const handleEscape = (e: KeyboardEvent) => {
 }
 onMounted(() => document.addEventListener('keydown', handleEscape))
 onUnmounted(() => document.removeEventListener('keydown', handleEscape))
-
+onMounted(() => {
+  const token = localStorage.getItem('token')
+  if (token) connectSocket(token)
+})
 const getCurrentPageTitle = () => {
   const route = useRoute()
   const item = sidebarItems.find(item => item.href === route.path)
@@ -125,7 +129,8 @@ const sidebarItems = [
   {label: 'View Jobs', href: '/dashboard/provider/viewjobs'},
   {label: 'Proposals', href: '/dashboard/provider/ManagesProposals'},
   {label: 'Chats', href: '/dashboard/provider/Manageschats'},
-  {label: 'Reviews', href: '/dashboard/provider/ManagesReview'}
+  {label: 'Reviews', href: '/dashboard/provider/ManagesReview'},
+  {label: 'Portfolio', href: '/dashboard/provider/ProviderPortfolio'},
 ]
 </script>
 
