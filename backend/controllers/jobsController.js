@@ -161,6 +161,17 @@ export const getJobs = async (req, res) => {
   }
 };
 
+export const getJobByIdExcludeProposals = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id).populate("client", "name email roles");
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    res.json(job);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching job", error: error.message });
+  }
+};
+
 
 // GET single job by ID + proposals
 export const getJobById = async (req, res) => {

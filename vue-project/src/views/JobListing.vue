@@ -205,12 +205,12 @@
 
                 <div class="mt-4 sm:mt-0 sm:ml-4 flex items-start">
                   <div class="flex flex-col space-y-2">
-<!--                    <button-->
-<!--                      @click="viewJobDetails(job._id)"-->
-<!--                      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"-->
-<!--                    >-->
-<!--                      View Details-->
-<!--                    </button>-->
+                    <button
+                      @click="viewJobDetails(job._id)"
+                      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    >
+                      View Details
+                    </button>
                     <button
                       v-if="job.attachments?.length"
                       @click="viewAttachments(job.attachments)"
@@ -321,7 +321,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-// import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -336,7 +336,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import { API_BASE_URL } from '@/config';
 
-// const router = useRouter();
+const router = useRouter();
 
 // Reactive data
 const jobs = ref([]);
@@ -577,9 +577,9 @@ const getFilterLabel = (key, value) => {
   return labels[key] || `${key}: ${value}`;
 };
 
-// const viewJobDetails = (jobId) => {
-//   router.push(`/jobs/${jobId}`);
-// };
+const viewJobDetails = (jobId) => {
+  router.push(`/listing/${jobId}`);
+};
 
 const viewAttachments = (attachments) => {
   // Open attachments in new window/modal

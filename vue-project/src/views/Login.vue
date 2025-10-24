@@ -47,25 +47,25 @@
         </button>
       </form>
 
-      <!-- Divider -->
-      <div class="flex items-center gap-2">
-        <hr class="flex-grow border-gray-200" />
-        <span class="text-xs text-gray-400">or continue with</span>
-        <hr class="flex-grow border-gray-200" />
-      </div>
+<!--      &lt;!&ndash; Divider &ndash;&gt;-->
+<!--      <div class="flex items-center gap-2">-->
+<!--        <hr class="flex-grow border-gray-200" />-->
+<!--        <span class="text-xs text-gray-400">or continue with</span>-->
+<!--        <hr class="flex-grow border-gray-200" />-->
+<!--      </div>-->
 
-      <!-- Social login -->
-      <div class="flex justify-center gap-4">
-        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-          <img src="/google.jpg" alt="Google" class="w-6 h-6" />
-        </button>
-        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-          <img src="/apple.png" alt="Apple" class="w-6 h-6" />
-        </button>
-        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">
-          <img src="/facebook.png" alt="Facebook" class="w-6 h-6" />
-        </button>
-      </div>
+<!--      &lt;!&ndash; Social login &ndash;&gt;-->
+<!--      <div class="flex justify-center gap-4">-->
+<!--        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--          <img src="/google.jpg" alt="Google" class="w-6 h-6" />-->
+<!--        </button>-->
+<!--        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--          <img src="/apple.png" alt="Apple" class="w-6 h-6" />-->
+<!--        </button>-->
+<!--        <button class="w-12 h-12 border border-pink-500 rounded-full flex items-center justify-center">-->
+<!--          <img src="/facebook.png" alt="Facebook" class="w-6 h-6" />-->
+<!--        </button>-->
+<!--      </div>-->
 
       <!-- Error -->
       <p v-if="error" class="text-red-500 text-sm text-center">{{ error }}</p>

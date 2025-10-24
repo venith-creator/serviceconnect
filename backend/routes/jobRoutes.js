@@ -11,7 +11,7 @@ import {
   cancelJobByAdmin,
   assignProvider,
   markJobCompleted,
-  getAllJobsAdmin
+  getAllJobsAdmin, getJobByIdExcludeProposals
 } from "../controllers/jobsController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -32,6 +32,8 @@ router.get("/", getJobs);
 
 // Get my jobs (client)
 router.get("/my", protect, authorizeRoles("client"), getMyJobs);
+
+router.get("/:id/all", getJobByIdExcludeProposals);
 
 // Get, update, delete a specific job (client)
 router

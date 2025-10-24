@@ -38,6 +38,7 @@ import ManagesReview from '@/views/Provider/ManagesReview.vue';
 import SubscriptionManagement from "@/views/SubscriptionManagement.vue";
 import AdminJobProposals from '@/views/Admin/AdminJobProposals.vue';
 import JobListing from "@/views/JobListing.vue";
+import JobDetails from "@/views/JobDetails.vue";
 
 
 const router = createRouter({
@@ -54,6 +55,7 @@ const router = createRouter({
   { path: "/reset-password/:token", component: ResetPassword, meta: { public: true } },
   { path: "/contact", component: ContactView, meta: { public: true } },
   { path: "/listing", component: JobListing, meta: { public: true } },
+  { path: "/listing/:id", component: JobDetails, meta: { public: true } },
   // AdminDashboard routes
     { path: "/dashboard/admin", component: AdminDashboard, name: 'AdminDashboard', meta: { layout: 'dashboard'} },
     {
