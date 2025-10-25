@@ -10,18 +10,23 @@
 
 <script setup lang="ts">
 import * as Icons from 'lucide-vue-next'
-import { computed, type Component } from 'vue'
+import { computed } from 'vue'
 
-const props = defineProps({
-  icon: String,
-  label: String,
-  value: [String, Number],
-  color: { type: String, default: 'gray' },
-})
+const props = defineProps<{
+  icon?: string
+  label?: string
+  value?: string | number
+  color?: string
+}>()
 
-const iconComponent = computed<Component>(() => {
+// ✅ Tell TypeScript that we’re only dealing with valid Vue components
+const iconComponent = computed(() => {
   const iconName = props.icon as keyof typeof Icons
-  return Icons[iconName] || Icons.HelpCircle
+  const Icon = Icons[iconName]
+  // Only return if it's a valid Vue component (function)
+  if (typeof Icon === 'function') {
+    return Icon as any
+  }
+  return Icons.HelpCircle as any
 })
 </script>
-
