@@ -3,8 +3,8 @@
     <div class="min-h-screen flex flex-col">
       <main class="flex-1 p-4 sm:p-6 overflow-x-hidden">
         <div class="p-4 sm:p-6 w-full sm:max-w-3xl mx-auto space-y-10 overflow-x-hidden">
-          <h1 class="text-2xl sm:text-3xl font-bold text-purple-600">
-            Explore Service Providers
+          <h1 class="text-4xl sm:text-3xl font-semibold text-purple-600">
+             Providers Blog
           </h1>
 
           <!-- Feed -->

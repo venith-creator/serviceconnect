@@ -10,6 +10,7 @@ import {
   deleteAnnouncement,
   getAllHomeowners
 } from "../controllers/adminController.js";
+import { getAdminDashboard } from "../controllers/adminDashboardController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
 import { authorizeRoles } from "../middleware/roleMiddleware.js";
@@ -17,6 +18,7 @@ import { authorizeRoles } from "../middleware/roleMiddleware.js";
 const router = express.Router();
 
 // user management
+router.get("/dashboard", protect, authorizeRoles("admin"), getAdminDashboard);
 router.get("/homeowners", protect, authorizeRoles("admin"), getAllHomeowners);
 router.get("/users", protect, authorizeRoles("admin"), listUsers);
 router.patch("/users/:id/role", protect, authorizeRoles("admin"), updateUserRole);

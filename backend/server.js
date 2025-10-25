@@ -22,6 +22,8 @@ import aiRoutes from "./routes/aiRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import clientStatsRoutes from "./routes/clientStatsRoutes.js";
+import providerRoutes from "./routes/providerRoutes.js";
 
 // DB Connection Logs
 console.log("🔌 Connecting to MongoDB...");
@@ -79,6 +81,8 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/client-stats", clientStatsRoutes);
+app.use("/api/provider",providerRoutes);
 
 // Static folder for uploads
 app.use("/uploads", express.static("uploads"));

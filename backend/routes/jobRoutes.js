@@ -32,24 +32,6 @@ router.get("/", getJobs);
 
 // Get my jobs (client)
 router.get("/my", protect, authorizeRoles("client"), getMyJobs);
-
-router.get("/:id/all", getJobByIdExcludeProposals);
-
-// Get, update, delete a specific job (client)
-router
-  .route("/:id")
-  .get(getJobById)
-  .put(protect, authorizeRoles("client"), updateJob)
-  .delete(protect, authorizeRoles("client"), deleteJob);
-
-// Assign a provider (client)
-router.patch("/:id/assign", protect, authorizeRoles("client"), assignProvider);
-router.patch(
-  "/:id/complete",
-  protect,
-  authorizeRoles("client"),
-  markJobCompleted
-);
 /**
  * ADMIN ROUTES
  */
@@ -70,6 +52,25 @@ router.patch(
   protect,
   authorizeRoles("admin"),
   cancelJobByAdmin
+);
+
+
+router.get("/:id/all", getJobByIdExcludeProposals);
+
+// Get, update, delete a specific job (client)
+router
+  .route("/:id")
+  .get(getJobById)
+  .put(protect, authorizeRoles("client"), updateJob)
+  .delete(protect, authorizeRoles("client"), deleteJob);
+
+// Assign a provider (client)
+router.patch("/:id/assign", protect, authorizeRoles("client"), assignProvider);
+router.patch(
+  "/:id/complete",
+  protect,
+  authorizeRoles("client"),
+  markJobCompleted
 );
 
 export default router;
