@@ -41,7 +41,7 @@ import AdminJobProposals from '@/views/Admin/AdminJobProposals.vue';
 import ProviderPortfolio from '@/views/Provider/ProviderPortfolio.vue';
 import JobListing from "@/views/JobListing.vue";
 import JobDetails from "@/views/JobDetails.vue";
-
+import ProviderSettings from '@/views/Provider/ProviderSettings.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -198,6 +198,13 @@ const router = createRouter({
       component: SubscriptionManagement,
       meta: { layout: 'dashboard' }
     },
+    {
+        path: "/dashboard/provider/settings",
+        name: "ProviderSettings",
+        component: ProviderSettings,
+        meta: { layout: 'dashboard', role: "provider" },
+    }
+
 ],
 scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {

@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
-import { Briefcase, MessageSquare, Star, Users, X, User, LogOut } from 'lucide-vue-next'
+import { Briefcase, MessageSquare, Star, Users, X, User, LogOut, Video } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
 interface Props { isMobileSidebarOpen: boolean }
@@ -79,7 +79,8 @@ const menu = [
   { name: 'jobs', label: 'My Jobs', path: '/dashboard/client/Managesjobs', icon: Briefcase },
   { name: 'chats', label: 'Chats', path: '/dashboard/client/Manageschat', icon: MessageSquare },
   { name: 'reviews', label: 'Reviews', path: '/dashboard/client/ManagesReviews', icon: Star },
-  { name: 'providers', label: 'Providers', path: '/dashboard/client/ViewProviders', icon: Users }
+  { name: 'providers', label: 'Service Providers Blog', path: '/dashboard/client/ViewProviders', icon: Video },
+  { name: 'providersList', label: 'Service Providers List', path: '/dashboard/client/ProvidersList', icon: Users },
 ]
 </script>
 

@@ -50,11 +50,8 @@
               Provider
             </Badge>
             <Bell class="w-6 h-6 text-gray-600"/>
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User class="w-4 h-4 text-gray-600"/>
-              </div>
-              <span class="text-sm font-medium text-gray-900 hidden sm:block">{{ name }}</span>
+            <div class="flex items-center space-x-2 relative">
+              <ProviderSettingsDropdown />
             </div>
           </div>
         </div>
@@ -77,6 +74,8 @@ import Badge from './ui/Badge.vue'
 import {useAuthStore} from '@/stores/auth'
 import DashboardSwitchModal from './DashboardSwitchmodal.vue'
 import { connectSocket } from '@/utils/socketClient'
+import ProviderSettingsDropdown from '../components/provider/ProviderSettingsDropdown.vue'
+
 
 const showSwitch = ref(false)
 const trialDaysRemaining = computed(() => {

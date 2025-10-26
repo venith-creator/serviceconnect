@@ -300,8 +300,13 @@ export const markJobCompleted = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to complete this job" });
     }
 
+    if (!job.assignedProvider) {
+      return res.status(400).json({ message: "No provider assigned to this job" });
+    }
+
     // Update job status
     job.status = "completed";
+    job.completedAt = new Date();
     await job.save();
 
     // Also update accepted proposal (if any)
@@ -309,6 +314,12 @@ export const markJobCompleted = async (req, res) => {
       { job: job._id, status: "accepted" },
       { $set: { status: "completed" } }
     );
+
+    const providerProfile = await ProviderProfile.findOne({ user: job.assignedProvider });
+    if (providerProfile && !providerProfile.pastJobs.includes(job._id)) {
+      providerProfile.pastJobs.push(job._id);
+      await providerProfile.save();
+    }
 
     res.json({ message: "Job marked as completed successfully", job });
   } catch (error) {

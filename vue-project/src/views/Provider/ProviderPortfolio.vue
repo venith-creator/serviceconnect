@@ -100,12 +100,16 @@
           <!-- Header -->
           <div class="flex  items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img
-              v-if="post.provider?.user?.avatar"
-              :src="post.provider.user.avatar"
-              alt="Avatar"
-              class="w-10 h-10 rounded-full object-cover"
-            />
+            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold">
+              <img
+                v-if="post.provider?.user?.avatar"
+                :src="post.provider.user.avatar"
+                alt="Avatar"
+                class="w-full h-full rounded-full object-cover"
+                @error="post.provider.user.avatar = ''"
+              />
+              <span v-else>{{ getInitials(getSafeName(post.provider?.user)) }}</span>
+            </div>
             <div>
               <p class="font-semibold text-gray-800">
                 {{ post.provider?.user?.name }}
@@ -217,12 +221,16 @@
                   <!-- Header Row -->
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                      <img
-                        v-if="comment.author?.avatar"
-                        :src="comment.author.avatar"
-                        alt="avatar"
-                        class="w-6 h-6 rounded-full object-cover"
-                      />
+                      <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xs">
+                        <img
+                          v-if="comment.author?.avatar"
+                          :src="comment.author.avatar"
+                          alt="avatar"
+                          class="w-full h-full rounded-full object-cover"
+                          @error="comment.author.avatar = ''"
+                        />
+                        <span v-else>{{ getInitials(getSafeName(comment.author)) }}</span>
+                      </div>
                       <span class="font-semibold text-gray-800 text-sm">
                         {{ comment.author?.name || "Unknown User" }}
                       </span>
@@ -266,12 +274,16 @@
                       class="bg-gray-50 border-l-2 border-purple-200 p-2 rounded"
                     >
                     <div class="flex items-start gap-2">
-                        <img
-                          v-if="reply.author?.avatar"
-                          :src="reply.author.avatar"
-                          alt="avatar"
-                          class="w-5 h-5 rounded-full object-cover"
-                        />
+                        <div class="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-[10px]">
+                          <img
+                            v-if="reply.author?.avatar"
+                            :src="reply.author.avatar"
+                            alt="avatar"
+                            class="w-full h-full rounded-full object-cover"
+                            @error="reply.author.avatar = ''"
+                          />
+                          <span v-else>{{ getInitials(getSafeName(reply.author)) }}</span>
+                        </div>
                         <div>
                           <div class="flex items-center gap-1">
                             <span class="font-medium text-gray-800 text-xs">
@@ -424,6 +436,21 @@ const handleFiles = (e: Event) => {
   files.value.push(...selected);
   filePreviews.value = files.value.map((f) => URL.createObjectURL(f));
 };
+
+const getSafeName = (user?: { name?: string; _id?: string }) => {
+  if (user?.name?.trim()) return user.name;
+  if (user?._id) return `User-${user._id.slice(-4)}`;
+  return "Unknown User";
+};
+
+const getInitials = (name?: string) => {
+  if (!name) return "??";
+  const parts = name.trim().split(" ");
+  return parts.length > 1
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : parts[0].slice(0, 2).toUpperCase();
+};
+
 
 const removeFile = (index: number) => {
   files.value.splice(index, 1)

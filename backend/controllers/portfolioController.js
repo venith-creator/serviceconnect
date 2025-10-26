@@ -37,14 +37,30 @@ export const createPortfolioItem = [
 export const getPortfolioForProvider = async (req, res) => {
   try {
     const { providerId } = req.params;
+
     const items = await Portfolio.find({ provider: providerId })
-      .populate("provider", "user")
+      .populate({
+        path: "provider",
+        select: "user city state country",
+        populate: { path: "user", select: "name avatar" },
+      })
+      .populate({
+        path: "comments.author",
+        select: "name avatar",
+      })
+      .populate({
+        path: "comments.replies.author",
+        select: "name avatar",
+      })
       .sort({ createdAt: -1 });
+
     res.json(items);
   } catch (err) {
+    console.error("❌ getPortfolioForProvider error:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const likePortfolio = async (req, res) => {
   try {

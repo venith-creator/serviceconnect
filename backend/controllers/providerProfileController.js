@@ -176,7 +176,15 @@ export const getProfileById = async (req, res) => {
 
     const profile = await ProviderProfile.findById(id)
       .populate("user", "name email roles avatar")
-      .populate("pastJobs", "title budget status createdAt completedAt");
+      .populate("pastJobs", "title budget status createdAt completedAt client")
+      .populate({
+          path: "pastJobs",
+          select: "title description budget status createdAt completedAt client",
+          populate: {
+            path: "client",
+            select: "name email avatar"
+          }
+        });
 
     if (!profile) return res.status(404).json({ message: "Profile not found" });
 
