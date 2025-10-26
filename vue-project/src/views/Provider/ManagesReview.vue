@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <div class="p-6 max-w-7xl mx-auto">
       <!-- Two-column layout -->
       <div class="grid md:grid-cols-2 gap-8 items-start">
@@ -82,12 +81,11 @@
         </div>
       </div>
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
+//import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRoute } from "vue-router";
 import StarRating from "@/components/StarRating.vue";

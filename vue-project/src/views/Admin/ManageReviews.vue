@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 max-w-7xl mx-auto">
       <h1 class="text-2xl font-bold mb-6 text-gray-800">Manage Reviews</h1>
 
@@ -148,12 +147,11 @@
         </div>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
+//import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
 import { API_BASE_URL } from '@/config'
 
 const reviews = ref<any[]>([])

@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col h-full bg-gray-100">
-    <!-- Header -->
+  <div class="flex flex-col max-h-[80vh] bg-gray-100 rounded-xl overflow-hidden">
+
     <div class="border-b p-3 bg-white shadow-sm flex items-center justify-between">
       <div>
         <div class="font-semibold text-gray-800">{{ roomTitle }}</div>
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Messages -->
-    <div ref="scrollEl" class="flex-1 overflow-auto p-4 flex flex-col gap-3">
+    <div ref="scrollEl" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style="max-height: calc(80vh - 120px);">
       <div v-if="loadingMessages" class="text-center text-sm text-gray-500">
         Loading messages...
       </div>

@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <div class="max-w-3xl mx-auto py-10 space-y-8">
       <h1 class="text-2xl font-bold text-gray-800 mb-4">Profile Settings</h1>
 
@@ -78,13 +77,12 @@
         </div>
       </form>
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { API_BASE_URL } from "@/config";
-import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
+//import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
 
 const token = localStorage.getItem("token");
 const loading = ref(false);

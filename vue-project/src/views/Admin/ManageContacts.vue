@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 bg-gray-50 min-h-screen">
       <h1 class="text-3xl font-bold mb-8 text-purple-700 text-center">
         Manage Contact Messages
@@ -124,12 +123,11 @@
         </div>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
+//import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
 import { API_BASE_URL } from '@/config'
 
 interface Contact {

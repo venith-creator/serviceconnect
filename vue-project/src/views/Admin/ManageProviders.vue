@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 space-y-6">
       <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-800">Manage Providers</h1>
@@ -393,12 +392,11 @@
         </div>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import {ref, computed, onMounted} from 'vue'
-import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
+//import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue'
 import {API_BASE_URL} from '@/config'
 
 const tabs = [

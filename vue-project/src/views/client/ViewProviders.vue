@@ -1,5 +1,4 @@
 <template>
-  <ClientDashboardLayout>
     <div class="min-h-screen flex flex-col">
       <main class="flex-1 p-4 sm:p-6 overflow-x-hidden">
         <div class="p-4 sm:p-6 w-full sm:max-w-3xl mx-auto space-y-10 overflow-x-hidden">
@@ -354,11 +353,10 @@
         </button>
       </div>
     </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup lang="ts">
-import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
+//import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { ref, onMounted } from "vue";
 import { API_BASE_URL } from "@/config";
 import { Heart, MessageCircle, Share2 } from "lucide-vue-next";

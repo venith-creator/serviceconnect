@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <div class="p-6 space-y-6">
 
       <!-- Header -->
@@ -181,12 +180,11 @@
         </div>
       </div>
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
+//import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { CurrencyPoundIcon, ClockIcon } from "@heroicons/vue/24/outline";
 

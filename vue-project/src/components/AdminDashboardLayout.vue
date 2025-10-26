@@ -32,13 +32,9 @@
           </div>
 
           <div class="flex items-center space-x-4">
-            <Badge class="bg-purple-100 text-purple-800 px-2 py-1 text-xs font-medium rounded-full">
+            <Badge class="bg-purple-100 text-white-800 px-2 py-1 text-xs font-medium rounded-full">
               Admin
             </Badge>
-            <div class="relative">
-              <Bell class="w-6 h-6 text-gray-600" />
-              <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-            </div>
             <div class="flex items-center space-x-2">
               <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                 <User class="w-4 h-4 text-gray-600" />
@@ -60,7 +56,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Menu, Bell, User } from 'lucide-vue-next'
+import { Menu, User } from 'lucide-vue-next'
 import AdminDashboardSidebar from './AdminDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -117,6 +113,6 @@ const sidebarItems = [
 
 const getCurrentPageTitle = () => {
   const current = sidebarItems.find((item) => item.href === route.path)
-  return current?.label || 'Dashboard'
+  return current?.label || 'admin'
 }
 </script>

@@ -1,5 +1,4 @@
 <template>
-  <ClientDashboardLayout>
     <div class="space-y-8">
       <section>
         <h2 class="text-2xl font-bold text-gray-800">Welcome, {{ clientName }} 👋</h2>
@@ -30,13 +29,12 @@
         <DashboardCard icon="Users" label="Reviews Received" :value="stats.reviewStats?.reviewsReceived || 0" color="pink" />
       </section>
     </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { API_BASE_URL } from '@/config'
-import ClientDashboardLayout from '@/components/ClientDashboardLayout.vue'
+//import ClientDashboardLayout from '@/components/ClientDashboardLayout.vue'
 import DashboardCard from '@/components/DashboardCard.vue'
 
 const stats = ref<any>({})

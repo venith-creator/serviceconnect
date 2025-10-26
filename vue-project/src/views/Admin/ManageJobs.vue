@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 space-y-8">
       <!-- Header -->
       <div class="flex justify-between items-center">
@@ -111,12 +110,11 @@
         </button>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
+//import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRouter } from "vue-router";
 

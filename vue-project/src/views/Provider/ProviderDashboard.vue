@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <div class="space-y-8">
       <!-- Header -->
       <section>
@@ -130,12 +129,11 @@
       </section>
 
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
+//import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
 import DashboardCard from "@/components/DashboardCard.vue";
 import { API_BASE_URL } from "@/config";
 

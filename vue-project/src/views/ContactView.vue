@@ -156,12 +156,12 @@
         class="absolute inset-0 bg-cover bg-center bg-no-repeat"
         :style="{ backgroundImage: `url('/section.png')` }"
       />
-      <div class="absolute inset-0 bg-purple-700/20" />
+      <div class="absolute inset-0 bg-purple-700" />
 
       <div class="container mx-auto px-4 text-center relative z-10">
         <div class="max-w-3xl mx-auto space-y-8">
           <h2 class="text-3xl lg:text-4xl font-bold text-white leading-tight">
-            Ready to Post Your First Job or Send a Quote?
+            Ready to Post Your First Job ?
           </h2>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <router-link
@@ -170,11 +170,11 @@
             >
               Post a Job
             </router-link>
-            <router-link
-              to="/providers"
+             <router-link
+              to="/listing"
               class="border border-white text-white hover:bg-white hover:text-primary bg-transparent px-8 py-3 rounded-lg text-lg font-medium transition-colors"
             >
-              Explore Providers
+              view Job Posts
             </router-link>
           </div>
         </div>

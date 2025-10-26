@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="space-y-8">
       <!-- Header -->
       <section>
@@ -163,12 +162,11 @@
         />
       </section>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
+//import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 import DashboardCard from "@/components/DashboardCard.vue";
 import { API_BASE_URL } from "@/config";
 

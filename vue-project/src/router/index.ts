@@ -12,7 +12,7 @@ import ContactView from '@/views/ContactView.vue';
 //adminDashboard
 import AdminDashboard from "@/views/Admin/AdminDashboard.vue";
 import MakeAnnouncements from '@/views/Admin/MakeAnnouncements.vue';
-import ManageChats from '@/views/Admin/ManageChats.vue';
+import ManageBlogs from '@/views/Admin/ManageBlogs.vue';
 import ManageContacts from '@/views/Admin/ManageContacts.vue';
 import ManageHomeowners from '@/views/Admin/ManageHomeowners.vue';
 import ManageJobs from '@/views/Admin/ManageJobs.vue';
@@ -59,150 +59,156 @@ const router = createRouter({
   { path: "/listing", component: JobListing, meta: { public: true } },
   { path: "/listing/:id", component: JobDetails, meta: { public: true } },
   // AdminDashboard routes
-    { path: "/dashboard/admin", component: AdminDashboard, name: 'AdminDashboard', meta: { layout: 'dashboard'} },
+    { path: "/dashboard/admin", component: AdminDashboard, name: 'AdminDashboard', meta: { layout: 'admin'} },
     {
       path: '/dashboard/admin/makeAnnouncement',
       name: 'AdminDashboardMakeAnnouncements',
       component: MakeAnnouncements,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/job/:jobId/proposals',
       name: 'AdminDashboardJobProposals',
       component: AdminJobProposals,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/managechats',
       name: 'AdminDashboardManageChats',
-      component: ManageChats,
-      meta: { layout: 'dashboard' }
+      component: ManageBlogs,
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManageContacts',
       name: 'AdminDashboardManageContacts',
       component: ManageContacts,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManageHomeowners',
       name: 'AdminDashboardManageHomeowners',
       component: ManageHomeowners,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManageJobs',
       name: 'AdminDashboardManageJobs',
       component: ManageJobs,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManagePayments',
       name: 'AdminDashboardManagePayments',
       component: ManagePayments,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/manageproposals',
       name: 'AdminDashboardManageproposals',
       component: ManageProposals,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManageProviders',
       name: 'AdminDashboardManageProviders',
       component: ManageProviders,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
     {
       path: '/dashboard/admin/ManageReviewss',
       name: 'AdminDashboardManageReviews',
       component: ManageReviews,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'admin' }
     },
 
     // clientDashboard routes
-    { path: "/dashboard/client", component: ClientDashboard, name: 'ClientDashboard', meta: { layout: 'dashboard'} },
+    { path: "/dashboard/client", component: ClientDashboard, name: 'ClientDashboard', meta: { layout: 'client'} },
     {
       path: '/dashboard/client/Manageschat',
       name: 'ClientDashboardManageschat',
       component: ManagesChat,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'client' }
     },
     {
       path: '/dashboard/client/job/:jobId/proposals',
       name: 'ClientDashboardJobProposals',
       component: JobProposals,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'client' }
     },
     {
         path: '/dashboard/client/seeProvider/:providerId',
         name: 'ClientDashboardSeeProvider',
         component: seeProvider,
-        meta: { layout: 'dashboard' },
+        meta: { layout: 'client' },
       },
 
     {
       path: '/dashboard/client/Managesjobs',
       name: 'ClientDashboardManagesjobs',
       component: ManagesJobs,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'client' }
     },
     {
       path: '/dashboard/client/ManagesReviews',
       name: 'ClientDashboardManagesReviews',
       component: ManagesReviews,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'client' }
     },
     {
       path: '/dashboard/client/ViewProviders',
       name: 'ClientDashboardViewProviders',
       component: ViewProviders,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'client' }
+    },
+    {
+      path: '/dashboard/client/post-job',
+      name: 'ClientDashboardPostJob',
+      component: () => import('@/views/PostJob.vue'),
+      meta: { layout: 'client' }
     },
     // ProviderDashboardRoutes
 
-    { path: "/dashboard/provider", component: ProviderDashboard , name: 'ProviderDashboard', meta: {layout: 'dashboard'}},
+    { path: "/dashboard/provider", component: ProviderDashboard , name: 'ProviderDashboard', meta: {layout: 'provider'}},
     {
       path: '/dashboard/provider/ManagesReview',
       name: 'ProviderDashboardManagesReview',
       component: ManagesReview,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     {
       path: '/dashboard/provider/viewjobs',
       name: 'ProviderDashboardViewjobs',
       component: viewJobs,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     {
       path: '/dashboard/provider/Manageschats',
       name: 'providerDashboardManageschats',
       component: ManagesChats,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     { path: '/dashboard/provider/ProviderPortfolio',
       name: 'ProviderDashboardProviderPortfolio',
       component: ProviderPortfolio,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     {
       path: '/dashboard/provider/ManagesProposals',
       name: 'ProviderDashboardManagesProposals',
       component: ManagesProposals,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     {
       path: '/dashboard/provider/subscription',
       name: 'SubscriptionManagement',
       component: SubscriptionManagement,
-      meta: { layout: 'dashboard' }
+      meta: { layout: 'provider' }
     },
     {
         path: "/dashboard/provider/settings",
         name: "ProviderSettings",
         component: ProviderSettings,
-        meta: { layout: 'dashboard', role: "provider" },
+        meta: { layout: 'provider', role: "provider" },
     }
 
 ],

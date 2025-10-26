@@ -29,6 +29,9 @@
             </button>
             <h1 class="text-2xl font-bold text-gray-900">{{ getCurrentPageTitle() }}</h1>
           </div>
+          <div class="flex items-center space-x-2 relative">
+              <ProviderSettingsDropdown />
+            </div>
 
           <div class="flex items-center space-x-4">
             <div v-if="trialDaysRemaining > 0"
@@ -49,10 +52,6 @@
             <Badge class="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded-full">
               Provider
             </Badge>
-            <Bell class="w-6 h-6 text-gray-600"/>
-            <div class="flex items-center space-x-2 relative">
-              <ProviderSettingsDropdown />
-            </div>
           </div>
         </div>
       </header>
@@ -68,7 +67,7 @@
 <script setup lang="ts">
 import {ref, onMounted, onUnmounted, watch, computed} from 'vue'
 import {useRoute} from 'vue-router'
-import {Menu, Bell, User} from 'lucide-vue-next'
+import {Menu,} from 'lucide-vue-next'
 import ProviderDashboardSidebar from './ProviderDashboardSidebar.vue'
 import Badge from './ui/Badge.vue'
 import {useAuthStore} from '@/stores/auth'
@@ -120,7 +119,7 @@ onMounted(() => {
 const getCurrentPageTitle = () => {
   const route = useRoute()
   const item = sidebarItems.find(item => item.href === route.path)
-  return item ? item.label : 'Dashboard'
+  return item ? item.label : 'provider'
 }
 
 const sidebarItems = [

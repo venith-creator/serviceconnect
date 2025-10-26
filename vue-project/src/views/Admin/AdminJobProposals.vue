@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 max-w-7xl mx-auto space-y-8">
       <!-- Header -->
       <div class="flex justify-between items-center">
@@ -126,13 +125,13 @@
         </div>
       </div>
     </div>
-  </AdminDashboardLayout>
+
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
+//import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 
 const proposals = ref<any[]>([]);

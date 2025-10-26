@@ -1,5 +1,4 @@
 <template>
-  <ClientDashboardLayout>
     <div class="max-w-5xl mx-auto p-6 space-y-8">
 
       <!-- Provider Header -->
@@ -402,13 +401,12 @@
           />
         </div>
       </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
+//import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { Heart, MessageCircle } from "lucide-vue-next";
 

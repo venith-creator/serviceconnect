@@ -1,11 +1,10 @@
 <template>
-  <ClientDashboardLayout>
     <div class="p-6 space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-purple-600">Manage Jobs</h1>
         <button
-          @click="$router.push('/post-job')"
+          @click="$router.push('/dashboard/client/post-job')"
           class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
         >
           + Post New Job
@@ -81,19 +80,18 @@
       <div v-else class="text-center py-12">
         <p class="text-gray-600">You haven’t posted any jobs yet.</p>
         <button
-          @click="$router.push('/post-job')"
+         @click="$router.push('/dashboard/client/post-job')"
           class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg"
         >
           Post Your First Job
         </button>
       </div>
     </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
+//import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRouter } from "vue-router";
 const router = useRouter();

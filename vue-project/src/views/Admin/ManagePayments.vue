@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Payment Management</h1>
@@ -374,12 +373,11 @@
 <!--        </div>-->
 <!--      </div>-->
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue';
+//import AdminDashboardLayout from '@/components/AdminDashboardLayout.vue';
 import subscriptionService, { type Payment } from '@/services/subscriptionService';
 import {useToast} from "vue-toast-notification";
 

@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 space-y-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 class="text-3xl font-bold text-purple-700">Manage Homeowners</h1>
@@ -120,12 +119,11 @@
         </button>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
+//import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 
 const homeowners = ref([]);

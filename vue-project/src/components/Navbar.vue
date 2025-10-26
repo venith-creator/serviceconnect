@@ -167,15 +167,18 @@
         <!-- Drawer Nav -->
         <div class="flex-1 overflow-y-auto">
           <nav class="p-6 space-y-1">
-            <a href="#how"
+            <router-link
+            to="/"
                class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
-               @click="closeMobileMenu">How it Works</a>
-            <a href="#testimonials"
+               @click="closeMobileMenu">How it Works</router-link>
+           <router-link
+            to="/listing"
                class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
-               @click="closeMobileMenu">Testimonials</a>
-            <a href="#faqs"
+               @click="closeMobileMenu">Job Listing</router-link>
+            <router-link
+            to="/contact"
                class="block py-3 px-4 rounded-lg text-lg font-medium text-black hover:bg-gray-100"
-               @click="closeMobileMenu">FAQs</a>
+               @click="closeMobileMenu">Contact Us</router-link>
           </nav>
         </div>
 

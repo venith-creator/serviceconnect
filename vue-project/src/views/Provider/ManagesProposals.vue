@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <div class="p-6 space-y-6">
       <!-- Header -->
       <h1 class="text-2xl font-bold text-purple-600 mb-4">My Proposals</h1>
@@ -80,12 +79,11 @@
         </table>
       </div>
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
+//import ProviderDashboardLayout from "@/components/ProviderDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRouter } from "vue-router";
 

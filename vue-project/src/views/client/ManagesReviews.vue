@@ -1,5 +1,4 @@
 <template>
-  <ClientDashboardLayout>
     <div class="p-6 max-w-7xl mx-auto">
       <h1 class="text-2xl font-bold text-purple-700 mb-6">Manage Reviews</h1>
 
@@ -78,12 +77,11 @@
         </div>
       </div>
     </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
+//import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRoute } from "vue-router";
 import StarRating from "@/components/StarRating.vue";

@@ -1,5 +1,4 @@
 <template>
-  <AdminDashboardLayout>
     <div class="p-6 max-w-7xl mx-auto">
       <!-- Two-column layout -->
       <div class="grid md:grid-cols-2 gap-8 items-start">
@@ -146,13 +145,12 @@
         </div>
       </div>
     </div>
-  </AdminDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { API_BASE_URL } from "@/config";
-import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
+//import AdminDashboardLayout from "@/components/AdminDashboardLayout.vue";
 
 interface a {
   _id: string;

@@ -1,5 +1,4 @@
 <template>
-  <ClientDashboardLayout>
     <div class="p-6 max-w-6xl mx-auto space-y-6">
       <h1 class="text-2xl font-bold text-purple-600">
         Proposals for: {{ jobTitle }}
@@ -104,13 +103,12 @@
         No proposals yet for this job.
       </div>
     </div>
-  </ClientDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
+//import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
 import { useRouter } from "vue-router";
 const router = useRouter();

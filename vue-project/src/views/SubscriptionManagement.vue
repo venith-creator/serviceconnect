@@ -1,5 +1,4 @@
 <template>
-  <ProviderDashboardLayout>
     <!-- Add Service Dialog -->
     <div v-if="showAddService" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -530,13 +529,12 @@
         </div>
       </div>
     </div>
-  </ProviderDashboardLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
-import ProviderDashboardLayout from '@/components/ProviderDashboardLayout.vue';
+//import ProviderDashboardLayout from '@/components/ProviderDashboardLayout.vue';
 import { useAuthStore } from "@/stores/auth.ts";
 import SubscriptionService, {type IService, type Payment} from "@/services/subscriptionService.ts";
 import {API_BASE_URL} from "@/config.ts";
