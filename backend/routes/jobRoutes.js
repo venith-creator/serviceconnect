@@ -11,7 +11,7 @@ import {
   cancelJobByAdmin,
   assignProvider,
   markJobCompleted,
-  getAllJobsAdmin, getJobByIdExcludeProposals
+  getAllJobsAdmin, getJobByIdExcludeProposals, getCompletedJobsForClient, getCompletedJobsForProvider
 } from "../controllers/jobsController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -29,6 +29,8 @@ router.post("/", attachmentUpload.array("attachments", 10), createJob);
 
 // Get all jobs (public)
 router.get("/", getJobs);
+router.get("/completed", protect, getCompletedJobsForClient);
+router.get("/completed/provider", protect, getCompletedJobsForProvider);
 
 // Get my jobs (client)
 router.get("/my", protect, authorizeRoles("client"), getMyJobs);

@@ -2,6 +2,7 @@ import Job from "../models/Job.js";
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
 import fetch from "node-fetch";
+import ProviderProfile from "../models/ProviderProfile.js";
 
 // CREATE job (client posts a new job)
 export const createJob = async (req, res) => {
@@ -309,17 +310,28 @@ export const markJobCompleted = async (req, res) => {
     job.completedAt = new Date();
     await job.save();
 
+     const providerProfile = await ProviderProfile.findById(job.assignedProvider);
+      if (providerProfile) {
+        const alreadyAdded = providerProfile.pastJobs.some(
+          j => j.toString() === job._id.toString()
+        );
+
+        if (!alreadyAdded) {
+          providerProfile.pastJobs.push(job._id);
+          await providerProfile.save();
+          console.log("✅ Job added to pastJobs:", job._id);
+        } else {
+          console.log("⚠️ Job already exists in pastJobs:", job._id);
+        }
+}
+
+
+
     // Also update accepted proposal (if any)
     await Proposal.updateMany(
       { job: job._id, status: "accepted" },
       { $set: { status: "completed" } }
     );
-
-    const providerProfile = await ProviderProfile.findOne({ user: job.assignedProvider });
-    if (providerProfile && !providerProfile.pastJobs.includes(job._id)) {
-      providerProfile.pastJobs.push(job._id);
-      await providerProfile.save();
-    }
 
     res.json({ message: "Job marked as completed successfully", job });
   } catch (error) {
@@ -343,3 +355,49 @@ export const getAllJobsAdmin = async (req, res) => {
     res.status(500).json({ message: "Error fetching jobs", error: error.message });
   }
 };
+
+export const getCompletedJobsForClient = async (req, res) => {
+  try {
+    const jobs = await Job.find({
+      client: req.user._id,
+      status: "completed",
+    })
+      .populate({
+        path: "assignedProvider",
+        populate: { path: "user", select: "name email" },
+      })
+      .lean();
+
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching completed jobs", error: error.message });
+  }
+};
+
+// ✅ PROVIDER: Get completed jobs they've done
+export const getCompletedJobsForProvider = async (req, res) => {
+  try {
+    // 1️⃣ Find provider profile by the logged-in user's ID
+    const providerProfile = await ProviderProfile.findOne({ user: req.user._id });
+    if (!providerProfile) {
+      return res.status(404).json({ message: "Provider profile not found" });
+    }
+
+    // 2️⃣ Use the profile ID to query completed jobs
+    const jobs = await Job.find({
+      assignedProvider: providerProfile._id, // ✅ FIXED
+      status: "completed",
+    })
+      .populate("client", "name email")
+      .lean();
+
+    res.json(jobs);
+  } catch (error) {
+    console.error("❌ Error fetching provider completed jobs:", error);
+    res.status(500).json({
+      message: "Error fetching completed jobs for provider",
+      error: error.message,
+    });
+  }
+};
+

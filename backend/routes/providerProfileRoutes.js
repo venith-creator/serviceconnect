@@ -12,6 +12,7 @@ import {
   approveProfile,
   rejectProvider,
   getActiveProviders,
+  getAllActiveProviders,
   approveService,
   rejectService,
   getServicesRequiringPayment, getProviderServices, addService, deleteService, updateService,
@@ -37,7 +38,7 @@ router.post(
   },
   createOrUpdateProfile
 );
-
+router.get("/active", getAllActiveProviders);
 router.get("/me", protect, authorizeRoles("provider"), getMyProfile);
 
 // Get all services for the current provider

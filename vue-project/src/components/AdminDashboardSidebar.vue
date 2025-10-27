@@ -86,6 +86,7 @@ import {
   X,
   User,
   LogOut,
+  PictureInPicture,
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
@@ -125,7 +126,7 @@ const menu = [
   { name: 'manageJobs', label: 'Jobs', path: '/dashboard/admin/ManageJobs', icon: Briefcase },
   { name: 'managePayments', label: 'Payments', path: '/dashboard/admin/ManagePayments', icon: DollarSign },
   { name: 'manageReviews', label: 'Reviews', path: '/dashboard/admin/ManageReviewss', icon: Star },
-  { name: 'manageChats', label: 'Chats', path: '/dashboard/admin/managechats', icon: MessageSquare },
+  { name: 'manageBlogs', label: 'Blogs', path: '/dashboard/admin/manageBlogs', icon: PictureInPicture },
   { name: 'announcements', label: 'Announcements', path: '/dashboard/admin/makeAnnouncement', icon: Speaker },
   { name: 'contacts', label: 'Contact Messages', path: '/dashboard/admin/ManageContacts', icon: MessageSquare }
 ]

@@ -358,13 +358,15 @@
               <div class="flex-1">
                 <div class="flex justify-between items-center">
                   <p class="font-medium text-gray-800">{{ review.reviewer?.name }}</p>
-                  <div class="flex text-yellow-500 text-sm">
-                    <i
+                  <div class="flex items-center gap-0.5 text-yellow-500">
+                    <Star
                       v-for="n in 5"
                       :key="n"
-                      class="fa"
-                      :class="n <= review.rating ? 'fa-star' : 'fa-star-o'"
-                    ></i>
+                      :class="[
+                        'w-4 h-4',
+                        n <= review.rating ? 'fill-current text-yellow-500' : 'text-gray-300'
+                      ]"
+                    />
                   </div>
                 </div>
                 <p v-if="review.job?.title" class="text-xs text-gray-500 mt-1">
@@ -408,7 +410,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 //import ClientDashboardLayout from "@/components/ClientDashboardLayout.vue";
 import { API_BASE_URL } from "@/config";
-import { Heart, MessageCircle } from "lucide-vue-next";
+import { Heart, MessageCircle, Star } from "lucide-vue-next";
 
 const userId = localStorage.getItem("userId");
 const route = useRoute();
@@ -568,7 +570,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.fa-star {
-  color: #fbbf24;
+.text-yellow-500 {
+  color: #fbbf24; /* Lucide stars will inherit this color */
 }
 </style>

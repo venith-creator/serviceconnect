@@ -73,8 +73,8 @@ const router = createRouter({
       meta: { layout: 'admin' }
     },
     {
-      path: '/dashboard/admin/managechats',
-      name: 'AdminDashboardManageChats',
+      path: '/dashboard/admin/manageBlogs',
+      name: 'AdminDashboardManageBlogs',
       component: ManageBlogs,
       meta: { layout: 'admin' }
     },
@@ -166,6 +166,10 @@ const router = createRouter({
       component: () => import('@/views/PostJob.vue'),
       meta: { layout: 'client' }
     },
+    { path: '/dashboard/client/ProvidersList',
+      name: 'ClientDashboardProvidersList',
+      component: () => import('@/views/client/ProvidersList.vue'),
+      meta: { layout: 'client' }},
     // ProviderDashboardRoutes
 
     { path: "/dashboard/provider", component: ProviderDashboard , name: 'ProviderDashboard', meta: {layout: 'provider'}},

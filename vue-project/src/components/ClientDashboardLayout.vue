@@ -83,7 +83,8 @@ const sidebarItems = [
   { label: 'My Jobs', href: '/dashboard/client/Managesjobs' },
   { label: 'Chats', href: '/dashboard/client/Manageschat' },
   { label: 'Reviews', href: '/dashboard/client/ManagesReviews' },
-  { label: 'Providers', href: '/dashboard/client/ViewProviders' }
+  { label: 'Providers', href: '/dashboard/client/ViewProviders' },
+  { label: 'providersList', href: '/dashboard/client/ProvidersList' },
 ]
 const getCurrentPageTitle = () => sidebarItems.find(i => i.href === route.path)?.label || 'client'
 </script>

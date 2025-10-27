@@ -106,7 +106,7 @@ const sidebarItems = [
   { id: 'jobs', label: 'Jobs', href: '/dashboard/admin/ManageJobs' },
   { id: 'payments', label: 'Payments', href: '/dashboard/admin/ManagePayments' },
   { id: 'reviews', label: 'Reviews', href: '/dashboard/admin/ManageReviews' },
-  { id: 'chats', label: 'Chats', href: '/dashboard/admin/managechats' },
+  { id: 'Blogs', label: 'Blogs', href: '/dashboard/admin/manageBlogs' },
   { id: 'announcements', label: 'Announcements', href: '/dashboard/admin/makeAnnouncement' },
   { id: 'contacts', label: 'Contact Messages', href: '/dashboard/admin/ManageContacts' },
 ]

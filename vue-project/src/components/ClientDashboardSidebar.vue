@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
-import { Briefcase, MessageSquare, Star, Users, X, User, LogOut, Video } from 'lucide-vue-next'
+import { Briefcase, MessageSquare, Star, Users, X, User, LogOut, Video, ToolCase } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
 interface Props { isMobileSidebarOpen: boolean }
@@ -76,7 +76,7 @@ watch(() => auth.user, (u) => { if (u) email.value = u.email }, { immediate: tru
 
 const menu = [
   { name: 'dashboard', label: 'Dashboard', path: '/dashboard/client', icon: Briefcase },
-  { name: 'jobs', label: 'My Jobs', path: '/dashboard/client/Managesjobs', icon: Briefcase },
+  { name: 'jobs', label: 'My Jobs', path: '/dashboard/client/Managesjobs', icon: ToolCase },
   { name: 'chats', label: 'Chats', path: '/dashboard/client/Manageschat', icon: MessageSquare },
   { name: 'reviews', label: 'Reviews', path: '/dashboard/client/ManagesReviews', icon: Star },
   { name: 'providers', label: 'Service Providers Blog', path: '/dashboard/client/ViewProviders', icon: Video },

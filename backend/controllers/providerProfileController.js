@@ -461,6 +461,67 @@ export const getActiveProviders = async (req, res) => {
   }
 };
 
+// ✅ Public: Get all *approved & active* provider profiles (with pagination)
+export const getAllActiveProviders = async (req, res) => {
+  try {
+    const { service, city, state, country, minExp, minRating, page = 1, limit = 12 } = req.query;
+
+    const filter = {
+      approved: true,
+      suspended: false,
+      status: { $in: ["approved", "active"] },
+    };
+
+    // Optional filters
+    if (service) filter["services.category"] = new RegExp(service, "i");
+    if (city) filter.city = new RegExp(city, "i");
+    if (state) filter.state = new RegExp(state, "i");
+    if (country) filter.country = new RegExp(country, "i");
+    if (minExp) filter.yearsOfExperience = { $gte: Number(minExp) };
+    if (minRating) filter.ratingAvg = { $gte: Number(minRating) };
+
+    const p = Math.max(Number(page) || 1, 1);
+    const l = Math.max(Number(limit) || 12, 1);
+    const skip = (p - 1) * l;
+
+    // Count + Fetch
+    const total = await ProviderProfile.countDocuments(filter);
+
+    const providers = await ProviderProfile.find(filter)
+      .populate("user", "name avatar")
+      .select("user ratingAvg ratingCount services city state country createdAt")
+      .sort({ ratingAvg: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(l)
+      .lean();
+
+    // Normalize structure (e.g. add default values, avatar fallback)
+    const normalized = providers.map((p) => ({
+      ...p,
+      ratingAvg: p.ratingAvg || 0,
+      ratingCount: p.ratingCount || 0,
+      user: {
+        ...p.user,
+        avatar:
+          p.user?.avatar && p.user.avatar.startsWith("http")
+            ? p.user.avatar
+            : null,
+      },
+    }));
+
+    res.json({
+      total,
+      currentPage: p,
+      totalPages: Math.ceil(total / l),
+      limit: l,
+      providers: normalized,
+    });
+  } catch (error) {
+    console.error("❌ Error loading active providers:", error);
+    res.status(500).json({ message: "Failed to load providers" });
+  }
+};
+
 export const rejectProvider = async (req, res) => {
   try {
     const { reason } = req.body;
