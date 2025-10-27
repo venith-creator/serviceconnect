@@ -29,6 +29,7 @@ import ViewProviders from '@/views/client/ViewProviders.vue';
 import ManagesReviews from '@/views/client/ManagesReviews.vue';
 import JobProposals from '@/views/client/JobProposals.vue';
 import seeProvider from '@/views/client/seeProvider.vue';
+import ProvidersList from '@/views/client/ProvidersList.vue';
 
 //providerDashboard
 import ProviderDashboard from "@/views/Provider/ProviderDashboard.vue";
@@ -168,7 +169,7 @@ const router = createRouter({
     },
     { path: '/dashboard/client/ProvidersList',
       name: 'ClientDashboardProvidersList',
-      component: () => import('@/views/client/ProvidersList.vue'),
+      component: ProvidersList,
       meta: { layout: 'client' }},
     // ProviderDashboardRoutes
 
