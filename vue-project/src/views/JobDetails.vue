@@ -168,14 +168,14 @@
                   </div>
                 </div>
 
-                <div class="mt-6">
-                  <button
-                    @click="applyForJob"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                  >
-                    Apply for this Job
-                  </button>
-                </div>
+<!--                <div class="mt-6">-->
+<!--                  <button-->
+<!--                    @click="applyForJob"-->
+<!--                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"-->
+<!--                  >-->
+<!--                    Apply for this Job-->
+<!--                  </button>-->
+<!--                </div>-->
               </div>
             </div>
           </div>
@@ -286,10 +286,10 @@ const viewAttachment = (attachment) => {
 };
 
 // Apply for job
-const applyForJob = () => {
-  // Implement job application logic
-  alert('Job application functionality will be implemented here');
-};
+// const applyForJob = () => {
+//   // Implement job application logic
+//   alert('Job application functionality will be implemented here');
+// };
 
 watch(() => jobId, () => {
   fetchJobDetails()
