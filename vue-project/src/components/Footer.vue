@@ -118,7 +118,7 @@
             <li><router-link to="/post-job" class="hover:text-primary">Post a Job</router-link></li>
 <!--            <li><router-link to="/categories" class="hover:text-primary">Browse Categories</router-link></li>-->
             <li><router-link to="/" class="hover:text-primary">How it Works</router-link></li>
-<!--            <li><router-link to="/safety" class="hover:text-primary">Safety Tips</router-link></li>-->
+            <li><router-link to="/safety" class="hover:text-primary">Safety Tips</router-link></li>
           </ul>
         </div>
 
@@ -128,7 +128,7 @@
           <ul class="space-y-3 text-gray-700">
             <li><router-link to="/signup?role=provider" class="hover:text-primary">Join as Provider</router-link></li>
             <li><router-link to="/listing" class="hover:text-primary">Find Work</router-link></li>
-<!--            <li><router-link to="/verification" class="hover:text-primary">Verification Process</router-link></li>-->
+            <li><router-link to="/verification" class="hover:text-primary">Verification Process</router-link></li>
           </ul>
         </div>
 
@@ -138,8 +138,8 @@
           <ul class="space-y-3 text-gray-700">
             <li><router-link to="/about" class="hover:text-primary">About Us</router-link></li>
             <li><router-link to="/contact" class="hover:text-primary">Contact</router-link></li>
-<!--            <li><router-link to="/privacy-policy" class="hover:text-primary">Privacy Policy</router-link></li>-->
-<!--            <li><router-link to="/terms" class="hover:text-primary">Terms of Service</router-link></li>-->
+            <li><router-link to="/privacy-policy" class="hover:text-primary">Privacy Policy</router-link></li>
+            <li><router-link to="/terms" class="hover:text-primary">Terms of Service</router-link></li>
           </ul>
         </div>
       </div>
