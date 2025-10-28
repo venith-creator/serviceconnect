@@ -42,6 +42,7 @@ export const updateUserRole = async (req, res) => {
   }
 };
 
+// PATCH /admin/users/:id/ban
 export const toggleBanUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,13 +51,19 @@ export const toggleBanUser = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    user.isBanned = ban;
-    user.banReason = ban ? reason || "Banned by admin" : "";
+    user.isBanned = !!ban;
+    user.banReason = ban ? reason || "Violation of terms" : "";
     await user.save();
 
-    res.json({ message: ban ? "User banned" : "User unbanned", user });
+    res.json({
+      message: ban
+        ? `${user.name || "User"} has been suspended`
+        : `${user.name || "User"} has been reactivated`,
+      user,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("❌ Error toggling user ban:", err);
+    res.status(500).json({ message: "Error updating ban status", error: err.message });
   }
 };
 
@@ -144,7 +151,7 @@ export const getAllHomeowners = async (req, res) => {
     const baseEndpoint = process.env.MINIO_ENDPOINT || "";
     // 1️⃣ Get all users with the "client" role
     const clients = await User.find({ roles: { $in: ["client"] } })
-      .select("name email phone avatar createdAt");
+      .select("name email phone avatar isBanned banReason createdAt");
 
     // 2️⃣ Enrich each client with jobs + reviews
     const enrichedClients = await Promise.all(
@@ -181,6 +188,8 @@ export const getAllHomeowners = async (req, res) => {
           email: client.email,
           phone: client.phone,
           avatar: client.avatar,
+          isBanned: client.isBanned || false,
+          banReason: client.banReason || "",
           joinedAt: client.createdAt,
           jobsCount: jobs.length,
           avgRating: avgRating.toFixed(1),

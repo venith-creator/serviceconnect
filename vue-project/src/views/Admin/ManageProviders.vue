@@ -143,47 +143,62 @@
               <td class="p-3">{{ provider.yearsOfExperience || '-' }}</td>
               <td class="p-3">{{ provider.city }}, {{ provider.state }}</td>
               <td class="p-3">{{ provider.ratingAvg?.toFixed(1) || '0.0' }}</td>
-              <td class="p-3 space-x-2">
+              <td class="p-3 text-right relative">
+                <!-- Three dots icon -->
                 <button
-                  v-if="provider.status === 'pending'"
-                  @click="approveProvider(provider._id)"
-                  class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  @click="toggleMenu(provider._id)"
+                  class="p-2 rounded-full hover:bg-gray-100"
                 >
-                  Approve
+                  ⋮
                 </button>
-                <button
+                <!-- Dropdown menu -->
+                <div
+                  v-if="openMenuId === provider._id"
+                  class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
+                >
+                  <ul class="text-sm text-gray-700">
+                <li
+                    v-if="provider.status === 'pending'"
+                    @click="approveProvider(provider._id)"
+                    class="px-4 py-2 hover:bg-green-50 cursor-pointer"
+                  >
+                   Approve
+                  </li>
+                <li
                   v-if="provider.status === 'pending'"
                   @click="openRejectModal(provider._id)"
-                  class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                  class="px-4 py-2 hover:bg-red-50 cursor-pointer"
                 >
-                  Reject
-                </button>
-                <button
-                  v-if="provider.status === 'approved' && !provider.suspended"
-                  @click="suspendProvider(provider._id)"
-                  class="px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
-                >
-                  Suspend
-                </button>
-                <button
+                 Reject
+                </li>
+                 <li
+                    v-if="provider.status === 'approved' && !provider.suspended"
+                    @click="suspendProvider(provider._id)"
+                    class="px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                  >
+                    Suspend
+                  </li>
+                <li
                   v-if="provider.suspended"
                   @click="approveProvider(provider._id)"
-                  class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  class="px-4 py-2 hover:bg-green-50 cursor-pointer"
                 >
                   Re-activate
-                </button>
+                  </li>
                 <button
                   @click="deleteProvider(provider._id)"
                   class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                 >
                   Delete
                 </button>
-                <button
+               <li
                   @click="viewProvider(provider._id)"
-                  class="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  class="px-4 py-2 hover:bg-blue-50 cursor-pointer"
                 >
-                  View
-                </button>
+                   View
+                </li>
+                  </ul>
+                </div>
               </td>
             </tr>
             </tbody>
@@ -425,7 +440,10 @@ const serviceToBeRejected = ref({
 const showProviderModal = ref(false)
 const selectedProvider = ref<any>(null)
 const pendingServicesCount = ref(0)
-
+const openMenuId = ref<string | null>(null);
+const toggleMenu = (id: string) => {
+  openMenuId.value = openMenuId.value === id ? null : id;
+};
 onMounted(async () => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_BASE_URL}/provider-profiles?status=pending`, {
@@ -713,6 +731,9 @@ const providerReviews = computed(() => {
     (r: any) => r.revieweeRole === "provider"
   )
 })
-
+window.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest("td")) openMenuId.value = null;
+});
 onMounted(fetchProviders)
 </script>

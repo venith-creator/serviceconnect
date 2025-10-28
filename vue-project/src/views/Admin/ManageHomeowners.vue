@@ -34,6 +34,7 @@
               <th class="px-6 py-3 text-left font-semibold">Jobs Posted</th>
               <th class="px-6 py-3 text-left font-semibold">Avg Rating</th>
               <th class="px-6 py-3 text-left font-semibold">Reviews</th>
+              <th class="px-6 py-3 text-left font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -42,12 +43,26 @@
                 class="border-t hover:bg-purple-50 transition-colors duration-200"
               >
                 <td class="px-6 py-3 flex items-center gap-3">
-                  <img
-                    :src="homeowner.avatar ? homeowner.avatar : '/images/default-avatar.png'"
-                    alt="Avatar"
-                    class="w-12 h-12 rounded-full object-cover"
-                  />
-                  <span class="font-medium">{{ homeowner.name }}</span>
+                  <div
+                    class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-purple-700 font-semibold text-sm overflow-hidden"
+                  >
+                    <img
+                      v-if="homeowner.avatar"
+                      :src="homeowner.avatar"
+                      alt="Avatar"
+                      class="w-full h-full object-cover"
+                      @error="homeowner.avatar = ''"
+                    />
+                    <span v-else>{{ getInitials(getSafeName(homeowner)) }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium block">{{ homeowner.name }}</span>
+                    <span
+                      v-if="homeowner.isBanned"
+                      class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-md"
+                      >Suspended</span
+                    >
+                  </div>
                 </td>
                 <td class="px-6 py-3">{{ homeowner.email }}</td>
                 <td class="px-6 py-3">{{ homeowner.jobsCount }}</td>
@@ -62,6 +77,17 @@
                     {{ expandedId === homeowner._id ? "Hide" : "View" }}
                   </button>
                 </td>
+                <td class="px-6 py-3">
+                <button
+                  @click="toggleBan(homeowner)"
+                  class="px-3 py-1 rounded-lg text-sm font-medium transition-colors"
+                  :class="homeowner.isBanned
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                    : 'bg-red-100 text-red-700 hover:bg-red-200'"
+                >
+                  {{ homeowner.isBanned ? 'Reactivate' : 'Suspend' }}
+                </button>
+              </td>
               </tr>
 
               <!-- Expanded reviews -->
@@ -134,8 +160,67 @@ const filterRating = ref("");
 const currentPage = ref(1);
 const perPage = 6;
 
+// --- helper: initials fallback ---
+const getInitials = (name) => {
+  if (!name) return "??";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+};
+
+const getSafeName = (user) => {
+  if (user?.name?.trim()) return user.name;
+  if (user?._id) return `User-${user._id.slice(-4)}`;
+  return "Unknown User";
+};
+
 const toggleReviews = (id) => {
   expandedId.value = expandedId.value === id ? null : id;
+};
+
+const toggleBan = async (homeowner) => {
+  try {
+    const newStatus = !homeowner.isBanned;
+    let reason = "";
+
+    if (newStatus) {
+      reason = prompt("Enter reason for suspension:", "Violation of terms") || "No reason specified";
+    }
+
+    const res = await fetch(`${API_BASE_URL}/admin/users/${homeowner._id}/ban`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ ban: newStatus, reason }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    alert(data.message);
+    await fetchHomeowners(); // 👈 refresh data to sync from DB
+  } catch (err) {
+    console.error("Ban toggle error:", err);
+    alert("Failed to update user status");
+  }
+};
+
+const fetchHomeowners = async () => {
+  loading.value = true;
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/homeowners`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    homeowners.value = data;
+  } catch (err) {
+    console.error("❌ Error fetching homeowners:", err);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const filteredHomeowners = computed(() => {

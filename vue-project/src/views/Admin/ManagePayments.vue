@@ -19,7 +19,7 @@
           />
           <button
             @click="fetchPayments()"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-blue-700"
           >
             Search
           </button>

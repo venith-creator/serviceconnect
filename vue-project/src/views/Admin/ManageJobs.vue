@@ -55,15 +55,18 @@
               View Proposals
             </button>
             <div class="flex gap-2">
+              <!-- Force Complete (outlined green) -->
               <button
                 @click="forceComplete(job._id)"
-                class="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-xs font-semibold shadow-sm transition"
+                class="flex items-center gap-1 border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-2 rounded-md text-xs font-semibold shadow-sm transition"
               >
                 Force Complete
               </button>
+
+              <!-- Cancel (outlined red) -->
               <button
                 @click="cancelJob(job._id)"
-                class="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-xs font-semibold shadow-sm transition"
+                class="flex items-center gap-1 border border-red-600 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-md text-xs font-semibold shadow-sm transition"
               >
                 Cancel
               </button>

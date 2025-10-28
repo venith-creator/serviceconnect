@@ -31,18 +31,15 @@
           </div>
 
           <div class="flex items-center space-x-1.5">
-            <div class="flex items-center space-x-1.5 relative">
-              <ProviderSettingsDropdown />
-            </div>
             <button
               @click="showSwitch = true"
               class="px-3 py-1 border rounded-lg text-sm text-gray-700 hover:bg-gray-50"
             >
               Switch Role
             </button>
-            <Badge class="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded-full">
-              Provider
-            </Badge>
+            <div class="flex items-center space-x-1.5 relative">
+              <ProviderSettingsDropdown />
+            </div>
           </div>
         </div>
       </header>
@@ -60,7 +57,6 @@ import {ref, onMounted, onUnmounted, watch, } from 'vue'
 import {useRoute} from 'vue-router'
 import {Menu,} from 'lucide-vue-next'
 import ProviderDashboardSidebar from './ProviderDashboardSidebar.vue'
-import Badge from './ui/Badge.vue'
 import {useAuthStore} from '@/stores/auth'
 import DashboardSwitchModal from './DashboardSwitchmodal.vue'
 import { connectSocket } from '@/utils/socketClient'

@@ -33,6 +33,9 @@
             </svg>
             <span>{{ trialDaysRemaining }} days left in trial</span>
           </div>
+          <Badge class="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded-full">
+              Provider
+            </Badge>
         </div>
       </div>
 
@@ -90,7 +93,7 @@ import { useRoute } from 'vue-router'
 import { ref, watch, computed } from 'vue'
 import { Briefcase, MessageSquare, Star, X, User, LogOut, FileText, CreditCard, Video } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
-
+import Badge from './ui/Badge.vue'
 interface Props {
   isMobileSidebarOpen: boolean
 }
