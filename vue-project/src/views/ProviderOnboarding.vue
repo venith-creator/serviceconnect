@@ -287,7 +287,7 @@
         </div>
 
           <div class="mt-4">
-            <label class="font-medium text-gray-700">Hourly Rate ($)</label>
+            <label class="font-medium text-gray-700">Hourly Rate (£)</label>
             <input
               v-model.number="profile.rate"
               type="number"
@@ -362,7 +362,7 @@
 
               <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div>
-                  <label class="font-medium">Rate ($)</label>
+                  <label class="font-medium">Rate (£)</label>
                   <input
                     v-model.number="service.rate"
                     type="number"

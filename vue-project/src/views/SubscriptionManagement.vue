@@ -75,7 +75,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (km)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (miles)</label>
                 <input
                   v-model="serviceRadius"
                   type="number"
@@ -480,7 +480,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (km)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Service Area (miles)</label>
               <input
                 v-model="serviceRadius"
                 type="number"

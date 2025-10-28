@@ -93,7 +93,7 @@
 
           <!-- Budget -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Budget ($)</label>
+            <label class="block text-sm font-medium text-gray-700">Budget (£)</label>
             <input
               v-model="form.budget"
               type="number"

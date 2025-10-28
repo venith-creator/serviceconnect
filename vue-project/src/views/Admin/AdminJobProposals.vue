@@ -114,7 +114,7 @@
                 class="flex justify-between text-sm text-gray-600"
               >
                 <span>{{ srv.category || 'N/A' }}</span>
-                <span>{{ srv.rate ? `$${srv.rate}` : 'N/A' }} • {{ srv.availability || '-' }}</span>
+                <span>{{ srv.rate ? `$£{srv.rate}` : 'N/A' }} • {{ srv.availability || '-' }}</span>
               </div>
             </div>
             <p>

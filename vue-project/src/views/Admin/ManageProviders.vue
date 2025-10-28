@@ -276,7 +276,7 @@
               <p><strong>Experience:</strong> {{ selectedProvider.yearsOfExperience || 'N/A' }} yrs
               </p>
               <p><strong>Rate:</strong>
-                {{ selectedProvider.rate ? `$${selectedProvider.rate}/hr` : 'N/A' }}</p>
+                {{ selectedProvider.rate ? `$£{selectedProvider.rate}/hr` : 'N/A' }}</p>
               <p><strong>Languages:</strong> {{ selectedProvider.languages || '-' }}</p>
               <p><strong>Availability:</strong> {{ selectedProvider.availability || '-' }}</p>
             </div>
@@ -374,7 +374,7 @@
                 >
                   <span>{{ srv.category }}</span>
                   <span class="text-gray-500 text-sm">
-                    {{ srv.rate ? `$${srv.rate}` : 'N/A' }} • {{ srv.availability || 'N/A' }}
+                    {{ srv.rate ? `$£{srv.rate}` : 'N/A' }} • {{ srv.availability || 'N/A' }}
                   </span>
                 </li>
               </ul>
