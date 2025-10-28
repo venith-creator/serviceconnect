@@ -19,12 +19,16 @@
           <input
             type="text"
             placeholder="Enter your location"
+            v-model="searchQuery"
             class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:outline-none text-black"
           />
-          <button class="bg-primary text-white px-4 py-2 flex items-center gap-2 rounded-lg ml-2">
+          <router-link
+            :to="{ path: '/listing', query: { location: searchQuery } }"
+            class="bg-primary text-white px-4 py-2 flex items-center gap-2 rounded-lg ml-2"
+          >
             <MagnifyingGlassIcon class="w-5 h-5"/>
-            Search Service Provider
-          </button>
+            Search for jobs
+          </router-link>
         </div>
       </div>
     </section>
@@ -75,18 +79,20 @@
           class="bg-white rounded-lg shadow p-6 text-left space-y-3"
         >
           <div class="flex justify-between items-center">
-            <h3 class="font-semibold text-lg" v-html="job.title"></h3>
+            <h3 class="font-semibold text-lg" v-html="toTitleCase(job.title)"></h3>
             <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Open</span>
           </div>
-          <p class="text-gray-600 text-sm">{{ job.desc }}</p>
+          <p class="text-gray-600 text-sm">{{ job.description }}</p>
           <div class="text-gray-500 text-sm space-y-1">
             <p>
               <MapPinIcon class="w-4 h-4 inline"/>
-              {{ job.location }}
+              {{ job.location.address }}
             </p>
             <p>
-              £ {{ job.price }}
-              <span class="float-right"><ClockIcon class="w-4 h-4 inline"/> {{ job.time }}</span>
+              £ {{ job.budget }}
+              <span class="float-right">
+                <ClockIcon class="w-4 h-4 inline"/> {{ new Date(job.createdAt).toDateString() }}
+              </span>
             </p>
           </div>
           <button class="bg-primary text-white px-4 py-2 rounded-lg mx-auto block w-full">Send
@@ -265,8 +271,10 @@ import {
   // CameraIcon
 } from "@heroicons/vue/24/solid";
 import {useRouter} from "vue-router";
+import {API_BASE_URL} from "@/config.js";
 
 const router = useRouter();
+const searchQuery = ref("");
 // const categories = [
 //   {name: "Plumber", icon: WrenchScrewdriverIcon, color: "text-blue-500"},
 //   {name: "Electrician", icon: BoltIcon, color: "text-yellow-500"},
@@ -299,56 +307,7 @@ const steps = [
   },
 ];
 
-const jobs = [
-  {
-    id: 1,
-    title: "Need a plumber in <br> Solihull",
-    desc: "Urgent plumbing repair needed for kitchen sink and bathroom fixtures",
-    location: "Solihull Street, London",
-    price: "500 - 700",
-    time: "3 days",
-  },
-  {
-    id: 2,
-    title: "Looking for a <br> Gardener in London",
-    desc: "Regular garden maintenance and landscaping services",
-    location: "London Street",
-    price: "200 - 300",
-    time: "5 days",
-  },
-  {
-    id: 3,
-    title: "Electrician Needed - <br> Wiring Installation",
-    desc: "Complete electrical wiring for the new house construction",
-    location: "London",
-    price: "700 - 1000",
-    time: "2 days",
-  },
-  {
-    id: 1,
-    title: "Need a plumber in <br> Solihull",
-    desc: "Urgent plumbing repair needed for kitchen sink and bathroom fixtures",
-    location: "Solihull Street, London",
-    price: "500 - 700",
-    time: "3 days",
-  },
-  {
-    id: 2,
-    title: "Looking for a <br> Gardener in London",
-    desc: "Regular garden maintenance and landscaping services",
-    location: "London Street",
-    price: "200 - 300",
-    time: "5 days",
-  },
-  {
-    id: 3,
-    title: "Electrician Needed - <br> Wiring Installation",
-    desc: "Complete electrical wiring for the new house construction",
-    location: "London",
-    price: "700 - 1000",
-    time: "2 days",
-  },
-];
+const jobs = ref([]);
 
 const testimonials = [
   {
@@ -414,9 +373,43 @@ const prevTestimonial = () => {
     (activeTestimonial.value - 1 + testimonials.length) % testimonials.length;
 };
 
+const fetchJobs = async () => {
+  try {
+    const queryParams = new URLSearchParams();
+
+    queryParams.append('status', 'open');
+
+    const url = `${API_BASE_URL}/jobs?${queryParams.toString()}`;
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch jobs: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const jobsData = Array.isArray(data) ? data : (data.jobs || []);
+    if (jobsData.length === 0) {
+      jobsData.push({category: 'other'});
+    }
+    jobs.value = jobsData;
+  } catch (err) {
+    console.error('Error fetching jobs:', err);
+  } finally {
+  }
+};
+
+const toTitleCase = (str) => {
+  return str.replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 let interval;
 onMounted(() => {
   interval = setInterval(nextTestimonial, 5000);
+  fetchJobs();
 });
 onUnmounted(() => {
   clearInterval(interval);

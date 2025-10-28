@@ -26,7 +26,7 @@
                 class="w-full border border-gray-300 rounded-md py-2 pl-4 pr-10 focus:ring-primary focus:border-primary"
               />
               <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" />
+                <MagnifyingGlassIcon class="h-5 w-5 text-gray-400"/>
               </div>
             </div>
           </div>
@@ -76,7 +76,8 @@
         <!-- Status and Active Filters -->
         <div class="mt-4 flex items-center flex-wrap gap-2">
           <!-- Always show Open status -->
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
             Status: Open
           </span>
 
@@ -112,7 +113,7 @@
       <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-md p-4">
         <div class="flex">
           <div class="flex-shrink-0">
-            <ExclamationTriangleIcon class="h-5 w-5 text-red-400" />
+            <ExclamationTriangleIcon class="h-5 w-5 text-red-400"/>
           </div>
           <div class="ml-3">
             <h3 class="text-sm font-medium text-red-800">Error loading jobs</h3>
@@ -133,7 +134,7 @@
 
       <!-- No Jobs State -->
       <div v-else-if="filteredJobs.length === 0" class="text-center py-12">
-        <BriefcaseIcon class="mx-auto h-12 w-12 text-gray-400" />
+        <BriefcaseIcon class="mx-auto h-12 w-12 text-gray-400"/>
         <h3 class="mt-2 text-sm font-medium text-gray-900">No jobs found</h3>
         <p class="mt-1 text-sm text-gray-500">
           {{ hasActiveFilters ? 'Try changing your filters' : 'No jobs available at the moment' }}
@@ -181,23 +182,23 @@
 
                   <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                     <div class="flex items-center">
-                      <MapPinIcon class="h-4 w-4 text-gray-400 mr-1.5" />
+                      <MapPinIcon class="h-4 w-4 text-gray-400 mr-1.5"/>
                       <span>{{ job.location?.address || 'Location not specified' }}</span>
                     </div>
 
                     <div v-if="job.budget" class="flex items-center">
-                      <CurrencyPoundIcon class="h-4 w-4 text-gray-400 mr-1.5" />
+                      <CurrencyPoundIcon class="h-4 w-4 text-gray-400 mr-1.5"/>
                       <span>Budget: £{{ job.budget.toLocaleString() }}</span>
                     </div>
 
                     <div v-if="job.timelineStart" class="flex items-center">
-                      <CalendarIcon class="h-4 w-4 text-gray-400 mr-1.5" />
+                      <CalendarIcon class="h-4 w-4 text-gray-400 mr-1.5"/>
                       <span>{{ formatDate(job.timelineStart) }}</span>
                       <span v-if="job.timelineEnd"> - {{ formatDate(job.timelineEnd) }}</span>
                     </div>
 
                     <div v-if="job.category" class="flex items-center">
-                      <TagIcon class="h-4 w-4 text-gray-400 mr-1.5" />
+                      <TagIcon class="h-4 w-4 text-gray-400 mr-1.5"/>
                       <span class="capitalize">{{ job.category }}</span>
                     </div>
                   </div>
@@ -238,8 +239,9 @@
 
                 <div v-if="job.assignedProvider" class="flex items-center">
                   <span class="text-xs text-gray-500 mr-2">Assigned to:</span>
-                  <div class="flex-shrink-0 h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
-                    <UserIcon class="h-3 w-3 text-gray-500" />
+                  <div
+                    class="flex-shrink-0 h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
+                    <UserIcon class="h-3 w-3 text-gray-500"/>
                   </div>
                 </div>
               </div>
@@ -249,7 +251,8 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="!isLoading && filteredJobs.length > 0" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-lg">
+      <div v-if="!isLoading && filteredJobs.length > 0"
+           class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-lg">
         <div class="flex-1 flex justify-between sm:hidden">
           <button
             @click="currentPage--"
@@ -270,12 +273,15 @@
           <div>
             <p class="text-sm text-gray-700">
               Showing <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to
-              <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredJobs.length) }}</span> of
+              <span class="font-medium">{{
+                  Math.min(currentPage * itemsPerPage, filteredJobs.length)
+                }}</span> of
               <span class="font-medium">{{ filteredJobs.length }}</span> results
             </p>
           </div>
           <div>
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                 aria-label="Pagination">
               <button
                 @click="currentPage--"
                 :disabled="currentPage === 1"
@@ -285,7 +291,7 @@
                 ]"
               >
                 <span class="sr-only">Previous</span>
-                <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
+                <ChevronLeftIcon class="h-5 w-5" aria-hidden="true"/>
               </button>
               <button
                 v-for="page in totalPages"
@@ -309,7 +315,7 @@
                 ]"
               >
                 <span class="sr-only">Next</span>
-                <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
+                <ChevronRightIcon class="h-5 w-5" aria-hidden="true"/>
               </button>
             </nav>
           </div>
@@ -320,8 +326,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import {ref, computed, watch, onMounted} from 'vue';
 import {
   MagnifyingGlassIcon,
   MapPinIcon,
@@ -334,18 +339,12 @@ import {
   ExclamationTriangleIcon,
   BriefcaseIcon
 } from '@heroicons/vue/24/outline';
-import { API_BASE_URL } from '@/config';
+import {API_BASE_URL} from '@/config';
+import {useRoute, useRouter} from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 
-// Reactive data
-const jobs = ref([]);
-const isLoading = ref(false);
-const error = ref(null);
-const isGettingLocation = ref(false);
-
-// Filters
-const searchQuery = ref('');
 const filters = ref({
   category: '',
   location: '',
@@ -353,6 +352,15 @@ const filters = ref({
   lat: '',
   lon: ''
 });
+
+// Stateactive data
+const jobs = ref([]);
+const isLoading = ref(false);
+const error = ref(null);
+const isGettingLocation = ref(false);
+// Filters
+const searchQuery = ref('');
+
 
 // Pagination
 const currentPage = ref(1);
@@ -376,7 +384,13 @@ const categories = computed(() => {
 
 // Fetch jobs with filters
 const fetchJobs = async () => {
-  console.log(filters.value.category);
+  isLoading.value = true;
+  error.value = null;
+
+  // Use location from query params if available and not already set
+  if (route.query.location && !filters.value.location) {
+    filters.value.location = route.query.location;
+  }
   try {
     isLoading.value = true;
     error.value = null;
@@ -408,7 +422,7 @@ const fetchJobs = async () => {
     const jobsData = Array.isArray(data) ? data : (data.jobs || []);
     // Ensure we have at least the 'other' category if no jobs are found
     if (jobsData.length === 0) {
-      jobsData.push({ category: 'other' });
+      jobsData.push({category: 'other'});
     }
     jobs.value = jobsData;
 
@@ -479,6 +493,13 @@ const removeFilter = (filterKey) => {
   } else {
     filters.value[filterKey] = '';
   }
+  const query = {...route.query};
+  delete query[filterKey];
+  if (Object.keys(query).length > 0) {
+    router.replace({query});
+  } else {
+    router.replace({query: {}});
+  }
   applyFilters();
 };
 
@@ -518,10 +539,10 @@ const totalPages = computed(() => {
 
 const hasActiveFilters = computed(() => {
   return searchQuery.value ||
-         filters.value.category ||
-         filters.value.location ||
-         filters.value.lat ||
-         filters.value.lon;
+    filters.value.category ||
+    filters.value.location ||
+    filters.value.lat ||
+    filters.value.lon;
 });
 
 // Get active filters (excluding status)
@@ -537,7 +558,7 @@ const activeFilters = computed(() => {
 // Helper methods
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  const options = {year: 'numeric', month: 'short', day: 'numeric'};
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
@@ -590,8 +611,20 @@ const viewAttachments = (attachments) => {
 
 // Watch for page changes
 watch(currentPage, () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top: 0, behavior: 'smooth'});
 });
+
+// Watch for location query parameter changes
+watch(
+  () => route.query.location,
+  (newLocation) => {
+    if (newLocation) {
+      filters.value.location = newLocation;
+      applyFilters();
+    }
+  },
+  {immediate: true}
+);
 
 // Initial load
 onMounted(() => {
