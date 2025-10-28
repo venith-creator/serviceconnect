@@ -75,33 +75,41 @@
       <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         <div
           v-for="job in jobs"
-          :key="job.id"
-          class="bg-white rounded-lg shadow p-6 text-left space-y-3"
+          :key="job._id"
+          class="flex flex-col bg-white rounded-lg shadow overflow-hidden h-full"
         >
-          <div class="flex justify-between items-center">
-            <h3 class="font-semibold text-lg" v-html="toTitleCase(job.title)"></h3>
-            <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Open</span>
-          </div>
-          <p class="text-gray-600 text-sm">{{ job.description }}</p>
-          <div class="text-gray-500 text-sm space-y-1">
-            <p>
-              <MapPinIcon class="w-4 h-4 inline"/>
-              {{ job.location.address }}
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex justify-between items-start mb-3">
+              <h3 class="font-semibold text-lg text-left" v-html="toTitleCase(job.title)"></h3>
+              <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full whitespace-nowrap ml-2">Open</span>
+            </div>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+              {{ job.description || 'No description provided' }}
             </p>
-            <p>
-              £ {{ job.budget }}
-              <span class="float-right">
-                <ClockIcon class="w-4 h-4 inline"/> {{ new Date(job.createdAt).toDateString() }}
-              </span>
-            </p>
+            <div class="text-gray-500 text-sm space-y-2 mt-auto">
+              <div class="flex items-center">
+                <MapPinIcon class="h-4 w-4 text-gray-400 mr-1.5 flex-shrink-0"/>
+                <span class="truncate">{{ job.location?.address || 'Location not specified' }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="font-medium">£{{ job.budget?.toLocaleString() || 'Negotiable' }}</span>
+                <div class="flex items-center text-gray-400">
+                  <ClockIcon class="h-4 w-4 mr-1"/>
+                  <span class="text-xs">{{ new Date(job.createdAt).toDateString() }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <button class="bg-primary text-white px-4 py-2 rounded-lg mx-auto block w-full">Send
-            Quote
+          <button
+            @click="viewJobDetails(job._id)"
+            class="bg-primary hover:bg-primary/90 text-white px-4 py-3 text-sm font-medium w-full text-center transition-colors"
+          >
+            View Details
           </button>
         </div>
       </div>
 
-      <div class="mt-6">
+      <div class="mt-6" v-if="jobs.length">
         <button @click="viewAllJobs" class="text-black font-semibold flex items-center gap-2 mx-auto">
           View All
           <span class="bg-primary text-white rounded-full p-1">
@@ -401,6 +409,10 @@ const fetchJobs = async () => {
   } finally {
   }
 };
+
+const viewJobDetails = async (jobId) => {
+  await router.push(`/listing/${jobId}`)
+}
 
 const toTitleCase = (str) => {
   return str.replace(/\b\w/g, (match) => match.toUpperCase());

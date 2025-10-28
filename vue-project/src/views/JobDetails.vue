@@ -186,8 +186,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import {ref, onMounted, watch} from 'vue';
+import { useRoute } from 'vue-router';
 import {
   ArrowLeftIcon,
   MapPinIcon,
@@ -199,7 +199,6 @@ import {
 import {API_BASE_URL} from "@/config.js";
 
 const route = useRoute();
-const router = useRouter();
 const jobId = route.params.id;
 
 const job = ref(null);
@@ -291,6 +290,10 @@ const applyForJob = () => {
   // Implement job application logic
   alert('Job application functionality will be implemented here');
 };
+
+watch(() => jobId, () => {
+  fetchJobDetails()
+}, {immediate: true})
 
 // Initialize component
 onMounted(() => {
