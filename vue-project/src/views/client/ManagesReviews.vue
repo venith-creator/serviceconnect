@@ -30,7 +30,7 @@
               </select>
             </div>
             <div v-else class="text-sm text-gray-500 italic">
-              No completed jobs yet.
+              No completed jobs yet. You can leave reviews after a job is completed.
             </div>
 
             <!-- Hidden fields -->

@@ -92,6 +92,57 @@
         <div v-else class="bg-white p-6 rounded-xl shadow-md text-gray-500 italic">
           No completed jobs yet.
         </div>
+        <!-- Reviews -->
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 v-if="provider?.user" class="text-xl font-semibold mb-5 text-gray-700">
+          Reviews for {{ provider.user.name }}
+        </h3>
+
+        <div v-if="reviews.length" class="space-y-5">
+          <div
+            v-for="review in reviews"
+            :key="review._id"
+            class="border border-gray-100 p-4 rounded-lg hover:shadow transition"
+          >
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-base overflow-hidden">
+                <img
+                  v-if="review.reviewer?.avatar"
+                  :src="review.reviewer.avatar"
+                  alt="avatar"
+                  class="w-full h-full object-cover rounded-full"
+                  @error="review.reviewer.avatar = ''"
+                />
+                <span v-else>{{ getInitials(getSafeName(review.reviewer)) }}</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between items-center">
+                  <p class="font-medium text-gray-800">{{ review.reviewer?.name }}</p>
+                  <div class="flex items-center gap-0.5 text-yellow-500">
+                    <Star
+                      v-for="n in 5"
+                      :key="n"
+                      :class="[
+                        'w-4 h-4',
+                        n <= review.rating ? 'fill-current text-yellow-500' : 'text-gray-300'
+                      ]"
+                    />
+                  </div>
+                </div>
+                <p v-if="review.job?.title" class="text-xs text-gray-500 mt-1">
+                  For job: <span class="font-medium">{{ review.job.title }}</span>
+                </p>
+                <p class="mt-2 text-gray-700 text-sm">{{ review.comment }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="text-gray-500 italic text-center py-5">
+          No reviews yet for this provider.
+        </div>
+      </div>
+    </div>
 
       <!-- Previous Posts -->
         <div v-if="posts.length" class="bg-white p-6 rounded-xl shadow-md">
@@ -331,58 +382,6 @@
         <div v-else class="bg-white p-6 rounded-xl shadow-md text-gray-500 italic">
           No previous posts by this provider.
         </div>
-
-      <!-- Reviews -->
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <h3 v-if="provider?.user" class="text-xl font-semibold mb-5 text-gray-700">
-          Reviews for {{ provider.user.name }}
-        </h3>
-
-        <div v-if="reviews.length" class="space-y-5">
-          <div
-            v-for="review in reviews"
-            :key="review._id"
-            class="border border-gray-100 p-4 rounded-lg hover:shadow transition"
-          >
-            <div class="flex items-start gap-4">
-              <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-base overflow-hidden">
-                <img
-                  v-if="review.reviewer?.avatar"
-                  :src="review.reviewer.avatar"
-                  alt="avatar"
-                  class="w-full h-full object-cover rounded-full"
-                  @error="review.reviewer.avatar = ''"
-                />
-                <span v-else>{{ getInitials(getSafeName(review.reviewer)) }}</span>
-              </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-center">
-                  <p class="font-medium text-gray-800">{{ review.reviewer?.name }}</p>
-                  <div class="flex items-center gap-0.5 text-yellow-500">
-                    <Star
-                      v-for="n in 5"
-                      :key="n"
-                      :class="[
-                        'w-4 h-4',
-                        n <= review.rating ? 'fill-current text-yellow-500' : 'text-gray-300'
-                      ]"
-                    />
-                  </div>
-                </div>
-                <p v-if="review.job?.title" class="text-xs text-gray-500 mt-1">
-                  For job: <span class="font-medium">{{ review.job.title }}</span>
-                </p>
-                <p class="mt-2 text-gray-700 text-sm">{{ review.comment }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-else class="text-gray-500 italic text-center py-5">
-          No reviews yet for this provider.
-        </div>
-      </div>
-    </div>
     <!-- Image Modal -->
       <div
         v-if="showModal"
