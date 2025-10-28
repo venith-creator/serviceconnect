@@ -386,6 +386,7 @@ const fetchJobs = async () => {
     const queryParams = new URLSearchParams();
 
     queryParams.append('status', 'open');
+    queryParams.append('limit', 6);
 
     const url = `${API_BASE_URL}/jobs?${queryParams.toString()}`;
     const response = await fetch(url, {

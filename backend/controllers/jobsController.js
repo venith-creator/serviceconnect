@@ -117,7 +117,7 @@ const geocodeLocation = async (address) => {
 // ✅ GET all jobs (with optional filters)
 export const getJobs = async (req, res) => {
   try {
-    const { keyword, category, location, lat, lon, maxDistance, city, state, country, status } = req.query;
+    const { keyword, category, location, lat, lon, maxDistance, city, state, country, status, limit } = req.query;
     const filter = {};
 
     //  Keyword filter (by title)
@@ -152,6 +152,14 @@ export const getJobs = async (req, res) => {
           $maxDistance: maxDistance ? parseInt(maxDistance) : 10000, // 10 km default
         },
       };
+    }
+
+    if (limit) {
+        const filteredJobs = await Job.find(
+            filter
+        ).populate("client", "name email roles").limit(limit);
+
+        res.json(filteredJobs);
     }
 
     const jobs = await Job.find(filter).populate("client", "name email roles");
