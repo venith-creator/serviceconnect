@@ -12,15 +12,14 @@
     <div class="flex-1 flex flex-col lg:ml-64 min-h-screen  overflow-x-hidden">
       <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-1.5">
             <button @click="toggleMobileSidebar" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
               <Menu class="h-6 w-6 text-gray-600" />
             </button>
             <h1 class="text-2xl font-bold text-gray-900">{{ getCurrentPageTitle() }}</h1>
           </div>
-          <div class="flex items-center space-x-4">
-
-            <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-1.5">
+            <div class="flex items-center space-x-1.5">
             <button
               @click="showSwitch = true"
               class="px-3 py-1 border rounded-lg text-sm text-gray-700 hover:bg-gray-50"
@@ -84,7 +83,7 @@ const sidebarItems = [
   { label: 'Chats', href: '/dashboard/client/Manageschat' },
   { label: 'Reviews', href: '/dashboard/client/ManagesReviews' },
   { label: 'Providers', href: '/dashboard/client/ViewProviders' },
-  { label: 'providersList', href: '/dashboard/client/ProvidersList' },
+  { label: 'Providers List', href: '/dashboard/client/ProvidersList' },
 ]
 const getCurrentPageTitle = () => sidebarItems.find(i => i.href === route.path)?.label || 'client'
 </script>

@@ -29,19 +29,10 @@
             </button>
             <h1 class="text-2xl font-bold text-gray-900">{{ getCurrentPageTitle() }}</h1>
           </div>
-          <div class="flex items-center space-x-2 relative">
-              <ProviderSettingsDropdown />
-            </div>
 
-          <div class="flex items-center space-x-4">
-            <div v-if="trialDaysRemaining > 0"
-                 class="flex items-center bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-1 rounded-lg text-sm">
-              <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                      clip-rule="evenodd"/>
-              </svg>
-              <span>{{ trialDaysRemaining }} days left in trial</span>
+          <div class="flex items-center space-x-1.5">
+            <div class="flex items-center space-x-1.5 relative">
+              <ProviderSettingsDropdown />
             </div>
             <button
               @click="showSwitch = true"
@@ -65,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onUnmounted, watch, computed} from 'vue'
+import {ref, onMounted, onUnmounted, watch, } from 'vue'
 import {useRoute} from 'vue-router'
 import {Menu,} from 'lucide-vue-next'
 import ProviderDashboardSidebar from './ProviderDashboardSidebar.vue'
@@ -77,15 +68,6 @@ import ProviderSettingsDropdown from '../components/provider/ProviderSettingsDro
 
 
 const showSwitch = ref(false)
-const trialDaysRemaining = computed(() => {
-  const trialEnd: Date = new Date()
-  trialEnd.setDate(trialEnd.getDate() + 14)
-
-  const today: Date = new Date()
-  const diffTime: number = trialEnd.getTime() - today.getTime()
-  const diffDays: number = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays > 0 ? diffDays : 0
-})
 
 const auth = useAuthStore()
 //const route = useRoute()
@@ -128,7 +110,7 @@ const sidebarItems = [
   {label: 'Proposals', href: '/dashboard/provider/ManagesProposals'},
   {label: 'Chats', href: '/dashboard/provider/Manageschats'},
   {label: 'Reviews', href: '/dashboard/provider/ManagesReview'},
-  {label: 'Portfolio', href: '/dashboard/provider/ProviderPortfolio'},
+  {label: 'Blog', href: '/dashboard/provider/ProviderPortfolio'},
 ]
 </script>
 

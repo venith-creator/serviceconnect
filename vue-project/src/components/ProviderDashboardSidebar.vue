@@ -7,10 +7,36 @@
     ]"
   >
     <div class="p-6 border-b border-gray-200 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <img src="/Service_connect_logo.png" alt="ServiceConnect Logo" class="w-8 h-8" />
-        <span class="font-bold text-xl text-gray-900">ServiceConnect</span>
+      <!-- Left side: logo + name + trial -->
+      <div class="flex items-start space-x-3">
+        <!-- Logo -->
+        <img
+          src="/Service_connect_logo.png"
+          alt="ServiceConnect Logo"
+          class="w-8 h-8 mt-1"
+        />
+
+        <!-- Name + Trial stacked -->
+        <div class="flex flex-col">
+          <span class="font-bold text-xl text-gray-900">ServiceConnect</span>
+
+          <div
+            v-if="trialDaysRemaining > 0"
+            class="flex items-center bg-yellow-50 border border-yellow-200 text-yellow-700 px-3 py-1 rounded-lg text-sm mt-1 w-fit"
+          >
+            <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>{{ trialDaysRemaining }} days left in trial</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Close button (mobile) -->
       <button
         @click="closeMobileSidebar"
         class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -29,7 +55,7 @@
         :class="[
           'w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors',
           isActive(item.path)
-            ? 'bg-blue-600 text-white'
+            ? 'bg-purple-600 text-white'
             : 'text-gray-700 hover:bg-gray-100'
         ]"
       >
@@ -61,7 +87,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Briefcase, MessageSquare, Star, X, User, LogOut, FileText, CreditCard, Video } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
@@ -79,7 +105,15 @@ const isActive = (href: string) => route.path === href
 const auth = useAuthStore()
 const email = ref('')
 watch(() => auth.user, (newUser) => { if (newUser) email.value = newUser.email }, { immediate: true })
+const trialDaysRemaining = computed(() => {
+  const trialEnd: Date = new Date()
+  trialEnd.setDate(trialEnd.getDate() + 14)
 
+  const today: Date = new Date()
+  const diffTime: number = trialEnd.getTime() - today.getTime()
+  const diffDays: number = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  return diffDays > 0 ? diffDays : 0
+})
 const menu = [
   { name: 'dashboard', label: 'Dashboard', path: '/dashboard/provider', icon: Briefcase },
   { name: 'viewJobs', label: 'View Jobs', path: '/dashboard/provider/viewjobs', icon: FileText },
@@ -87,6 +121,6 @@ const menu = [
   { name: 'chats', label: 'Chats', path: '/dashboard/provider/Manageschats', icon: MessageSquare },
   { name: 'reviews', label: 'Reviews', path: '/dashboard/provider/ManagesReview', icon: Star },
   { name: 'subscription', label: 'Subscription', path: '/dashboard/provider/subscription', icon: CreditCard },
-  { name: 'portfolio', label: 'Portfolio', path: '/dashboard/provider/ProviderPortfolio', icon: Video}
+  { name: 'Blog', label: 'Blog', path: '/dashboard/provider/ProviderPortfolio', icon: Video}
 ]
 </script>

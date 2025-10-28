@@ -14,6 +14,7 @@
         :key="p._id"
         class="bg-white rounded-xl shadow-md p-5 flex flex-col items-center text-center hover:shadow-lg transition"
       >
+       <div class="flex flex-col items-center flex-grow">
         <div class="w-20 h-20 rounded-full overflow-hidden bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xl shadow">
           <img
             v-if="p.user?.avatar"
@@ -56,10 +57,11 @@
             +{{ p.services.length - 2 }} more
           </p>
         </div>
+        </div>
 
         <button
           @click="goToProvider(p._id)"
-          class="mt-5 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg w-full font-medium transition"
+          class="mt-5 bg-purple-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg w-full font-medium transition self-end"
         >
           More about service provider
         </button>

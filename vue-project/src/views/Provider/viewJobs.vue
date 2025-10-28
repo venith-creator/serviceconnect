@@ -20,10 +20,10 @@
           class="border rounded-md px-3 py-2 text-sm w-full sm:w-48"
         >
           <option value="">All Categories</option>
-          <option>Web Development</option>
-          <option>Design</option>
-          <option>Marketing</option>
-          <option>Writing</option>
+          <option>Plumbing</option>
+          <option>Electrician</option>
+          <option>painter</option>
+          <option>Carpenter</option>
         </select>
 
         <input
@@ -36,7 +36,7 @@
 
         <button
           @click="findNearbyJobs"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+          class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
         >
           Find Jobs Near Me
         </button>

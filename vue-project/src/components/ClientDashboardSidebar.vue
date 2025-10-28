@@ -25,7 +25,7 @@
         :class="[
           'w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors',
           isActive(item.path)
-            ? 'bg-green-600 text-white'
+            ? 'bg-purple-600 text-white'
             : 'text-gray-700 hover:bg-gray-100'
         ]"
       >
@@ -79,8 +79,8 @@ const menu = [
   { name: 'jobs', label: 'My Jobs', path: '/dashboard/client/Managesjobs', icon: ToolCase },
   { name: 'chats', label: 'Chats', path: '/dashboard/client/Manageschat', icon: MessageSquare },
   { name: 'reviews', label: 'Reviews', path: '/dashboard/client/ManagesReviews', icon: Star },
-  { name: 'providers', label: 'Service Providers Blog', path: '/dashboard/client/ViewProviders', icon: Video },
   { name: 'providersList', label: 'Service Providers List', path: '/dashboard/client/ProvidersList', icon: Users },
+   { name: 'providers', label: 'Service Providers Blog', path: '/dashboard/client/ViewProviders', icon: Video },
 ]
 </script>
 
