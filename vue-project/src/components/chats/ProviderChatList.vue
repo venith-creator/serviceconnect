@@ -13,9 +13,10 @@
         :key="room._id"
         @click="openRoom(room)"
         :class="[
-          'p-3 rounded cursor-pointer bg-white hover:bg-gray-50',
-          selectedRoomId === room._id ? 'ring-2 ring-purple-300' : ''
-        ]"
+            'p-3 rounded-[27px] cursor-pointer bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200',
+            selectedRoomId === room._id ? 'ring-2 ring-purple-300' : ''
+          ]"
+
       >
         <div class="flex justify-between items-start">
           <div class="flex items-center gap-2">
