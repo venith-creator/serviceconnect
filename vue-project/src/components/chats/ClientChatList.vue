@@ -14,7 +14,8 @@
         @click="openRoom(room)"
         :class="[
           'p-3 rounded-[27px] cursor-pointer bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200',
-          selectedRoomId === room._id ? 'ring-2 ring-purple-300' : ''
+          selectedRoomId === room._id ? 'ring-2 ring-purple-300' : 'bg-white hover:bg-gray-50',
+          isUnread(room) ? 'bg-purple-50 border-l-4 border-purple-400' : ''
         ]"
 
       >
@@ -22,7 +23,10 @@
           <div class="flex items-center gap-2">
             <component :is="getIcon(room)" class="w-4 h-4 text-purple-500" v-if="getIcon(room)" />
             <div>
-              <div class="text-sm font-medium">{{ getDisplayName(room) }}</div>
+              <div class="text-sm" :class="isUnread(room) ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'">
+                {{ getDisplayName(room) }}
+              </div>
+              <div v-if="isUnread(room)" class="w-2 h-2 bg-purple-500 rounded-full ml-2"></div>
               <div class="text-xs text-gray-500">
                 {{ room.job?.title || getSubLabel(room) }}
               </div>
@@ -101,9 +105,22 @@ const fetchRooms = async () => {
   }
 };
 
-const openRoom = (room: any) => {
+const openRoom = async (room: any) => {
   selectedRoomId.value = room._id;
   emit('select', room);
+
+  // 🆕 Mark as read when user opens the chat
+  try {
+    await fetch(`${API_BASE_URL}/chats/room/${room._id}/read`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // locally remove user from unreadBy
+    const me = localStorage.getItem('userId');
+    room.unreadBy = (room.unreadBy || []).filter((id: string) => id !== me);
+  } catch (e) {
+    console.error('Failed to mark as read', e);
+  }
 };
 
 /*const otherName = (room: any) => {
@@ -118,6 +135,12 @@ const lastMessagePreview = (room: any) => {
 };
 
 const refresh = fetchRooms;
+
+const isUnread = (room: any) => {
+  const me = localStorage.getItem('userId');
+  return room.unreadBy?.includes(me);
+};
+
 
 onMounted(async () => {
   await fetchRooms();

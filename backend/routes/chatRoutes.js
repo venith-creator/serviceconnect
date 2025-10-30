@@ -4,6 +4,7 @@ import {
   createOrGetRoom,
   createClientProviderRoom,
   getRoomsForUser,
+  markRoomAsRead,
   getMessagesForRoom,
   sendMessage,
 } from "../controllers/chatController.js";
@@ -17,4 +18,5 @@ router.get("/rooms", protect, getRoomsForUser);
 router.get("/room/:roomId/messages", protect, getMessagesForRoom);
 router.post("/room/:roomId/message", protect, sendMessage);
 router.post("/room/client-provider", protect, createClientProviderRoom);
+router.patch("/room/:roomId/read", protect, markRoomAsRead);
 export default router;

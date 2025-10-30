@@ -345,7 +345,7 @@
             <h2 class="mt-3 text-xl font-semibold">Payment & Summary</h2>
             <p class="text-gray-600 mt-1">
               You’re on a <b>free 1-month trial</b>. After that, subscription required
-              ($20 first service, $10 each additional).
+              (£20 first service, £10 each additional).
             </p>
           </div>
 

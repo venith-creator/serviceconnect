@@ -1,6 +1,7 @@
 import ChatRoom from "../models/chatRoom.js";
 import Message from "../models/Message.js";
 import mongoose from "mongoose";
+import User from "../models/User.js";
 import { getIO } from "../utils/socket.js";
 
 let io = null;
@@ -282,6 +283,8 @@ export const sendMessage = async (req, res) => {
 
     // ✅ Update room lastMessage and updatedAt
     room.lastMessage = msg._id;
+    room.unreadBy = room.participants
+        .filter(p => p && p._id.toString() !== req.user._id.toString());
     await room.save();
 
     // ✅ Correct emit: broadcast to the chatRoom ID everyone joined
@@ -297,9 +300,35 @@ export const sendMessage = async (req, res) => {
   }
 };
 
+// ✅ Mark a chat room as read for the current user
+export const markRoomAsRead = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await ChatRoom.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ message: "Chat room not found" });
+    }
+
+    // Remove the current user from unreadBy
+    await ChatRoom.findByIdAndUpdate(roomId, {
+      $pull: { unreadBy: req.user._id },
+    });
+
+    res.json({ success: true, message: "Room marked as read" });
+  } catch (error) {
+    console.error("Error marking room as read:", error);
+    res.status(500).json({ message: "Failed to mark as read", error: error.message });
+  }
+};
+
+
 export const publishAnnouncementToChat = async (announcement) => {
+  try {
   const io = getIO();
   const { title, message, audience, createdBy } = announcement;
+  if (!title || !message || !createdBy)
+      throw new Error("Missing announcement fields");
 
   /*if (expiresAt && new Date(expiresAt) < new Date()) {
     console.log("⚠️ Skipping expired announcement:", title);
@@ -334,6 +363,24 @@ export const publishAnnouncementToChat = async (announcement) => {
 
   // ✅ Update lastMessage
   room.lastMessage = chatMessage._id;
+  try {
+      let audienceUsers = [];
+      if (audience === "all") {
+        audienceUsers = await User.find({}, "_id");
+      } else if (audience === "clients") {
+        audienceUsers = await User.find({ roles: { $in: ["client"] } }, "_id");
+      } else if (audience === "providers") {
+        audienceUsers = await User.find({ roles: { $in: ["provider"] } }, "_id");
+      }
+
+      const unreadFor = audienceUsers
+        .map((u) => u._id.toString())
+        .filter((id) => id !== createdBy.toString());
+
+      room.unreadBy = unreadFor;
+    } catch (unreadErr) {
+      console.warn("⚠️ Could not populate unreadBy:", unreadErr.message);
+    }
   await room.save();
 
   // ✅ Emit only to audience group
@@ -350,5 +397,10 @@ export const publishAnnouncementToChat = async (announcement) => {
     io.emit("announcement:new", { roomId: room._id, message: chatMessage });
   }
 
+   console.log("📢 Announcement published:", title);
   return chatMessage;
+  } catch (err) {
+    console.error("❌ publishAnnouncementToChat failed:", err);
+    throw err; // Let controller catch it
+  }
 };

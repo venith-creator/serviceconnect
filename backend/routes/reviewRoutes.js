@@ -5,6 +5,7 @@ import {
   getReviewsForProvider,
   getReviewsForClient,
   getMyReviews,
+  getReviewsAboutMe,
   deleteReview,
    getAllReviewsAdmin,
   getProviderRatingSummary
@@ -20,6 +21,7 @@ router.post("/", protect, authorizeRoles("client"), createReview);
 router.post("/provider", protect, authorizeRoles("provider"), providerCreateReview);
 
 router.get("/my", protect, getMyReviews);
+router.get("/about-me", protect, getReviewsAboutMe);
 router.get("/provider/:providerId", getReviewsForProvider);
 router.get("/client/:clientId", getReviewsForClient);
 router.get("/admin/all", protect, authorizeRoles("admin"), getAllReviewsAdmin);

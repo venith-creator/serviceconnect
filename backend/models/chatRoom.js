@@ -5,6 +5,7 @@ const chatRoomSchema = new mongoose.Schema({
   job: { type: mongoose.Schema.Types.ObjectId, ref: "Job" },
   systemName: { type: String, unique: true, sparse: true },
   lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
+  unreadBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 const ChatRoom = mongoose.models.ChatRoom || mongoose.model("ChatRoom", chatRoomSchema);

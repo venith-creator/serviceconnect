@@ -14,7 +14,8 @@
         @click="openRoom(room)"
         :class="[
             'p-3 rounded-[27px] cursor-pointer bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200',
-            selectedRoomId === room._id ? 'ring-2 ring-purple-300' : ''
+            selectedRoomId === room._id ? 'ring-2 ring-purple-300' : 'bg-white hover:bg-gray-50',
+            isUnread(room) ? 'bg-purple-50 border-l-4 border-purple-400' : ''
           ]"
 
       >
@@ -22,7 +23,10 @@
           <div class="flex items-center gap-2">
             <component :is="getIcon(room)" class="w-4 h-4 text-purple-500" v-if="getIcon(room)" />
             <div>
-              <div class="text-sm font-medium">{{ getDisplayName(room) }}</div>
+              <div class="text-sm" :class="isUnread(room) ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'">
+                {{ getDisplayName(room) }}
+              </div>
+              <div v-if="isUnread(room)" class="w-2 h-2 bg-purple-500 rounded-full ml-2"></div>
               <div class="text-xs text-gray-500">
                 {{ room.job?.title || getSubLabel(room) }}
               </div>
@@ -105,37 +109,27 @@ const fetchRooms = async () => {
   }
 }
 
-const openRoom = (room: any) => {
+const openRoom = async (room: any) => {
   selectedRoomId.value = room._id
-  emit('select', room)
+  emit('select', room);
+
+  try {
+    await fetch(`${API_BASE_URL}/chats/room/${room._id}/read`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // locally remove user from unreadBy
+    const me = localStorage.getItem('userId');
+    room.unreadBy = (room.unreadBy || []).filter((id: string) => id !== me);
+  } catch (e) {
+    console.error('Failed to mark as read', e);
+  }
 }
 
 const lastMessagePreview = (room: any) =>
   room.lastMessage?.text?.slice(0, 40) || ''
 
 const refresh = fetchRooms
-/*onMounted(() => {
-  if (!rooms.value.length) loadRooms();
-});
-const loadRooms = async () => {
-  if (loading.value) return;
-  loading.value = true;
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${API_BASE_URL}/chats/rooms`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  rooms.value = await res.json();
-  loading.value = false;
-};
-
-onMounted(async () => {
-  await fetchRooms()
-
-  const s = getSocket()
-  if (s) {
-    s.on('chat:new', handleNewChat)
-  }
-})*/
 
 onUnmounted(() => {
   const s = getSocket()
@@ -148,70 +142,11 @@ const handleNewChat = (room: any) => {
   }
 };
 
+const isUnread = (room: any) => {
+  const me = localStorage.getItem('userId');
+  return room.unreadBy?.includes(me);
+};
 
-/*onMounted(async () => {
-  await fetchRooms()
-
-  if (props.initialRoomId) {
-    const match = rooms.value.find(r => r._id === props.initialRoomId)
-    if (match) openRoom(match)
-  }
-
-  if (token) {
-    const s = connectSocket(token)
-    s.on('connect', () => {
-      const userId = localStorage.getItem("userId");
-      s.emit('registerRole', { role: 'provider' });
-      s.emit("register", { userId, role: "provider" });
-      console.log('✅ Registered role:', 'provider')
-    })
-    s.on("chat:new", () => fetchRooms());
-    s.on('message:new', () => fetchRooms())
-    s.on('announcement:new', () => fetchRooms())
-    s.on('reconnect', () => s.emit('registerRole', { role: 'provider' }))
-  }
-})*/
-
-/*onMounted(async () => {
-  if (loading.value) return;
-
-  loading.value = true;
-  await fetchRooms();
-  loading.value = false;
-
-  // Auto-select initial room if provided
-  if (props.initialRoomId) {
-    const match = rooms.value.find(r => r._id === props.initialRoomId);
-    if (match) openRoom(match);
-  }
-
-  // ✅ Connect socket once
-  if (token) {
-    const s = connectSocket(token);
-
-    s.on("connect", () => {
-      const userId = localStorage.getItem("userId");
-      s.emit("registerRole", { role: "provider" });
-      s.emit("register", { userId, role: "provider" });
-      console.log("✅ Registered provider socket:", s.id);
-    });
-
-    // Refresh rooms on relevant socket events
-    ["chat:new", "message:new", "announcement:new"].forEach(evt => {
-      s.off(evt);
-      s.on(evt, () => fetchRooms());
-    });
-
-    // Auto re-register if socket reconnects
-    s.off("reconnect");
-    s.on("reconnect", () => {
-      const userId = localStorage.getItem("userId");
-      s.emit("registerRole", { role: "provider" });
-      s.emit("register", { userId, role: "provider" });
-    });
-  }
-});
-*/
 onMounted(async () => {
   await fetchRooms();
 

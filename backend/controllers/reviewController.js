@@ -1,6 +1,7 @@
 // controllers/reviewController.js
 import Review from "../models/Review.js";
 import Job from "../models/Job.js";
+import ProviderProfile from "../models/ProviderProfile.js";
 import { recalcProviderRating } from "./providerProfileController.js";
 
 // CLIENT → PROVIDER
@@ -197,6 +198,54 @@ export const getMyReviews = async (req, res) => {
     res.status(500).json({ message: "Error fetching my reviews", error: error.message });
   }
 };
+export const getReviewsAboutMe = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Find provider profiles owned by this user
+    const myProviderProfiles = await ProviderProfile.find({ user: userId }).select("_id");
+
+    // Gather their IDs
+    const providerProfileIds = myProviderProfiles.map(p => p._id);
+
+    // Find reviews where:
+    // - revieweeUser = userId (as a client)
+    // - OR revieweeProvider in my provider profiles (as a provider)
+    const reviews = await Review.find({
+      $or: [
+        { revieweeUser: userId },
+        { revieweeProvider: { $in: providerProfileIds } },
+      ],
+    })
+      .populate("reviewer", "name email avatar")
+      .populate("job", "title")
+      .populate({
+        path: "revieweeProvider",
+        populate: { path: "user", select: "name email avatar" },
+      })
+      .populate("revieweeUser", "name email avatar")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // 4️⃣ Add unified "reviewee" field for convenience
+    const formatted = reviews.map(r => ({
+      ...r,
+      reviewee:
+        r.revieweeProvider?.user ||
+        r.revieweeUser ||
+        null,
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    console.error("Error fetching reviews about me:", error);
+    res.status(500).json({
+      message: "Error fetching reviews about me",
+      error: error.message,
+    });
+  }
+};
+
 
 export const deleteReview = async (req, res) => {
   try {
@@ -270,7 +319,6 @@ export const getAllReviewsAdmin = async (req, res) => {
 };
 
 // 📊 Admin Summary - Avg Ratings per Provider
-// controllers/reviewController.js
 export const getProviderRatingSummary = async (req, res) => {
   try {
     const summary = await Review.aggregate([

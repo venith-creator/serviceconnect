@@ -119,9 +119,9 @@
               class="mt-1 rounded border-gray-300 text-primary focus:ring-primary" />
             <label for="terms" class="ml-2 text-xs text-gray-600">
               I agree to the
-              <router-link to="/terms" class="text-primary">Terms of Service</router-link>
+              <router-link to="/terms" target="_blank" class="text-primary">Terms of Service</router-link>
               and
-              <router-link to="/privacy" class="text-primary">Privacy Policy</router-link> *
+              <router-link to="/privacy-policy" target="_blank" class="text-primary">Privacy Policy</router-link> *
             </label>
           </div>
 

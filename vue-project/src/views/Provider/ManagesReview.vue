@@ -98,6 +98,41 @@
 
           <p v-else class="text-gray-500 text-sm">No reviews yet.</p>
         </div>
+        <!-- Reviews About You -->
+        <div
+          class="bg-white rounded-xl shadow p-6 space-y-3 border border-gray-100 mt-8 h-[75vh] overflow-y-auto pr-2"
+        >
+          <h2 class="text-lg font-semibold text-gray-800">Reviews About You</h2>
+
+          <div v-if="reviewsAboutMe.length">
+            <div
+              v-for="rev in reviewsAboutMe"
+              :key="rev._id"
+              class="border-b py-4 space-y-2 text-sm"
+            >
+              <div class="flex justify-between items-center">
+                <p>
+                  <span class="font-semibold text-gray-800">
+                    From {{ rev.reviewer?.name || 'Unknown Reviewer' }}
+                  </span>
+                </p>
+                <span class="text-gray-500 text-xs italic">
+                  {{ rev.reviewerRole }}
+                </span>
+              </div>
+
+              <p class="text-gray-600"><strong>Job:</strong> {{ rev.job?.title || "N/A" }}</p>
+              <StarRating :rating="rev.rating" />
+              <p>{{ rev.comment }}</p>
+              <p class="text-xs text-gray-400">
+                {{ new Date(rev.createdAt).toLocaleDateString() }}
+              </p>
+            </div>
+          </div>
+
+          <p v-else class="text-gray-500 text-sm">No one has reviewed you yet.</p>
+        </div>
+
       </div>
     </div>
   </div>
@@ -115,6 +150,15 @@ const clientId = ref("");
 const rating = ref("");
 const comment = ref("");
 const reviews = ref<any[]>([]);
+const reviewsAboutMe = ref<any[]>([]);
+
+const loadReviewsAboutMe = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_BASE_URL}/reviews/about-me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.ok) reviewsAboutMe.value = await res.json();
+};
 
 const loadCompletedJobs = async () => {
   const token = localStorage.getItem("token");
@@ -177,6 +221,7 @@ const loadReviews = async () => {
 onMounted(() => {
   loadCompletedJobs();
   loadReviews();
+  loadReviewsAboutMe();
 });
 </script>
 
