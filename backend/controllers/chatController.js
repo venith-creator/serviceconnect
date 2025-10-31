@@ -8,7 +8,6 @@ let io = null;
 export const setSocketServer = (socketIo) => {
   io = socketIo;
 };
-
 export const createOrGetRoom = async (req, res) => {
   try {
     const { participants, jobId, isSystem } = req.body;

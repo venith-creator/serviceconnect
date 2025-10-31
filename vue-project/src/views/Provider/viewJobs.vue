@@ -34,6 +34,18 @@
           class="border rounded-md px-3 py-2 text-sm w-full sm:w-48"
         />
 
+        <select
+          v-model="filters.status"
+          @change="applyFilters"
+          class="border rounded-md px-3 py-2 text-sm w-full sm:w-48"
+        >
+          <option value="">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+
         <button
           @click="findNearbyJobs"
           class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
@@ -85,9 +97,16 @@
 
           <button
             @click="openProposalModal(job)"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg mx-auto block w-full"
+            :disabled="job.status?.toLowerCase() !== 'open' || hasAppliedToJob(job._id) "
+            class="transition text-white px-4 py-2 rounded-lg mx-auto block w-full
+            disabled:bg-gray-400 disabled:cursor-not-allowed
+            bg-purple-600 hover:bg-purple-700 text-white
+            disabled:bg-white disabled:border disabled:border-purple-600 disabled:text-purple-600"
           >
-            Send Quote
+           {{
+            hasAppliedToJob(job._id)
+            ? 'Applied'
+            :  getJobButtonText(job) }}
           </button>
         </div>
       </div>
@@ -210,16 +229,32 @@ interface Filters {
   keyword: string;
   category: string;
   location: string;
+  status?: string;
 }
 
 const jobs = ref<Job[]>([]);
-const filters = ref<Filters>({ keyword: "", category: "", location: "" });
+const myProposals = ref<any[]>([]);
+const filters = ref<Filters>({ keyword: "", category: "", location: "" , status: ""});
 const showModal = ref(false);
 const selectedJob = ref<Job | null>(null);
 const proposalForm = ref({ message: "", price: "", timelineEstimate: "" });
 
 const page = ref(1);
 const perPage = 6;
+
+const hasAppliedToJob = (jobId: string) => {
+  return myProposals.value.some((p) => p.job?._id === jobId);
+};
+
+const getJobButtonText = (job: Job) => {
+  const status = job.status?.toLowerCase();
+  if (status === "open") return "Send Quote";
+  if (status === "active") return "Already Taken";
+  if (status === "cancelled") return "Cancelled";
+  if (status === "completed") return "Completed";
+  return "Unavailable";
+};
+
 
 // ✅ FRONTEND FILTERING
 const filteredJobs = computed(() => {
@@ -238,7 +273,11 @@ const filteredJobs = computed(() => {
           .toLowerCase()
           .includes(filters.value.location.toLowerCase()));
 
-    return matchKeyword && matchCategory && matchLocation;
+    const matchStatus =
+      !filters.value.status ||
+      job.status?.toLowerCase() === filters.value.status.toLowerCase();
+
+    return matchKeyword && matchCategory && matchLocation && matchStatus;
   });
 });
 
@@ -291,6 +330,24 @@ const findNearbyJobs = async () => {
   }
 };
 
+const fetchMyProposals = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const res = await fetch(`${API_BASE_URL}/proposals/my`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Failed to fetch proposals");
+
+    const data = await res.json();
+    myProposals.value = data;
+  } catch (err) {
+    console.error("❌ Error fetching proposals:", err);
+  }
+};
+
+
 // 📨 Proposal submission
 const submitProposal = async () => {
   try {
@@ -336,5 +393,8 @@ const applyFilters = () => {
 
 const formatDate = (d?: string) => (d ? new Date(d).toLocaleDateString() : "N/A");
 
-onMounted(fetchJobs);
+onMounted(async () => {
+  await fetchJobs();
+  await fetchMyProposals();
+});
 </script>

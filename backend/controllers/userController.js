@@ -8,6 +8,7 @@ import multer from "multer";
 import { getUploader, getFileUrl } from "../middleware/upload.js";
 dotenv.config();
 import Job from "../models/Job.js";
+import { sendMail } from "../utils/email.js";
 
 
 const generateToken = (id, roles) => {
@@ -67,6 +68,70 @@ export const registerUser = async (req, res) => {
             services,
             providerOnboarding: role === "provider" ? false : undefined
         });
+
+        // ===============================
+        // ✉️ Send email notifications
+        // ===============================
+        try {
+          console.log("📨 Sending welcome email to:", user.email, "Role:", role);
+          // 1️⃣ Notify the user
+          const userSubject =
+            role === "provider"
+              ? "Welcome to Service Connect – Start Your Onboarding!"
+              : "Welcome to Service Connect – Find Trusted Service Providers!";
+
+          const userHtml =
+            role === "provider"
+              ? `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                  <h2>Welcome to Service Connect, ${name} 👋</h2>
+                  <p>We're excited to have you onboard as a service provider!</p>
+                  <p>To get started, please <strong>log in</strong> and complete your onboarding process. You’ll need to upload your proof documents, profile photo, and service details so homeowners can start hiring you.</p>
+                  <p>We encourage you to make your profile stand out by adding clear service rates and a detailed description of your expertise.</p>
+                  <p>Need help? Visit our <a href="https://serviceconnect.uk/contact" target="_blank">Contact Us</a> page for assistance.</p>
+                  <p>Welcome aboard,<br/>The Service Connect Team</p>
+                </div>
+              `
+              : `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                  <h2>Welcome to Service Connect, ${name} 👋</h2>
+                  <p>Thank you for joining our platform!</p>
+                  <p>You can now log in to your dashboard to <strong>find and hire trusted service providers</strong> in your area or <strong>post a job</strong> to receive proposals from professionals.</p>
+                  <p>Please take a moment to review our <a href="https://serviceconnect.uk/terms" target="_blank">Terms & Conditions</a> and <a href="https://serviceconnect.uk/privacy-policy" target="_blank">Privacy Policy</a>.</p>
+                  <p>Need help? Visit our <a href="https://serviceconnect.uk/contact" target="_blank">Contact Us</a> page.</p>
+                  <p>Welcome to a smarter way to get things done,<br/>The Service Connect Team</p>
+                </div>
+              `;
+
+          await sendMail(
+            user.email,
+            userSubject,
+            userSubject,
+            userHtml
+          );
+
+          // 2️⃣ Notify admin/support team
+          const adminHtml = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              <h3>New User Registration</h3>
+              <p><strong>Name:</strong> ${user.name}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Role:</strong> ${role}</p>
+              <p><strong>Phone:</strong> ${phone}</p>
+              <p>Check the admin dashboard for more details.</p>
+            </div>
+          `;
+
+          await sendMail(
+             process.env.EMAIL_USER,// internal notification address
+            `New ${role} Registered – ${name}`,
+            `A new ${role} has registered.`,
+            adminHtml
+          );
+        } catch (emailError) {
+          console.error("⚠️ Email sending failed:", emailError);
+        }
+
 
         await Job.updateMany(
           { clientEmail: email, client: { $exists: false } },
