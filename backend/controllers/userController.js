@@ -8,7 +8,7 @@ import multer from "multer";
 import { getUploader, getFileUrl } from "../middleware/upload.js";
 dotenv.config();
 import Job from "../models/Job.js";
-import { sendMail } from "../utils/email.js";
+import { sendMail } from "../utils/Email.js";
 
 
 const generateToken = (id, roles) => {
