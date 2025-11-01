@@ -183,9 +183,9 @@
                 If you have any questions about these Terms, please contact us:
               </p>
               <ul class="list-disc pl-6 mt-2 space-y-1 text-gray-600">
-                <li>By email: serviceconnectlimited@gmail.com</li>
+                <li>By email: support@serviceconnect.uk</li>
                 <li>By visiting our <router-link to="/contact" class="text-primary hover:underline">Contact Us</router-link> page</li>
-                <li>By phone: +44 7352 310353</li>
+                <li>By phone: +44 7440 110892</li>
               </ul>
             </div>
           </div>
