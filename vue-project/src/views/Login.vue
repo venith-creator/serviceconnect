@@ -105,16 +105,16 @@ const handleLogin = async () => {
 
     // Save token + user role
     // ✅ Save token + user
-localStorage.setItem("token", data.token);
-localStorage.setItem("user", JSON.stringify({
-  id: data._id,
-  _id: data._id,
-  name: data.name,
-  email: data.email,
-  roles: data.roles,
-  providerOnboarding: data.providerOnboarding
-}));
-localStorage.setItem("userId", data._id);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify({
+      id: data._id,
+      _id: data._id,
+      name: data.name,
+      email: data.email,
+      roles: data.roles,
+      providerOnboarding: data.providerOnboarding
+    }));
+    localStorage.setItem("userId", data._id);
 
 // ✅ Determine user role and connect socket
     const primaryRole = data.roles.includes("admin")
@@ -136,6 +136,7 @@ if (data.roles.includes("provider")) {
 
   if (profileRes.ok) {
     const profileData = await profileRes.json();
+    localStorage.setItem("providerSuspended", profileData.suspended ? "true" : "false");
     if (["pending", "approved", "rejected"].includes(profileData.status)) {
       localStorage.setItem("onboardingComplete", "true");
     } else {
@@ -143,9 +144,11 @@ if (data.roles.includes("provider")) {
     }
   } else {
     localStorage.removeItem("onboardingComplete");
+    localStorage.removeItem("providerSuspended");
   }
 } else {
   localStorage.removeItem("onboardingComplete");
+  localStorage.removeItem("providerSuspended");
 }
 // ✅ Redirect logic
 if (data.roles.includes("admin")) {

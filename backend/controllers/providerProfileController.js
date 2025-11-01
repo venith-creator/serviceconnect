@@ -584,6 +584,13 @@ export const getProviderStatus = async (req, res) => {
     }
     console.log("Provider status check:", req.user._id);
 
+    if (profile.suspended || profile.status === "suspended") {
+      return res.status(403).json({
+        message: "Your provider account has been suspended. Please contact support.",
+        suspended: true,
+      });
+    }
+
     const servicesStatus = profile.services.map(service => ({
       id: service._id,
       category: service.category,
@@ -596,6 +603,8 @@ export const getProviderStatus = async (req, res) => {
 
     res.json({
       status: profile.status,
+      suspended: profile.suspended,
+      approved: profile.approved,
       rejectionReason: profile.rejectionReason || "",
       hasActiveSubscription: profile.hasActiveSubscription,
       services: servicesStatus,

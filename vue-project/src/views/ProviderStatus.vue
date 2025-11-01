@@ -6,6 +6,21 @@
       </template>
 
       <template v-else>
+
+        <!-- Suspended -->
+        <div v-if="status === 'suspended'">
+          <h2 class="text-2xl font-bold text-red-600">Account Suspended</h2>
+          <p class="mt-3 text-gray-700">
+            Your provider account has been suspended. Please contact our support team for assistance.
+          </p>
+          <button
+            @click="contactSupport"
+            class="mt-4 px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Contact Support
+          </button>
+        </div>
+
         <!-- Pending -->
         <div v-if="status === 'pending'">
           <h2 class="text-2xl font-bold text-yellow-600">Waiting for admin review</h2>
@@ -92,7 +107,14 @@ const fetchStatus = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    if (!res.ok) throw new Error('Failed to fetch status');
+    if (!res.ok) {
+      const errData = await res.json();
+      if (errData.suspended) {
+        status.value = "suspended"; // 👈 show suspended section instead of redirect
+        return;
+      }
+      throw new Error(errData.message || "Failed to fetch status");
+    }
     const data = await res.json();
     status.value = data.status;
     rejectionReason.value = data.rejectionReason || '';

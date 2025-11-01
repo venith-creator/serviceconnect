@@ -98,7 +98,14 @@ async function goToDashboard(role) {
   if (role === "provider") {
     const token = localStorage.getItem("token");
     const onboardingComplete = localStorage.getItem("onboardingComplete") === "true";
+    const suspended = localStorage.getItem("providerSuspended") === "true";
     const providerApproved = userId && (localStorage.getItem(`providerApproved_${userId}`) === "true");
+
+    if (suspended) {
+      alert("Your provider account has been suspended. Please contact support via the Contact page.");
+      router.push("/contact");
+      return;
+    }
 
     if (providerApproved) {
       router.push("/dashboard/provider");
@@ -115,10 +122,24 @@ async function goToDashboard(role) {
       const res = await fetch(`${API_BASE_URL}/provider-profiles/provider-status`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to fetch status");
+      if (!res.ok) {
+          const errData = await res.json();
+          if (errData.suspended) {
+            alert(errData.message || "Your provider account has been suspended.");
+            router.push("/contact");
+            return;
+          }
+          throw new Error(errData.message || "Failed to fetch status");
+        }
+
       const data = await res.json();
 
       if (userId) {
+        if (data.status === "suspended" || data.suspended) {
+            alert("Your provider account has been suspended. Please contact us through our Contact page.");
+            router.push("/contact");
+            return;
+          }
       if (data.status === "approved") {
         localStorage.setItem(`providerApproved_${userId}`, "true");
         router.push("/dashboard/provider");

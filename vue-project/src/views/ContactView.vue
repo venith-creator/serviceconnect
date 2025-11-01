@@ -59,7 +59,7 @@
                 type="tel"
                 id="whatsapp"
                 pattern="^\+?[1-9]\d{7,14}$"
-                placeholder="Include your country code (e.g. +2348130000000)"
+                placeholder="Include your country code (e.g. +448130000000)"
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 required
                 :disabled="submitting"
@@ -128,20 +128,34 @@
             </div>
 
             <div class="space-y-6">
+              <!-- Email -->
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Chat With Us</h3>
-                <a href="mailto:support@serviceconnect.uk" class="text-gray-700 hover:text-primary transition-colors">
-                  support@serviceconnect.uk
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <Mail class="w-5 h-5 text-primary" />
+                  Email Us
+                </h3>
+                <a
+                  href="mailto:support@serviceconnect.uk"
+                  class="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors"
+                >
+                  <Mail class="w-5 h-5" />
+                  <span>Email us directly at <strong>support@serviceconnect.uk</strong></span>
                 </a>
               </div>
 
+              <!-- WhatsApp -->
               <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">WhatsApp</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <MessageCircle class="w-5 h-5 text-green-600" />
+                  WhatsApp
+                </h3>
                 <a
-                  href="https://wa.me/2348130000000"
-                  class="text-gray-700 hover:text-primary transition-colors"
+                  target="_blank"
+                  href="https://wa.me/447440110892"
+                  class="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors"
                 >
-                  +44 813 000 0000
+                  <MessageCircle class="w-5 h-5" />
+                  <span>Chat with us directly on WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -187,6 +201,7 @@
 import { ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 import { API_BASE_URL } from '@/config'
+import { Mail, MessageCircle } from "lucide-vue-next";
 
 const toast = useToast()
 

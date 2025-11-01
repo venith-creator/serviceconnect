@@ -18,7 +18,7 @@ const providerProfileSchema = new mongoose.Schema({
     }
   ],
 
-  status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+  status: { type: String, enum: ["pending", "approved", "rejected", "suspended"], default: "pending" },
   rejectionReason: { type: String, default: "" },
   docs: [
     {
