@@ -146,7 +146,9 @@
               <!-- WhatsApp -->
               <div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                  <MessageCircle class="w-5 h-5 text-green-600" />
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
+                      alt="WhatsApp"
+                      class="w-5 h-5 text-green-600" />
                   WhatsApp
                 </h3>
                 <a
@@ -154,7 +156,9 @@
                   href="https://wa.me/447440110892"
                   class="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors"
                 >
-                  <MessageCircle class="w-5 h-5" />
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg"
+                      alt="WhatsApp"
+                      class="w-5 h-5" />
                   <span>Chat with us directly on WhatsApp</span>
                 </a>
               </div>
@@ -201,7 +205,7 @@
 import { ref } from 'vue'
 import { useToast } from 'vue-toast-notification'
 import { API_BASE_URL } from '@/config'
-import { Mail, MessageCircle } from "lucide-vue-next";
+import { Mail } from "lucide-vue-next";
 
 const toast = useToast()
 
